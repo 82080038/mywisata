@@ -83,9 +83,17 @@ mulai dari konsep, analisis, desain, implementasi modul, hingga deployment.
 
 | No | Dokumen | Deskripsi |
 |----|---------|-----------|
-| 27 | `27_PANDUAN_INSTALASI_LOKAL.md` | Setup lingkungan development lokal (XAMPP/LAMPP), konfigurasi, import database, troubleshooting |
+| 27 | `27_PANDUAN_INSTALASI_LOKAL.md` | Setup lingkungan development lokal (XAMPP/LAMPP), konfigurasi, import database, troubleshooting, multi-environment config |
 | 28 | `28_STANDAR_KODE_KONTRIBUSI.md` | Standar penulisan kode PHP/JS/CSS, Git workflow, kontribusi tim, code review checklist |
 | 29 | `29_CHECKLIST_PENGEMBANGAN.md` | Checklist per fase pengembangan, acceptance criteria per modul, definisi selesai (Definition of Done) |
+
+### Bagian Tambahan — Prompting System
+
+| No | Dokumen | Deskripsi |
+|----|---------|-----------|
+| - | `prompting/README.md` | Panduan sistem prompting untuk autonomous development |
+| - | `prompting/README_SETUP.md` | Panduan setup konfigurasi multi-environment (Windows & Linux) |
+| - | `prompting/config.json` | Konfigurasi terpusat untuk development di multiple komputer |
 
 ### Bagian IX — Diagram, Glosarium & Audit
 

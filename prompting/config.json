@@ -1,0 +1,192 @@
+{
+  "project_info": {
+    "name": "Tour Guide Application",
+    "tech_stack": {
+      "backend": "PHP 8.1+",
+      "database": "MySQL 8.0+",
+      "frontend": "Bootstrap 5",
+      "javascript": "jQuery",
+      "architecture": "MVC"
+    }
+  },
+  "starting_point": {
+    "start_module": "05_DESAIN_DATABASE_MYSQL_ERD",
+    "modules_completed": [],
+    "modules_in_progress": [],
+    "resume_from_state": false
+  },
+  "environments": {
+    "local": {
+      "database": {
+        "host": "localhost",
+        "port": "3306",
+        "username": "root",
+        "password": "",
+        "database_name": "mywisata",
+        "charset": "utf8mb4",
+        "collation": "utf8mb4_unicode_ci"
+      },
+      "url": "http://localhost/mywisata",
+      "os_specific": {
+        "linux": {
+          "project_root": "/opt/lampp/htdocs/mywisata",
+          "php_path": "/opt/lampp/bin/php",
+          "mysql_path": "/opt/lampp/bin/mysql",
+          "composer_path": "/usr/local/bin/composer",
+          "sudo_password": "8208",
+          "phpmyadmin_password": "8208",
+          "phpmyadmin_url": "http://localhost/phpmyadmin"
+        },
+        "windows": {
+          "project_root": "C:\\xampp\\htdocs\\mywisata",
+          "php_path": "C:\\xampp\\php\\php.exe",
+          "mysql_path": "C:\\xampp\\mysql\\bin\\mysql.exe",
+          "composer_path": "C:\\ProgramData\\ComposerSetup\\bin\\composer.bat",
+          "sudo_password": null,
+          "phpmyadmin_password": "8208",
+          "phpmyadmin_url": "http://localhost/phpmyadmin"
+        }
+      }
+    },
+    "staging": {
+      "database": {
+        "host": null,
+        "port": "3306",
+        "username": null,
+        "password": null,
+        "database_name": "mywisata_staging",
+        "charset": "utf8mb4",
+        "collation": "utf8mb4_unicode_ci"
+      },
+      "url": null,
+      "os_specific": {
+        "linux": {
+          "project_root": null,
+          "php_path": "/usr/bin/php",
+          "mysql_path": "/usr/bin/mysql",
+          "composer_path": "/usr/local/bin/composer",
+          "sudo_password": null,
+          "phpmyadmin_password": null,
+          "phpmyadmin_url": null
+        },
+        "windows": {
+          "project_root": null,
+          "php_path": null,
+          "mysql_path": null,
+          "composer_path": null,
+          "sudo_password": null,
+          "phpmyadmin_password": null,
+          "phpmyadmin_url": null
+        }
+      }
+    },
+    "production": {
+      "database": {
+        "host": null,
+        "port": "3306",
+        "username": null,
+        "password": null,
+        "database_name": "mywisata_prod",
+        "charset": "utf8mb4",
+        "collation": "utf8mb4_unicode_ci"
+      },
+      "url": null,
+      "os_specific": {
+        "linux": {
+          "project_root": null,
+          "php_path": "/usr/bin/php",
+          "mysql_path": "/usr/bin/mysql",
+          "composer_path": "/usr/local/bin/composer",
+          "sudo_password": null,
+          "phpmyadmin_password": null,
+          "phpmyadmin_url": null
+        },
+        "windows": {
+          "project_root": null,
+          "php_path": null,
+          "mysql_path": null,
+          "composer_path": null,
+          "sudo_password": null,
+          "phpmyadmin_password": null,
+          "phpmyadmin_url": null
+        }
+      }
+    }
+  },
+  "api_keys": {
+    "openstreetmap": "free_no_api_key_required",
+    "payment_gateway": null,
+    "email_service": null,
+    "sms_service": null,
+    "other": {}
+  },
+  "permissions": {
+    "auto_write_files": true,
+    "auto_execute_commands": false,
+    "auto_database_changes": false,
+    "approval_required_for": [
+      "database_changes",
+      "deployment",
+      "production_changes"
+    ]
+  },
+  "escalation": {
+    "contact_method": "IDE Chat",
+    "escalation_criteria": [
+      "Critical security issues",
+      "Database corruption",
+      "Unrecoverable errors",
+      "Ambiguous requirements",
+      "Architecture conflicts"
+    ],
+    "auto_escalate_after_retries": 3
+  },
+  "testing": {
+    "test_environment": "local",
+    "auto_run_tests": true,
+    "test_coverage_target": 80
+  },
+  "deployment": {
+    "deployment_method": "manual",
+    "auto_deploy": false,
+    "deployment_target": null
+  },
+  "scope": {
+    "skip_modules": [],
+    "priority_modules": [
+      "05_DESAIN_DATABASE_MYSQL_ERD",
+      "06_MODUL_AUTHENTICATION",
+      "07_MODUL_ADMINISTRATOR"
+    ],
+    "must_have_features": [],
+    "nice_to_have_features": [],
+    "deadline": null
+  },
+  "preferences": {
+    "coding_style": "PSR-12",
+    "architecture_patterns": [
+      "MVC",
+      "Repository Pattern",
+      "Service Layer"
+    ],
+    "library_preferences": {
+      "php": "8.1+",
+      "database": "MySQL 8.0+",
+      "frontend": "Bootstrap 5",
+      "javascript": "jQuery"
+    },
+    "performance_requirements": {
+      "response_time": "< 500ms",
+      "concurrent_users": "1000+"
+    },
+    "security_standards": [
+      "OWASP Top 10",
+      "Input Validation",
+      "SQL Injection Prevention",
+      "XSS Prevention",
+      "CSRF Protection"
+    ]
+  },
+  "collected_at": "2026-06-30T21:27:00+07:00",
+  "last_updated": "2026-06-30T21:32:00+07:00"
+}

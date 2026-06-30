@@ -99,29 +99,66 @@ mywisata/
    xcopy mywisata C:\xampp\htdocs\mywisata /E /I
    ```
 
-2. **Start Apache & MySQL** via XAMPP Control Panel
-
-3. **Buat database**
-   ```bash
-   /opt/lampp/bin/mysql -u root -e "CREATE DATABASE tour_guide_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+2. **Konfigurasi Environment**
+   
+   Edit file `prompting/config.json` sesuai environment Anda (Linux/Windows):
+   ```json
+   {
+     "environments": {
+       "local": {
+         "os_specific": {
+           "linux": {
+             "project_root": "/opt/lampp/htdocs/mywisata",
+             "php_path": "/opt/lampp/bin/php",
+             "mysql_path": "/opt/lampp/bin/mysql"
+           },
+           "windows": {
+             "project_root": "C:\\xampp\\htdocs\\mywisata",
+             "php_path": "C:\\xampp\\php\\php.exe",
+             "mysql_path": "C:\\xampp\\mysql\\bin\\mysql.exe"
+           }
+         }
+       }
+     }
+   }
    ```
 
-4. **Import schema & seed data**
+3. **Start Apache & MySQL** via XAMPP Control Panel
+
+4. **Buat database**
    ```bash
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/seed.sql
+   # Linux
+   /opt/lampp/bin/mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+   # Windows
+   C:\xampp\mysql\bin\mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
 
-5. **Konfigurasi koneksi** di `app/config/database.php` dan `app/config/config.php`
+5. **Import schema & seed data**
+   ```bash
+   # Linux
+   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/migration.sql
+   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/seed.sql
 
-6. **Set permissions (Linux)**
+   # Windows
+   C:\xampp\mysql\bin\mysql -u root mywisata < C:\xampp\htdocs\mywisata\database\migration.sql
+   C:\xampp\mysql\bin\mysql -u root mywisata < C:\xampp\htdocs\mywisata\database\seed.sql
+   ```
+
+6. **Konfigurasi koneksi** di `app/config/database.php` dan `app/config/config.php`
+
+7. **Set permissions (Linux)**
    ```bash
    chmod -R 777 /opt/lampp/htdocs/mywisata/public/uploads
    chmod -R 777 /opt/lampp/htdocs/mywisata/logs
    chmod -R 777 /opt/lampp/htdocs/mywisata/database/backup
    ```
 
-7. **Akses aplikasi** di browser: `http://localhost/mywisata/`
+8. **Akses aplikasi** di browser: `http://localhost/mywisata/`
+
+### Multi-Environment Support
+
+Aplikasi ini mendukung development di multiple komputer (Windows & Linux) dengan konfigurasi terpusat di `prompting/config.json`. Lihat [`prompting/README_SETUP.md`](prompting/README_SETUP.md) untuk panduan setup lengkap.
 
 ### Login Default
 

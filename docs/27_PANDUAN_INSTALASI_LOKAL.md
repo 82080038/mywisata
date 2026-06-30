@@ -12,6 +12,10 @@ Panduan instalasi lingkungan development lokal untuk Tour Guide Application
 menggunakan XAMPP (Windows) atau LAMPP (Linux) dengan PHP 8.1+, MySQL 8.0+,
 dan Apache.
 
+**PENTING:** Aplikasi ini mendukung development di multiple komputer (Windows & Linux)
+dengan konfigurasi terpusat di `prompting/config.json`. Lihat bagian **Konfigurasi
+Multi-Environment** di bawah.
+
 ---
 
 ## 2. PRASYARAT
@@ -201,7 +205,7 @@ Edit `app/config/database.php`:
 ```php
 return [
     'host'    => 'localhost',
-    'dbname'  => 'tour_guide_app',
+    'dbname'  => 'mywisata',
     'user'    => 'root',
     'pass'    => '',           // XAMPP default: kosong
     'charset' => 'utf8mb4',
@@ -211,10 +215,109 @@ return [
 Edit `app/config/config.php`:
 
 ```php
-define('BASE_URL', 'http://localhost/wisata/');
+define('BASE_URL', 'http://localhost/mywisata/');
 define('APP_ENV', 'development');  // development | production
 define('APP_DEBUG', true);         // true di dev, false di prod
 ```
+
+---
+
+## 6.5 KONFIGURASI MULTI-ENVIRONMENT (WAJIB)
+
+Aplikasi ini mendukung development di multiple komputer (Windows & Linux) dengan
+konfigurasi terpusat. **WAJIB** mengkonfigurasi file ini sebelum memulai development.
+
+### 6.5.1 Edit File Config
+
+Edit file `prompting/config.json`:
+
+```bash
+# Linux
+nano /opt/lampp/htdocs/mywisata/prompting/config.json
+
+# Windows
+notepad C:\xampp\htdocs\mywisata\prompting\config.json
+```
+
+### 6.5.2 Struktur Config
+
+File config.json memiliki struktur berikut:
+
+```json
+{
+  "environments": {
+    "local": {
+      "database": {
+        "host": "localhost",
+        "port": "3306",
+        "username": "root",
+        "password": "",
+        "database_name": "mywisata"
+      },
+      "os_specific": {
+        "linux": {
+          "project_root": "/opt/lampp/htdocs/mywisata",
+          "php_path": "/opt/lampp/bin/php",
+          "mysql_path": "/opt/lampp/bin/mysql",
+          "sudo_password": "8208",
+          "phpmyadmin_password": "8208"
+        },
+        "windows": {
+          "project_root": "C:\\xampp\\htdocs\\mywisata",
+          "php_path": "C:\\xampp\\php\\php.exe",
+          "mysql_path": "C:\\xampp\\mysql\\bin\\mysql.exe",
+          "sudo_password": null,
+          "phpmyadmin_password": "8208"
+        }
+      }
+    }
+  }
+}
+```
+
+### 6.5.3 Sesuaikan dengan Environment Anda
+
+**Untuk Linux:**
+- Pastikan `project_root` sesuai dengan lokasi project
+- Pastikan `php_path` dan `mysql_path` benar
+- Isi `sudo_password` jika diperlukan
+- Isi `phpmyadmin_password`
+
+**Untuk Windows:**
+- Pastikan `project_root` sesuai dengan lokasi project (gunakan double backslash `\\`)
+- Pastikan `php_path` dan `mysql_path` benar
+- `sudo_password` bisa null (tidak dipakai di Windows)
+- Isi `phpmyadmin_password`
+
+### 6.5.4 Environment Lain (Opsional)
+
+Jika ada environment staging atau production, isi juga bagian:
+- `environments.staging` - untuk staging server
+- `environments.production` - untuk production server
+
+### 6.5.5 Validasi Config
+
+Setelah mengedit, validasi bahwa file JSON valid:
+
+```bash
+# Linux
+python3 -m json.tool /opt/lampp/htdocs/mywisata/prompting/config.json
+
+# Windows (jika ada Python)
+python -m json.tool C:\xampp\htdocs\mywisata\prompting\config.json
+```
+
+Jika ada error JSON, perbaiki syntax (kurung kurawal, koma, quote).
+
+### 6.5.6 Penggunaan Config
+
+File config.json ini akan:
+- Dibaca otomatis oleh AI development assistant (Cascade/Devin)
+- Digunakan untuk menentukan paths yang benar sesuai OS
+- Menyimpan credentials yang aman untuk multiple environment
+- Mengizinkan development paralel di multiple komputer
+
+Lihat [`prompting/README_SETUP.md`](../prompting/README_SETUP.md) untuk panduan lebih detail.
 
 ---
 

@@ -27,6 +27,24 @@ prompting/
 
 ## HOW TO USE
 
+### 0. Setup Configuration (WAJIB)
+
+Sebelum menggunakan sistem prompting, **WAJIB** mengkonfigurasi file `config.json`:
+
+```bash
+# Edit file konfigurasi
+prompting/config.json
+```
+
+File ini berisi:
+- **Environment config** untuk Linux & Windows (paths, database credentials, passwords)
+- **API keys** untuk third-party services
+- **Permissions** untuk auto-execution
+- **Starting point** untuk development
+- **Preferences** untuk coding style dan architecture
+
+Lihat [`README_SETUP.md`](README_SETUP.md) untuk panduan setup lengkap.
+
 ### 1. Autonomous Development
 
 Use the master prompting cycle from `05_cycle/00_MASTER_PROMPTING_CYCLE.md`:
@@ -41,6 +59,8 @@ START_FROM_MODULE: [MODULE_NAME]
 
 [Rest of the master prompt...]
 ```
+
+**Note:** AI akan membaca `prompting/config.json` untuk mendapatkan konfigurasi environment secara otomatis.
 
 ### 2. Manual Development
 
