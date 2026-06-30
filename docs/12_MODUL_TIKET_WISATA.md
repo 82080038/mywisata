@@ -1,6 +1,6 @@
 # MODUL 12 — MODUL TIKET WISATA
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -170,6 +170,21 @@ class DestinationController extends Controller {
 | POST | `api/ticket/buy` | Beli tiket |
 | GET | `api/ticket/my` | Tiket saya |
 | POST | `api/ticket/verify` | Verifikasi tiket (admin/guide) |
+
+---
+
+## 8. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Security:** QR code dengan digital signature untuk anti-fraud
+- [ ] **Security:** Rate limiting untuk pembelian tiket
+- [ ] **Performance:** Cache QR code generation
+- [ ] **Validation:** Validasi kuota harian sebelum pembayaran
+- [ ] **Analytics:** Track ticket sales dan conversion rate
+- [ ] **Notification:** Kirim email/SMS setelah pembelian berhasil
+- [ ] **Backup:** Backup data tiket harian
+- [ ] **Recovery:** Implementasi refund mechanism
 
 ---
 

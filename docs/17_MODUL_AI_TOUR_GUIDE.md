@@ -1,6 +1,6 @@
 # MODUL 17 — MODUL AI TOUR GUIDE
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -308,6 +308,21 @@ FAQ Entry:
 - keyword: "jam buka"
 - response: "Jam buka destinasi bervariasi, umumnya 08:00-17:00. Cek detail destinasi untuk info akurat."
 ```
+
+---
+
+## 8. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **ML Integration:** Pertimbangkan integrasi dengan ML API untuk NLP yang lebih advanced
+- [ ] **Performance:** Cache AI responses untuk pertanyaan yang sering muncul
+- [ ] **Analytics:** Track AI chat interactions dan user satisfaction
+- [ ] **Privacy:** Anonimisasi data chat untuk training model
+- [ ] **Fallback:** Fallback ke human support jika AI tidak bisa menjawab
+- [ ] **Testing:** A/B test AI responses untuk improvement
+- [ ] **Knowledge Base:** Regular update knowledge base dengan FAQ baru
+- [ ] **Rate Limiting:** Rate limiting untuk API endpoint AI chat
 
 ---
 

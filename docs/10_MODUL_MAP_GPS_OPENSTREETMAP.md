@@ -1,7 +1,7 @@
 # MODUL 10 — MODUL MAP & GPS (OpenStreetMap)
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -227,6 +227,21 @@ public function getNearby($lat, $lng, $radiusKm) {
 | Leaflet | unpkg.com/leaflet@1.9.4 | Peta utama |
 | Leaflet.markercluster | cdn.jsdelivr.net/npm/leaflet.markercluster | Cluster marker |
 | Leaflet Routing Machine | cdn.jsdelivr.net/npm/leaflet-routing-machine | Routing |
+
+---
+
+## 13. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Security:** Rate limiting untuk API endpoint map
+- [ ] **Performance:** Implementasi offline maps untuk area yang sering dikunjungi
+- [ ] **Privacy:** Request izin lokasi user dengan jelas
+- [ ] **Analytics:** Track map interactions (marker clicks, route requests)
+- [ ] **Caching:** Cache tile images dengan browser caching
+- [ ] **Fallback:** Fallback ke Google Maps jika OSM down
+- [ ] **Geofencing:** Implementasi geofencing untuk area wisata
+- [ ] **Accessibility:** Pastikan peta accessible untuk screen reader
 
 ---
 

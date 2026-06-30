@@ -1,6 +1,6 @@
 # MODUL 11 — MODUL BOOKING & TRANSAKSI
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -237,6 +237,180 @@ class BookingController extends Controller {
         </form>
     </div>
 </div>
+```
+
+---
+
+## 8. PAYMENT GATEWAY FALLBACK STRATEGY
+
+**Status:** Not Implemented — HIGH PRIORITY
+
+Implementasi multiple payment gateways dengan fallback:
+
+```php
+// app/services/PaymentGatewayService.php
+class PaymentGatewayService {
+    private $gateways = [
+        'midtrans' => MidtransGateway::class,
+        'xendit' => XenditGateway::class,
+        'stripe' => StripeGateway::class,
+    ];
+    private $primaryGateway = 'midtrans';
+    private $fallbackOrder = ['xendit', 'stripe'];
+
+    public function createPayment(array $data): array {
+        // Try primary gateway
+        try {
+            return $this->useGateway($this->primaryGateway, $data);
+        } catch (PaymentGatewayException $e) {
+            $this->logError($this->primaryGateway, $e);
+            
+            // Try fallback gateways
+            foreach ($this->fallbackOrder as $gateway) {
+                try {
+                    return $this->useGateway($gateway, $data);
+                } catch (PaymentGatewayException $e) {
+                    $this->logError($gateway, $e);
+                }
+            }
+            
+            throw new PaymentException('All payment gateways failed');
+        }
+    }
+
+    private function useGateway(string $gatewayName, array $data): array {
+        $gateway = new $this->gateways[$gatewayName]();
+        return $gateway->createPayment($data);
+    }
+}
+```
+
+### Payment Retry Logic with Exponential Backoff
+
+```php
+// app/services/PaymentRetryService.php
+class PaymentRetryService {
+    private $maxRetries = 3;
+    private $baseDelay = 1000; // 1 second
+
+    public function retryPayment(string $transactionId): bool {
+        $attempt = 0;
+        $delay = $this->baseDelay;
+
+        while ($attempt < $this->maxRetries) {
+            $attempt++;
+            
+            try {
+                $result = $this->processPayment($transactionId);
+                if ($result['success']) {
+                    return true;
+                }
+            } catch (Exception $e) {
+                if ($attempt === $this->maxRetries) {
+                    throw $e;
+                }
+            }
+
+            // Exponential backoff
+            usleep($delay * 1000);
+            $delay *= 2;
+        }
+
+        return false;
+    }
+}
+```
+
+---
+
+## 9. DATABASE ROW-LEVEL LOCKING FOR BOOKINGS
+
+**Status:** Not Implemented — HIGH PRIORITY
+
+Mencegah double booking dengan row-level locking:
+
+```php
+// app/services/BookingService.php
+class BookingService {
+    public function createBooking(array $data): int {
+        $db = Database::getInstance();
+        
+        try {
+            $db->beginTransaction();
+            
+            // Lock guide availability row
+            $sql = "SELECT * FROM guide_schedules 
+                    WHERE guide_id = :guide_id AND date = :date 
+                    FOR UPDATE";
+            $schedule = $db->query($sql, [
+                'guide_id' => $data['guide_id'],
+                'date' => $data['booking_date']
+            ])->fetch();
+
+            if (!$schedule || $schedule['status'] !== 'available') {
+                throw new BookingException('Guide tidak tersedia');
+            }
+
+            // Check concurrent bookings
+            $sql = "SELECT COUNT(*) as cnt FROM bookings 
+                    WHERE guide_id = :guide_id AND booking_date = :date 
+                    AND status IN ('pending', 'confirmed')";
+            $count = $db->query($sql, [
+                'guide_id' => $data['guide_id'],
+                'date' => $data['booking_date']
+            ])->fetch()['cnt'];
+
+            if ($count >= $schedule['max_bookings']) {
+                throw new BookingException('Guide sudah penuh');
+            }
+
+            // Create booking
+            $sql = "INSERT INTO bookings (user_id, guide_id, booking_date, guests, status, created_at) 
+                    VALUES (:user_id, :guide_id, :booking_date, :guests, 'pending', NOW())";
+            $db->query($sql, $data);
+            $bookingId = (int) $db->lastInsertId();
+
+            // Update schedule
+            $sql = "UPDATE guide_schedules 
+                    SET status = 'booked' 
+                    WHERE guide_id = :guide_id AND date = :date";
+            $db->query($sql, [
+                'guide_id' => $data['guide_id'],
+                'date' => $data['booking_date']
+            ]);
+
+            $db->commit();
+            return $bookingId;
+
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
+    }
+}
+```
+
+### Optimistic Locking Alternative
+
+```php
+// Using version column for optimistic locking
+public function updateBooking(int $bookingId, array $data): bool {
+    $sql = "UPDATE bookings 
+            SET status = :status, version = version + 1 
+            WHERE id = :id AND version = :version";
+    
+    $result = $this->db->query($sql, [
+        'status' => $data['status'],
+        'id' => $bookingId,
+        'version' => $data['version']
+    ]);
+
+    if ($result->rowCount() === 0) {
+        throw new ConcurrencyException('Booking diupdate oleh user lain');
+    }
+
+    return true;
+}
 ```
 
 ---

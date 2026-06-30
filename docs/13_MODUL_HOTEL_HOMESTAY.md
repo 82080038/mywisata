@@ -1,6 +1,6 @@
 # MODUL 13 — MODUL HOTEL & HOMESTAY
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -179,6 +179,21 @@ class HotelController extends Controller {
     </div>
 </div>
 ```
+
+---
+
+## 7. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Validation:** Validasi ketersediaan kamar sebelum booking
+- [ ] **Security:** Rate limiting untuk pencarian dan booking
+- [ ] **Payment:** Integrasi dengan payment gateway untuk deposit
+- [ ] **Notification:** Kirim email/SMS konfirmasi booking
+- [ ] **Analytics:** Track hotel search dan booking conversion
+- [ ] **Cancellation:** Implementasi cancellation policy
+- [ ] **Review:** Integrasi dengan modul review untuk rating
+- [ ] **Map:** Integrasi dengan modul map untuk lokasi hotel
 
 ---
 

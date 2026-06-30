@@ -1,6 +1,6 @@
 # MODUL 25 — DEPLOYMENT SERVER
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -226,9 +226,105 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
 ---
 
-## 9. OPTIMISASI PRODUKSI
+## 9. PRODUCTION MONITORING & SCALING
 
-### 9.1 PHP
+### 9.1 Application Performance Monitoring (APM)
+
+**Status:** Not Implemented — HIGH PRIORITY
+
+Implementasi APM untuk monitoring production:
+
+```bash
+# Install Sentry for error tracking
+composer require sentry/sentry
+```
+
+**Implementation:**
+- Sentry for error tracking and performance monitoring
+- New Relic or Datadog for APM (optional)
+- Uptime monitoring (Pingdom, UptimeRobot)
+- Log aggregation (ELK stack or Loki)
+
+### 9.2 Health Check Endpoints
+
+```php
+// app/controllers/HealthController.php
+class HealthController extends Controller {
+    public function index() {
+        $health = [
+            'status' => 'healthy',
+            'timestamp' => time(),
+            'services' => [
+                'database' => $this->checkDatabase(),
+                'cache' => $this->checkCache(),
+                'storage' => $this->checkStorage(),
+            ]
+        ];
+        $this->json($health);
+    }
+}
+```
+
+### 9.3 Horizontal Scaling Strategy
+
+**Load Balancer Configuration (Nginx):**
+
+```nginx
+upstream backend {
+    least_conn;
+    server 10.0.1.10:80;
+    server 10.0.1.11:80;
+}
+```
+
+### 9.4 Redis for Session Storage
+
+```bash
+sudo apt install redis-server php8.1-redis
+```
+
+### 9.5 Cloud Storage for File Uploads
+
+```bash
+composer require aws/aws-sdk-php
+```
+
+### 9.6 CDN for Static Assets
+
+- CloudFront or Cloudflare for CDN
+- Enable gzip compression
+- Configure cache behavior
+
+### 9.7 Containerization (Docker)
+
+```dockerfile
+FROM php:8.1-apache
+RUN docker-php-ext-install pdo pdo_mysql mbstring gd
+RUN a2enmod rewrite
+```
+
+### 9.8 CI/CD Pipeline
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Production
+on:
+  push:
+    branches: [main]
+```
+
+### 9.9 Disaster Recovery Plan
+
+- Daily automated backups to S3
+- Point-in-time recovery (PITR)
+- Offsite backup in different region
+- Weekly backup verification
+
+---
+
+## 10. OPTIMISASI PRODUKSI
+
+### 10.1 PHP
 
 ```ini
 ; /etc/php/8.1/apache2/php.ini (atau fpm/php.ini)
@@ -241,7 +337,7 @@ opcache.memory_consumption = 128
 opcache.max_accelerated_files = 4000
 ```
 
-### 9.2 MySQL
+### 10.2 MySQL
 
 ```ini
 # /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -251,7 +347,7 @@ query_cache_size = 64M
 max_connections = 100
 ```
 
-### 9.3 Apache
+### 10.3 Apache
 
 ```bash
 sudo a2enmod deflate expires headers

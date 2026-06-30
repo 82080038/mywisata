@@ -1,6 +1,6 @@
 # MODUL 23 — DATABASE BACKUP & RECOVERY
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -218,7 +218,98 @@ loadBackups();
 
 ---
 
-## 8. CHECKLIST BACKUP
+## 8. AUTOMATED BACKUP VERIFICATION
+
+**Status:** Not Implemented — HIGH PRIORITY
+
+Implementasi automated backup verification untuk memastikan backup dapat di-restore:
+
+```bash
+#!/bin/bash
+# /opt/scripts/verify_backup.sh
+# Cron: 0 3 * * * /opt/scripts/verify_backup.sh (1 hour after backup)
+
+DB_NAME="tour_guide_app"
+DB_USER="root"
+DB_PASS=""
+BACKUP_DIR="/opt/lampp/htdocs/wisata/database/backup"
+TEST_DB="${DB_NAME}_test_restore"
+DATE=$(date +%Y%m%d_%H%M%S)
+LATEST_BACKUP=$(ls -t ${BACKUP_DIR}/${DB_NAME}_*.sql.gz | head -1)
+
+# Create test database
+mysql -u${DB_USER} -p${DB_PASS} -e "DROP DATABASE IF EXISTS ${TEST_DB}"
+mysql -u${DB_USER} -p${DB_PASS} -e "CREATE DATABASE ${TEST_DB}"
+
+# Restore backup to test database
+gunzip < ${LATEST_BACKUP} | mysql -u${DB_USER} -p${DB_PASS} ${TEST_DB}
+
+# Verify data integrity
+TABLE_COUNT=$(mysql -u${DB_USER} -p${DB_PASS} ${TEST_DB} -e "SHOW TABLES" | wc -l)
+USER_COUNT=$(mysql -u${DB_USER} -p${DB_PASS} ${TEST_DB} -e "SELECT COUNT(*) FROM users" | tail -1)
+BOOKING_COUNT=$(mysql -u${DB_USER} -p${DB_PASS} ${TEST_DB} -e "SELECT COUNT(*) FROM bookings" | tail -1)
+
+# Check thresholds
+if [ $TABLE_COUNT -lt 10 ] || [ $USER_COUNT -lt 1 ] || [ $BOOKING_COUNT -lt 1 ]; then
+    echo "$(date): BACKUP VERIFICATION FAILED - ${LATEST_BACKUP}" >> ${BACKUP_DIR}/verification.log
+    # Send alert
+    echo "Backup verification failed for ${LATEST_BACKUP}" | mail -s "Backup Alert" admin@example.com
+else
+    echo "$(date): Backup verification PASSED - ${LATEST_BACKUP}" >> ${BACKUP_DIR}/verification.log
+fi
+
+# Cleanup test database
+mysql -u${DB_USER} -p${DB_PASS} -e "DROP DATABASE ${TEST_DB}"
+```
+
+### Point-in-Time Recovery (PITR)
+
+```bash
+#!/bin/bash
+# /opt/scripts/pitr_restore.sh
+# Restore to specific point in time using binary logs
+
+DB_NAME="tour_guide_app"
+DB_USER="root"
+DB_PASS=""
+BACKUP_DIR="/opt/lampp/htdocs/wisata/database/backup"
+BINLOG_DIR="/var/lib/mysql"
+TARGET_TIME="2026-06-30 14:30:00"
+
+# 1. Restore full backup
+FULL_BACKUP="${BACKUP_DIR}/${DB_NAME}_20260630_020001.sql.gz"
+gunzip < ${FULL_BACKUP} | mysql -u${DB_USER} -p${DB_PASS} ${DB_NAME}
+
+# 2. Apply binary logs up to target time
+mysqlbinlog --start-datetime="2026-06-30 02:00:01" \
+            --stop-datetime="${TARGET_TIME}" \
+            ${BINLOG_DIR}/binlog.000001 | mysql -u${DB_USER} -p${DB_PASS} ${DB_NAME}
+
+mysqlbinlog --start-datetime="2026-06-30 02:00:01" \
+            --stop-datetime="${TARGET_TIME}" \
+            ${BINLOG_DIR}/binlog.000002 | mysql -u${DB_USER} -p${DB_PASS} ${DB_NAME}
+```
+
+### Offsite Backup to Cloud Storage
+
+```bash
+#!/bin/bash
+# /opt/scripts/offsite_backup.sh
+# Upload backup to AWS S3 or Google Cloud Storage
+
+BACKUP_DIR="/opt/lampp/htdocs/wisata/database/backup"
+LATEST_BACKUP=$(ls -t ${BACKUP_DIR}/${DB_NAME}_*.sql.gz | head -1)
+
+# Upload to AWS S3
+aws s3 cp ${LATEST_BACKUP} s3://tourguide-backups/database/
+
+# Or upload to Google Cloud Storage
+gsutil cp ${LATEST_BACKUP} gs://tourguide-backups/database/
+```
+
+---
+
+## 9. CHECKLIST BACKUP
 
 - [ ] Cron job harian aktif
 - [ ] Retensi 7 hari auto-cleanup

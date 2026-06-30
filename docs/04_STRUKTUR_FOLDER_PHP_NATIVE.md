@@ -1,8 +1,9 @@
 # MODUL 04 — STRUKTUR FOLDER PHP NATIVE (MVC SEDERHANA)
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi Dokumen:** 1.0  
-> **Tanggal:** 2026-06-30
+> **Versi Dokumen:** 1.1  
+> **Tanggal:** 2026-06-30  
+> **Last Updated:** 2026-06-30
 
 ---
 
@@ -27,7 +28,7 @@ wisata/                              # Root project
 ├── app/                             # Application core (MVC)
 │   ├── config/                      # Konfigurasi
 │   │   ├── config.php               # Config utama (BASE_URL, dll)
-│   │   ├── database.php             # Kredensial database
+│   │   ├── database.php             # Kredensial database (fallback)
 │   │   └── routes.php               # Definisi route (opsional)
 │   │
 │   ├── core/                        # Core framework
@@ -96,6 +97,19 @@ wisata/                              # Root project
 │   │   ├── RestaurantOrderItem.php
 │   │   ├── TransactionItem.php
 │   │   └── Setting.php
+│   │
+│   ├── services/                    # Service layer — business logic
+│   │   ├── BookingService.php
+│   │   ├── PaymentService.php
+│   │   ├── NotificationService.php
+│   │   ├── ReportService.php
+│   │   └── EmailService.php
+│   │
+│   ├── repositories/                # Repository layer — data access
+│   │   ├── BookingRepository.php
+│   │   ├── UserRepository.php
+│   │   ├── DestinationRepository.php
+│   │   └── TransactionRepository.php
 │   │
 │   └── views/                       # View — template HTML
 │       ├── layouts/
@@ -241,6 +255,35 @@ wisata/                              # Root project
 ├── .gitignore                       # Git ignore
 ├── README.md                        # Project readme
 └── composer.json                    # Opsional (untuk autoload)
+```
+
+---
+
+## 1.1 ADDITIONAL FOLDERS (Modern PHP Practices)
+
+### Tests Folder Structure
+```
+tests/
+├── unit/                        # Unit tests (PHPUnit)
+│   ├── UserTest.php
+│   ├── BookingTest.php
+│   └── PaymentTest.php
+└── integration/                 # Integration tests
+    ├── AuthTest.php
+    └── APITest.php
+```
+
+### Environment Files
+```
+.env                              # Environment variables (TIDAK di-commit ke Git)
+.env.example                      # Template untuk .env
+```
+
+### Composer Files
+```
+composer.json                     # Composer configuration
+composer.lock                     # Lock file (auto-generated)
+vendor/                           # Composer dependencies (auto-generated)
 ```
 
 ---
@@ -416,9 +459,63 @@ node_modules/
 
 ---
 
-## 3. KONVENSI PENAMAAN
+## 3. INTEGRATION GUIDELINES — LAYER COMMUNICATION
 
-### 3.1 File & Class
+### ⚠️ CRITICAL: Layers Must Communicate Properly
+
+Saat membangun aplikasi, pastikan komunikasi antar layer berikut:
+
+#### 3.1 Controller ↔ Service Layer Integration
+
+| Rule | Implementation |
+|------|----------------|
+| **Thin Controllers** | Controller hanya handle HTTP request/response, business logic di service |
+| **Service Injection** | Inject service via constructor atau method injection |
+| **Error Handling** | Catch service exceptions dan convert ke HTTP response |
+| **Data Transformation** | Transform request data ke service DTO |
+| **Response Mapping** | Map service response ke API response format |
+
+#### 3.2 Service ↔ Repository Integration
+
+| Rule | Implementation |
+|------|----------------|
+| **Repository Injection** | Inject repository via constructor |
+| **Transaction Management** | Service manages transaction boundaries |
+| **Business Logic** | All business rules di service layer |
+| **Data Aggregation** | Service aggregate data dari multiple repositories |
+| **Caching** | Service layer handle caching logic |
+
+#### 3.3 Repository ↔ Database Integration
+
+| Rule | Implementation |
+|------|----------------|
+| **Prepared Statements** | Selalu gunakan prepared statements |
+| **Type Safety** | Gunakan type hints untuk parameters |
+| **Error Handling** | Catch database exceptions dan convert ke repository exceptions |
+| **Connection Management** | Gunakan singleton Database instance |
+| **Query Optimization** | Gunakan indexes dan avoid N+1 queries |
+
+#### 3.4 Integration Validation Checklist
+
+Sebelum commit code, pastikan:
+
+- [ ] Controller tidak mengandung business logic
+- [ ] Service layer mengelola transaction boundaries
+- [ ] Repository hanya handle data access
+- [ ] Semua query menggunakan prepared statements
+- [ ] Error handling di setiap layer
+- [ ] Type hints digunakan untuk parameters
+- [ ] Data validation sebelum insert/update
+- [ ] Response format konsisten
+- [ ] CSRF token validasi untuk state-changing
+- [ ] Authentication/authorization check
+- [ ] Audit log tercatat untuk sensitive actions
+
+---
+
+## 4. KONVENSI PENAMAAN
+
+### 4.1 File & Class
 
 | Tipe | Konvensi | Contoh |
 |------|----------|--------|
@@ -428,7 +525,7 @@ node_modules/
 | CSS/JS | snake_case | `booking_form.js` |
 | Config | lowercase | `database.php` |
 
-### 3.2 Database
+### 4.2 Database
 
 | Tipe | Konvensi | Contoh |
 |------|----------|--------|
@@ -438,7 +535,7 @@ node_modules/
 | Foreign Key | `{table_singular}_id` | `tour_guide_id`, `booking_id` |
 | Pivot Table | `{table1_singular}_{table2_singular}` | `guide_language` |
 
-### 3.3 URL Route
+### 4.3 URL Route
 
 | Pola | Contoh | Controller::Method |
 |------|--------|-------------------|
@@ -527,23 +624,85 @@ Setiap modul akan memiliki file di 3 layer MVC:
 
 ## 6. DEPENDENCY MANAGEMENT
 
-### 6.1 Composer (Opsional)
+### 6.1 Composer (Recommended for Modern PHP)
 
 ```json
 {
+    "name": "wisata/tour-guide-app",
+    "description": "Tour Guide Application - PHP Native MVC",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-gd": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10"
+    },
     "autoload": {
         "psr-4": {
             "App\\": "app/"
+        },
+        "files": [
+            "app/config/config.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     },
-    "require": {
-        "php": ">=8.1",
-        "endroid/qr-code": "^5.0"
+    "scripts": {
+        "test": "phpunit",
+        "analyze": "phpstan analyse app --level=5"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     }
 }
 ```
 
-### 6.2 Frontend Libraries (CDN)
+### 6.2 .env Example
+
+```bash
+# .env.example
+# Copy this file to .env and fill in your values
+
+# Application
+APP_ENV=development
+APP_DEBUG=true
+BASE_URL=http://localhost/wisata/
+
+# Database
+DB_HOST=localhost
+DB_NAME=tour_guide_app
+DB_USER=root
+DB_PASS=
+DB_CHARSET=utf8mb4
+
+# Session
+SESSION_TIMEOUT=1800
+
+# Upload
+UPLOAD_PATH=public/uploads/
+MAX_UPLOAD_SIZE=5242880
+
+# Email (SMTP)
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@tourguide.app
+MAIL_FROM_NAME=Tour Guide App
+```
+
+### 6.3 Frontend Libraries (CDN)
 
 ```html
 <!-- CSS -->

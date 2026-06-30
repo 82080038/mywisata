@@ -1,10 +1,11 @@
 # MODUL 05 — DESAIN DATABASE MYSQL & ERD
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi Dokumen:** 1.0  
+> **Versi Dokumen:** 1.1  
 > **Tanggal:** 2026-06-30  
 > **DBMS:** MySQL 8.0+  
-> **Charset:** utf8mb4, collate utf8mb4_unicode_ci
+> **Charset:** utf8mb4, collate utf8mb4_unicode_ci  
+> **Last Updated:** 2026-06-30
 
 ---
 
@@ -160,6 +161,78 @@
 │(1)             │ 1:N │(N)           │
 └────────────────┘     └──────────────┘
 ```
+
+---
+
+## 2.1 MYSQL 8.0 OPTIMIZATION STRATEGIES
+
+### Three-Star Indexing System
+
+Based on MySQL 8.0 best practices, use the Three-Star System for optimal index design:
+
+| Star | Criteria | Benefit |
+|------|----------|----------|
+| ⭐ First Star | Index groups relevant WHERE rows together (equality columns first) | Minimize scan range |
+| ⭐⭐ Second Star | Index covers ORDER BY columns (after equality columns) | Avoid filesort |
+| ⭐⭐⭐ Third Star | Index covers SELECT columns (covering index) | No bookmark lookup |
+
+### MySQL 8.0 Specific Features
+
+| Feature | Description | Use Case |
+|---------|-------------|----------|
+| **Descending Indexes** | True DESC storage for mixed-direction ORDER BY | ORDER BY col1 ASC, col2 DESC |
+| **Invisible Indexes** | Test dropping indexes safely | Index optimization testing |
+| **Functional Indexes** | Index expressions | WHERE UPPER(name) = 'TEST' |
+| **Histogram Statistics** | Better cost estimation without indexes | Large table analytics |
+| **Hash Join** | Dramatically faster indexless JOINs | Large table joins |
+| **Index Skip Scan** | Skip leftmost column in certain scenarios | Index on (col1, col2), query on col2 only |
+
+### Index Strategy for Key Tables
+
+#### bookings table
+```sql
+-- Composite index for guide availability check
+CREATE INDEX idx_guide_date_status ON bookings(guide_id, booking_date, status);
+
+-- Index for user booking history
+CREATE INDEX idx_user_date ON bookings(user_id, booking_date DESC);
+
+-- Index for status filtering
+CREATE INDEX idx_status_date ON bookings(status, created_at DESC);
+```
+
+#### transactions table
+```sql
+-- Index for payment status lookup
+CREATE INDEX idx_payment_status ON transactions(payment_status, created_at DESC);
+
+-- Index for user transaction history
+CREATE INDEX idx_user_type ON transactions(user_id, type, created_at DESC);
+
+-- Unique index for transaction codes
+CREATE UNIQUE INDEX idx_code ON transactions(transaction_code);
+```
+
+#### destinations table
+```sql
+-- Composite index for location-based search
+CREATE INDEX idx_city_active ON destinations(city, is_active, rating_avg DESC);
+
+-- Index for coordinate-based queries
+CREATE INDEX idx_coords ON destinations(latitude, longitude);
+
+-- Index for category filtering
+CREATE INDEX idx_category_active ON destinations(category_id, is_active);
+```
+
+### Query Optimization Guidelines
+
+1. **Use EXPLAIN** to analyze query execution plans
+2. **Avoid SELECT \*** — only select needed columns
+3. **Use LIMIT** for pagination to reduce data transfer
+4. **Optimize JOINs** — ensure indexed columns are used for joins
+5. **Use appropriate data types** — use INT instead of VARCHAR for IDs
+6. **Normalize vs Denormalize** — balance between read performance and write overhead
 
 ---
 

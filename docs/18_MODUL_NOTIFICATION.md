@@ -1,6 +1,6 @@
 # MODUL 18 — MODUL NOTIFICATION
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -198,6 +198,21 @@ updateNotifBadge();
 | POST | `api/notification/read/{id}` | Tandai dibaca |
 | POST | `api/notification/read-all` | Tandai semua dibaca |
 | POST | `api/admin/notification/broadcast` | Admin broadcast |
+
+---
+
+## 8. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Performance:** Implementasi queue system untuk email sending
+- [ ] **Security:** Rate limiting untuk notification sending
+- [ ] **Delivery:** Implementasi delivery tracking untuk email
+- [ ] **Fallback:** Fallback ke SMS jika email gagal
+- [ ] **Analytics:** Track notification open rate dan click rate
+- [ ] **Privacy:** Opsi user untuk unsubscribe dari certain notification types
+- [ ] **Template:** Email template dengan responsive design
+- [ ] **Spam:** Implementasi spam protection untuk broadcast
 
 ---
 

@@ -1,6 +1,6 @@
 # MODUL 16 — MODUL AUDIO GUIDE
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -128,6 +128,21 @@ $('#audio-lang').change(function() {
 | GET | `api/audio-guide/{dest_id}?lang=id` | Get audio by destinasi & bahasa |
 | GET | `api/admin/audio/list` | List semua audio (admin) |
 | POST | `api/admin/audio/delete/{id}` | Hapus audio |
+
+---
+
+## 6. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Performance:** Implementasi CDN untuk audio streaming
+- [ ] **Performance:** Audio compression untuk mobile
+- [ ] **Security:** Validasi file type dan size saat upload
+- [ ] **Analytics:** Track audio play count dan completion rate
+- [ ] **Accessibility:** Tambahkan captions/subtitles untuk aksesibilitas
+- [ ] **Backup:** Backup audio files ke cloud storage
+- [ ] **Caching:** Implementasi browser caching untuk audio files
+- [ ] **Bandwidth:** Implementasi adaptive bitrate streaming
 
 ---
 

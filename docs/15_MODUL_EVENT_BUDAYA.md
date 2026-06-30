@@ -1,6 +1,6 @@
 # MODUL 15 — MODUL EVENT & BUDAYA
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -200,6 +200,21 @@ foreach ($regs as $reg) {
     ]);
 }
 ```
+
+---
+
+## 7. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Validation:** Validasi kapasitas event sebelum pendaftaran
+- [ ] **Security:** Rate limiting untuk pendaftaran event
+- [ ] **Payment:** Integrasi dengan payment gateway untuk event berbayar
+- [ ] **Notification:** Integrasi dengan modul notification untuk reminder H-1
+- [ ] **Analytics:** Track event registration dan attendance rate
+- [ ] **Cancellation:** Implementasi cancellation policy
+- [ ] **Review:** Integrasi dengan modul review untuk rating event
+- [ ] **Calendar:** Integrasi dengan calendar API untuk sync ke user calendar
 
 ---
 

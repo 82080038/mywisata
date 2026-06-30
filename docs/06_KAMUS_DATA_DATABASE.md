@@ -1,12 +1,60 @@
 # MODUL 06 — KAMUS DATA DATABASE
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi Dokumen:** 1.0  
-> **Tanggal:** 2026-06-30
+> **Versi Dokumen:** 1.1  
+> **Tanggal:** 2026-06-30  
+> **Last Updated:** 2026-06-30
 
 ---
 
-## 1. TABEL `users`
+## 1. MYSQL 8.0 DATA TYPES REFERENCE
+
+### Numeric Types
+
+| Type | Range | Storage | Use Case |
+|------|-------|---------|----------|
+| TINYINT | -128 to 127 | 1 byte | Small flags, status codes |
+| SMALLINT | -32,768 to 32,767 | 2 bytes | Small IDs, counts |
+| INT | -2.1B to 2.1B | 4 bytes | Standard IDs |
+| BIGINT | -9.2E18 to 9.2E18 | 8 bytes | Large IDs, timestamps |
+| DECIMAL(M,D) | Exact precision | M+2 bytes | Currency, precise calculations |
+| FLOAT | Approximate | 4 bytes | Approximate measurements |
+
+### String Types
+
+| Type | Max Length | Storage | Use Case |
+|------|------------|---------|----------|
+| CHAR(N) | 255 | N bytes | Fixed-length codes |
+| VARCHAR(N) | 65,535 | L+1 bytes | Variable-length text |
+| TEXT | 65,535 | L+2 bytes | Short descriptions |
+| MEDIUMTEXT | 16M | L+3 bytes | Long content |
+| LONGTEXT | 4G | L+4 bytes | Very long content |
+| JSON | 4G | L+4 bytes | Structured data |
+
+### Date/Time Types
+
+| Type | Range | Storage | Use Case |
+|------|-------|---------|----------|
+| DATE | 1000-01-01 to 9999-12-31 | 3 bytes | Dates only |
+| TIME | -838:59:59 to 838:59:59 | 3 bytes | Time only |
+| DATETIME | 1000-01-01 00:00:00 to 9999-12-31 23:59:59 | 8 bytes | Date and time |
+| TIMESTAMP | 1970-01-01 00:00:01 UTC to 2038-01-19 03:14:07 UTC | 4 bytes | Auto-updating timestamps |
+| YEAR | 1901 to 2155 | 1 byte | Year values |
+
+### Validation Rules by Data Type
+
+| Data Type | Validation Pattern | Example |
+|-----------|-------------------|---------|
+| VARCHAR(email) | FILTER_VALIDATE_EMAIL | user@example.com |
+| VARCHAR(phone) | Regex: `^\+?[0-9]{10,15}$` | +6281234567890 |
+| VARCHAR(url) | FILTER_VALIDATE_URL | https://example.com |
+| DECIMAL(price) | >= 0 | 100.50 |
+| ENUM(status) | Specific values only | 'pending', 'paid', 'cancelled' |
+| JSON | Valid JSON structure | {"key": "value"} |
+
+---
+
+## 2. TABEL `users`
 
 | Kolom | Tipe Data | Panjang | Null | Default | Keterangan |
 |-------|-----------|---------|------|---------|-----------|

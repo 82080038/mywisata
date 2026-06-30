@@ -1,6 +1,6 @@
 # MODUL 14 — MODUL RESTORAN & UMKM
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -207,6 +207,21 @@ function checkout(restaurantId) {
     });
 }
 ```
+
+---
+
+## 7. INTEGRATION REMINDERS
+
+**Pastikan integrasi berikut sebelum production:**
+
+- [ ] **Validation:** Validasi stok menu sebelum order
+- [ ] **Security:** Rate limiting untuk order dan menu access
+- [ ] **Payment:** Integrasi dengan payment gateway
+- [ ] **Notification:** Kirim notifikasi ke restoran saat ada order baru
+- [ ] **Analytics:** Track menu popularity dan order conversion
+- [ ] **Cancellation:** Implementasi cancellation policy
+- [ ] **Review:** Integrasi dengan modul review untuk rating restoran
+- [ ] **Map:** Integrasi dengan modul map untuk lokasi restoran
 
 ---
 

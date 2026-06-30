@@ -1,9 +1,10 @@
 # MODUL 01 — KONSEP DAN ANALISIS SISTEM
 
 > **Aplikasi:** Tour Guide Application  
-> **Stack:** PHP Native (MVC Sederhana) + MySQL + Bootstrap + jQuery + OpenStreetMap/Leaflet  
-> **Versi Dokumen:** 1.0  
-> **Tanggal:** 2026-06-30
+> **Stack:** PHP 8.1+ Native (Simple MVC) + MySQL 8.0+ + Bootstrap 5.3 + jQuery 3.7 + OpenStreetMap/Leaflet  
+> **Versi Dokumen:** 1.1  
+> **Tanggal:** 2026-06-30  
+> **Last Updated:** 2026-06-30
 
 ---
 
@@ -115,17 +116,22 @@ pendukung (hotel, restoran, tiket, event) dalam satu sistem.
 |----------|-------|-----------|
 | OS | Ubuntu 22.04 LTS | Linux VPS |
 | Web Server | Apache 2.4 / Nginx 1.18 | Reverse proxy support |
-| PHP | 8.1+ | Native, tanpa framework |
-| MySQL | 8.0+ | Database utama |
+| PHP | 8.1+ | Native, PSR-4 autoloading, type declarations |
+| MySQL | 8.0+ | Database utama dengan InnoDB |
+| Composer | 2.x | Dependency management (opsional) |
 | phpMyAdmin | 5.2+ | Opsional, manajemen DB |
+| Certbot | Latest | SSL certificate automation |
 
 ### 6.3 Kebutuhan Perangkat Lunak (Client)
 
 | Komponen | Keterangan |
 |----------|-----------|
-| Browser | Chrome 90+, Firefox 88+, Safari 14+ |
+| Browser | Chrome 90+, Firefox 88+, Safari 14+, Samsung Internet |
 | JavaScript | ES6+ (jQuery 3.7+) |
-| Resolusi | Responsive (mobile 360px — desktop 1920px) |
+| Resolusi | **Mobile-First Responsive** (mobile 360px — tablet 768px — desktop 1920px) |
+| **Primary Device** | **Smartphone (Android/iOS) — 80%+ user base** |
+| Framework | **Bootstrap 5.3 Mobile-First** — grid system, responsive utilities |
+| Touch Support | Optimized untuk touch interaction (tap, swipe, pinch) |
 
 ### 6.4 Kebutuhan Library & Plugin Frontend
 
@@ -139,6 +145,8 @@ pendukung (hotel, restoran, tiket, event) dalam satu sistem.
 | Select2 | 4.1.x | Dropdown dengan search |
 | SweetAlert2 | 11.x | Notifikasi popup |
 | Chart.js | 4.x | Grafik analitik |
+| QRCode.js | 1.0.x | QR code generation (client-side) |
+| Moment.js | 2.29.x | Date/time formatting |
 
 ---
 
@@ -163,6 +171,8 @@ pendukung (hotel, restoran, tiket, event) dalam satu sistem.
 - Tour guide memiliki smartphone dengan GPS
 - Server VPS tersedia dengan akses root
 - Domain dan SSL certificate sudah disiapkan
+- Browser modern mendukung ES6+ dan PWA features
+- Compliance dengan regulasi data protection (GDPR, UU PDP Indonesia)
 
 ### Keterbatasan
 
@@ -170,6 +180,8 @@ pendukung (hotel, restoran, tiket, event) dalam satu sistem.
 - Pembayaran menggunakan simulasi / transfer manual di fase awal
 - Audio guide di-generate manual (tidak otomatis TTS di fase awal)
 - AI Tour Guide menggunakan rule-based / sederhana (bukan LLM eksternal berbayar)
+- Tidak ada real-time WebSocket (menggunakan polling untuk notifikasi)
+- Tidak ada multi-language i18n system di fase awal (Bahasa Indonesia + English)
 
 ---
 
@@ -188,17 +200,41 @@ pendukung (hotel, restoran, tiket, event) dalam satu sistem.
 | **Leaflet** | Library JavaScript untuk menampilkan peta |
 | **AJAX** | Asynchronous JavaScript and XML — komunikasi data tanpa reload |
 | **PWA** | Progressive Web App — web yang dapat diinstall seperti aplikasi |
+| **PSR** | PHP Standard Recommendation — standar coding PHP |
+| **Composer** | Dependency manager untuk PHP |
+| **RBAC** | Role-Based Access Control — sistem hak akses berbasis role |
+| **GDPR** | General Data Protection Regulation — regulasi data privasi Eropa |
+| **PCI DSS** | Payment Card Industry Data Security Standard — standar keamanan pembayaran |
+| **SSL/TLS** | Secure Sockets Layer / Transport Layer Security — enkripsi komunikasi |
+| **CI/CD** | Continuous Integration / Continuous Deployment — otomatisasi build dan deploy |
+| **Docker** | Platform containerization untuk aplikasi |
+| **OPcache** | Opcode cache PHP untuk performance optimization |
 
 ---
 
 ## 10. REFERENSI
 
-- [OpenStreetMap](https://www.openstreetmap.org/)
-- [Leaflet.js](https://leafletjs.com/)
-- [Bootstrap 5](https://getbootstrap.com/)
-- [jQuery](https://jquery.com/)
-- [PHP Manual](https://www.php.net/manual/en/)
-- [MySQL Documentation](https://dev.mysql.com/doc/)
+### Teknologi
+- [OpenStreetMap](https://www.openstreetmap.org/) — Peta dunia gratis dan open-source
+- [Leaflet.js](https://leafletjs.com/) — Library JavaScript untuk peta interaktif
+- [Bootstrap 5](https://getbootstrap.com/) — CSS framework modern
+- [jQuery](https://jquery.com/) — JavaScript library untuk DOM manipulation
+- [PHP Manual](https://www.php.net/manual/en/) — Dokumentasi resmi PHP 8.1+
+- [MySQL Documentation](https://dev.mysql.com/doc/) — Dokumentasi MySQL 8.0+
+
+### Best Practices
+- [PSR Standards](https://www.php-fig.org/psr/) — PHP Framework Interop Group standards
+- [OWASP Top 10 2025](https://owasp.org/Top10/2025/) — Security standards terbaru
+- [MySQL 8.0 Optimization](https://dev.mysql.com/doc/refman/8.0/en/optimization.html) — Performance tuning
+
+### Compliance
+- [GDPR](https://gdpr.eu/) — General Data Protection Regulation
+- [UU PDP Indonesia](https://www Kominfo.go.id/) — Undang-Undang Perlindungan Data Pribadi
+
+### Referensi Tambahan
+- [PHP Best Practices 2024](https://scriptbinary.com/php/best-practice-for-structuring-php-projects-in-2024)
+- [Leaflet Best Practices](https://leafletjs.com/examples.html)
+- [MySQL Indexing Strategies](https://cloudastra.co/blogs/indexing-strategies-mysql-8-0)
 
 ---
 

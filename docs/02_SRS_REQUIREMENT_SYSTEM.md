@@ -1,8 +1,9 @@
 # MODUL 02 — SOFTWARE REQUIREMENT SPECIFICATION (SRS)
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi Dokumen:** 1.0  
-> **Tanggal:** 2026-06-30
+> **Versi Dokumen:** 1.1  
+> **Tanggal:** 2026-06-30  
+> **Last Updated:** 2026-06-30
 
 ---
 
@@ -184,6 +185,8 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 | FR-RPT-06 | Export laporan CSV/Excel | Sedang |
 | FR-RPT-07 | Laporan pendapatan Tour Guide | Sedang |
 | FR-RPT-08 | Demografi wisatawan | Rendah |
+| FR-RPT-09 | Real-time analytics dashboard | Sedang |
+| FR-RPT-10 | Custom report builder | Rendah |
 
 ---
 
@@ -198,6 +201,11 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 | NFR-PERF-03 | Waktu query database | < 100ms |
 | NFR-PERF-04 | Peta lazy loading marker | < 3 detik |
 | NFR-PERF-05 | 100 concurrent users | Tanpa degradasi |
+| NFR-PERF-06 | OPcache enabled di production | - |
+| NFR-PERF-07 | Gzip compression enabled | - |
+| NFR-PERF-08 | Database index optimization | Three-Star System |
+| NFR-PERF-09 | Image optimization (WebP, lazy load) | - |
+| NFR-PERF-10 | CDN untuk static assets (opsional) | - |
 
 ### 3.2 Keamanan
 
@@ -212,7 +220,12 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 | NFR-SEC-07 | HTTPS/SSL wajib di production |
 | NFR-SEC-08 | RBAC untuk setiap endpoint |
 | NFR-SEC-09 | Audit log untuk aksi sensitif |
-| NFR-SEC-10 | Rate limiting untuk API |
+| NFR-SEC-10 | Rate limiting untuk API (60 req/menit) |
+| NFR-SEC-11 | Security headers (CSP, HSTS, X-Frame-Options) |
+| NFR-SEC-12 | OWASP Top 10 2025 compliance |
+| NFR-SEC-13 | File upload validation (MIME, size, random filename) |
+| NFR-SEC-14 | Session cookie: HttpOnly, Secure, SameSite |
+| NFR-SEC-15 | Environment variable untuk sensitive config (.env) |
 
 ### 3.3 Reliabilitas
 
@@ -227,11 +240,21 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 
 | ID | Kebutuhan |
 |----|-----------|
-| NFR-USA-01 | UI responsive mobile-first (Bootstrap 5) |
+| NFR-USA-01 | **UI responsive mobile-first (Bootstrap 5.3)** — **Primary target: smartphone** |
 | NFR-USA-02 | Bahasa Indonesia (default) + English |
 | NFR-USA-03 | Navigasi dengan breadcrumb |
 | NFR-USA-04 | Loading indicator untuk AJAX |
 | NFR-USA-05 | Validasi form dengan pesan error jelas |
+| NFR-USA-06 | WCAG 2.1 Level AA compliance (accessibility) |
+| NFR-USA-07 | PWA-ready (manifest.json, service worker) — **Installable di smartphone** |
+| NFR-USA-08 | Skeleton loading untuk async content |
+| NFR-USA-09 | Infinite scroll untuk list (opsional) |
+| NFR-USA-10 | Dark mode support (system-aware) |
+| NFR-USA-11 | **Touch-optimized UI** — tap targets minimum 44x44px |
+| NFR-USA-12 | **Mobile-specific gestures** — swipe, pinch-to-zoom untuk peta |
+| NFR-USA-13 | **Offline-first capabilities** — cache critical resources |
+| NFR-USA-14 | **Responsive images** — srcset untuk berbagai resolusi device |
+| NFR-USA-15 | **Viewport meta tag** — proper scaling untuk mobile browsers |
 
 ### 3.5 Maintainability
 
@@ -239,9 +262,13 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 |----|-----------|
 | NFR-MAINT-01 | Pola MVC sederhana |
 | NFR-MAINT-02 | PSR-4 autoloading |
-| NFR-MAINT-03 | Konfigurasi terpisah dari kode |
+| NFR-MAINT-03 | Konfigurasi terpisah dari kode (.env) |
 | NFR-MAINT-04 | Dokumentasi inline untuk fungsi kompleks |
 | NFR-MAINT-05 | Version control dengan Git |
+| NFR-MAINT-06 | PSR-12 coding standard compliance |
+| NFR-MAINT-07 | Type declarations (PHP 8.1+) |
+| NFR-MAINT-08 | Service layer pattern untuk business logic |
+| NFR-MAINT-09 | Repository pattern untuk data access |
 
 ### 3.6 Portability
 
@@ -250,6 +277,8 @@ AI Guide, Notifikasi, Report, Security, dan User Management.
 | NFR-PORT-01 | Deploy di Apache dan Nginx |
 | NFR-PORT-02 | Deploy di shared hosting dan VPS |
 | NFR-PORT-03 | Tidak bergantung ekstensi PHP non-standard |
+| NFR-PORT-04 | Docker containerization support (opsional) |
+| NFR-PORT-05 | PHP 8.1+ compatibility |
 
 ---
 
@@ -354,6 +383,55 @@ Admin
 - Payment gateway integrasi penuh
 - AI berbasis LLM eksternal
 - Integrasi sistem pemerintah
+
+---
+
+## 7. KEBUTUHAN COMPLIANCE & PRIVACY
+
+### 7.1 GDPR Compliance (General Data Protection Regulation)
+
+| ID | Kebutuhan | Prioritas |
+|----|-----------|-----------|
+| C-GDPR-01 | Consent cookie banner | Tinggi |
+| C-GDPR-02 | Right to data access (user dapat download data) | Tinggi |
+| C-GDPR-03 | Right to data deletion (account deletion) | Tinggi |
+| C-GDPR-04 | Data retention policy (auto-delete inactive accounts) | Sedang |
+| C-GDPR-05 | Privacy policy page | Tinggi |
+| C-GDPR-06 | Data breach notification procedure | Sedang |
+
+### 7.2 UU PDP Indonesia (Perlindungan Data Pribadi)
+
+| ID | Kebutuhan | Prioritas |
+|----|-----------|-----------|
+| C-PDP-01 | Explicit consent untuk data collection | Tinggi |
+| C-PDP-02 | Data encryption at rest dan in transit | Tinggi |
+| C-PDP-03 | Access control untuk data sensitif | Tinggi |
+| C-PDP-04 | Audit trail untuk data access | Sedang |
+| C-PDP-05 | Local data storage compliance | Sedang |
+
+### 7.3 PCI DSS Compliance (Payment Card Industry)
+
+| ID | Kebutuhan | Prioritas |
+|----|-----------|-----------|
+| C-PCI-01 | Tidak simpan data kartu kredit penuh | Tinggi |
+| C-PCI-02 | Payment gateway terintegrasi (Midtrans/Xendit) | Tinggi |
+| C-PCI-03 | SSL/TLS untuk semua payment pages | Tinggi |
+| C-PCI-04 | Fraud detection system | Sedang |
+
+---
+
+## 8. REFERENSI
+
+### Standards
+- [PSR Standards](https://www.php-fig.org/psr/) — PHP Framework Interop Group
+- [OWASP Top 10 2025](https://owasp.org/Top10/2025/) — Web Application Security
+- [WCAG 2.1](https://www.w3.org/WAI/WCAG21/quickref/) — Web Content Accessibility Guidelines
+- [GDPR](https://gdpr.eu/) — General Data Protection Regulation
+
+### Best Practices
+- [PHP Best Practices 2024](https://scriptbinary.com/php/best-practice-for-structuring-php-projects-in-2024)
+- [MySQL 8.0 Optimization](https://dev.mysql.com/doc/refman/8.0/en/optimization.html)
+- [PWA Best Practices](https://web.dev/progressive-web-apps/)
 
 ---
 

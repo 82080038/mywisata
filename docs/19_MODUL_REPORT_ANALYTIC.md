@@ -1,6 +1,6 @@
 # MODUL 19 — MODUL REPORT & ANALYTIC
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -226,6 +226,325 @@ public function guideEarnings() {
 | GET | `api/admin/report/guides` | Statistik guide |
 | GET | `api/admin/report/export-csv` | Export CSV |
 | GET | `api/guide/earnings` | Pendapatan guide |
+
+---
+
+## 7. USER ANALYTICS
+
+**Status:** Not Implemented — MEDIUM PRIORITY
+
+Implementasi user analytics untuk tracking user behavior dan engagement:
+
+```php
+// app/services/UserAnalyticsService.php
+class UserAnalyticsService {
+    public function trackPageView(int $userId, string $page, array $metadata = []): void {
+        $sql = "INSERT INTO user_analytics 
+                (user_id, event_type, page, metadata, created_at) 
+                VALUES (:user_id, 'page_view', :page, :metadata, NOW())";
+        
+        $this->db->query($sql, [
+            'user_id' => $userId,
+            'page' => $page,
+            'metadata' => json_encode($metadata)
+        ]);
+    }
+
+    public function trackEvent(int $userId, string $eventName, array $data = []): void {
+        $sql = "INSERT INTO user_analytics 
+                (user_id, event_type, event_name, event_data, created_at) 
+                VALUES (:user_id, 'custom_event', :event_name, :data, NOW())";
+        
+        $this->db->query($sql, [
+            'user_id' => $userId,
+            'event_name' => $eventName,
+            'data' => json_encode($data)
+        ]);
+    }
+
+    public function getUserFunnel(): array {
+        $funnel = [
+            'landing_page' => $this->getEventCount('page_view', '/'),
+            'search_guide' => $this->getEventCount('page_view', '/guides'),
+            'view_guide_profile' => $this->getEventCount('page_view', '/guide/'),
+            'start_booking' => $this->getEventCount('custom_event', 'booking_started'),
+            'complete_booking' => $this->getEventCount('custom_event', 'booking_completed'),
+        ];
+
+        return $funnel;
+    }
+
+    public function getUserRetention(int $days = 30): array {
+        $sql = "SELECT user_id, MIN(created_at) as first_visit, 
+                MAX(created_at) as last_visit,
+                COUNT(DISTINCT DATE(created_at)) as active_days
+                FROM user_analytics
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL :days DAY)
+                GROUP BY user_id";
+        
+        return $this->db->query($sql, ['days' => $days])->fetchAll();
+    }
+
+    private function getEventCount(string $eventType, string $pattern): int {
+        $sql = "SELECT COUNT(*) as cnt FROM user_analytics 
+                WHERE event_type = :event_type AND (page LIKE :pattern OR event_name LIKE :pattern)";
+        
+        return $this->db->query($sql, [
+            'event_type' => $eventType,
+            'pattern' => "%{$pattern}%"
+        ])->fetch()['cnt'];
+    }
+}
+```
+
+### User Analytics Table
+
+```sql
+CREATE TABLE user_analytics (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    session_id VARCHAR(100) NULL,
+    event_type VARCHAR(50) NOT NULL,
+    page VARCHAR(255) NULL,
+    event_name VARCHAR(100) NULL,
+    event_data JSON NULL,
+    metadata JSON NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_event_type (event_type),
+    INDEX idx_created_at (created_at),
+    INDEX idx_session_id (session_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### Analytics Dashboard
+
+```php
+// app/controllers/Admin/AnalyticsController.php
+class AnalyticsController extends Controller {
+    public function index(): void {
+        $analytics = new UserAnalyticsService();
+        
+        $this->view('admin/analytics', [
+            'funnel' => $analytics->getUserFunnel(),
+            'retention' => $analytics->getUserRetention(30),
+            'top_pages' => $analytics->getTopPages(),
+            'user_segments' => $analytics->getUserSegments(),
+        ]);
+    }
+}
+```
+
+---
+
+## 8. A/B TESTING
+
+**Status:** Not Implemented — MEDIUM PRIORITY
+
+Implementasi A/B testing untuk UX optimization:
+
+```php
+// app/services/ABTestService.php
+class ABTestService {
+    private $activeTests = [
+        'booking_cta_color' => ['control' => 'blue', 'variant' => 'green'],
+        'search_results_layout' => ['control' => 'list', 'variant' => 'grid'],
+    ];
+
+    public function getVariant(string $testName, int $userId): string {
+        $variant = $this->getUserVariant($testName, $userId);
+        
+        if (!$variant) {
+            $variant = $this->assignVariant($testName, $userId);
+        }
+        
+        return $variant;
+    }
+
+    private function assignVariant(string $testName, int $userId): string {
+        $variants = $this->activeTests[$testName];
+        $variant = (rand(0, 1) === 0) ? 'control' : 'variant';
+        
+        $sql = "INSERT INTO ab_test_assignments 
+                (test_name, user_id, variant, assigned_at) 
+                VALUES (:test_name, :user_id, :variant, NOW())";
+        
+        $this->db->query($sql, [
+            'test_name' => $testName,
+            'user_id' => $userId,
+            'variant' => $variant
+        ]);
+        
+        return $variant;
+    }
+
+    public function trackConversion(string $testName, int $userId): void {
+        $sql = "UPDATE ab_test_assignments 
+                SET converted = 1, converted_at = NOW() 
+                WHERE test_name = :test_name AND user_id = :user_id";
+        
+        $this->db->query($sql, [
+            'test_name' => $testName,
+            'user_id' => $userId
+        ]);
+    }
+
+    public function getTestResults(string $testName): array {
+        $sql = "SELECT variant, COUNT(*) as total, 
+                SUM(converted) as conversions,
+                (SUM(converted) / COUNT(*)) * 100 as conversion_rate
+                FROM ab_test_assignments
+                WHERE test_name = :test_name
+                GROUP BY variant";
+        
+        return $this->db->query($sql, ['test_name' => $testName])->fetchAll();
+    }
+}
+```
+
+### A/B Test Table
+
+```sql
+CREATE TABLE ab_test_assignments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    test_name VARCHAR(100) NOT NULL,
+    user_id INT NOT NULL,
+    variant VARCHAR(20) NOT NULL,
+    converted TINYINT(1) DEFAULT 0,
+    converted_at DATETIME NULL,
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY idx_test_user (test_name, user_id),
+    INDEX idx_test_name (test_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+---
+
+## 9. RECOMMENDATION ENGINE
+
+**Status:** Not Implemented — MEDIUM PRIORITY
+
+Implementasi recommendation engine untuk personalized suggestions:
+
+```php
+// app/services/RecommendationService.php
+class RecommendationService {
+    public function getRecommendedGuides(int $userId, int $limit = 5): array {
+        // Collaborative filtering based on user's past bookings
+        $userPreferences = $this->getUserPreferences($userId);
+        
+        $sql = "SELECT g.*, 
+                (g.rating * 0.4 + 
+                 (SELECT COUNT(*) FROM bookings b WHERE b.guide_id = g.id) * 0.3 +
+                 (g.languages LIKE :language) * 0.3) as score
+                FROM tour_guides g
+                WHERE g.status = 'approved'
+                ORDER BY score DESC
+                LIMIT :limit";
+        
+        return $this->db->query($sql, [
+            'language' => "%{$userPreferences['language']}%",
+            'limit' => $limit
+        ])->fetchAll();
+    }
+
+    public function getRecommendedDestinations(int $userId, int $limit = 5): array {
+        $userHistory = $this->getUserBookingHistory($userId);
+        $preferredCategories = $this->extractCategories($userHistory);
+        
+        $sql = "SELECT d.*, 
+                (d.rating * 0.5 + 
+                 (d.category_id IN (:categories)) * 0.5) as score
+                FROM destinations d
+                WHERE d.category_id IN (:categories)
+                ORDER BY score DESC
+                LIMIT :limit";
+        
+        return $this->db->query($sql, [
+            'categories' => $preferredCategories,
+            'limit' => $limit
+        ])->fetchAll();
+    }
+
+    private function getUserPreferences(int $userId): array {
+        $sql = "SELECT g.languages, g.specialization 
+                FROM bookings b
+                JOIN tour_guides g ON b.guide_id = g.id
+                WHERE b.user_id = :user_id
+                GROUP BY g.id
+                LIMIT 5";
+        
+        $bookings = $this->db->query($sql, ['user_id' => $userId])->fetchAll();
+        
+        $languages = [];
+        foreach ($bookings as $booking) {
+            $languages[] = $booking['languages'];
+        }
+        
+        return ['language' => implode(',', $languages)];
+    }
+}
+```
+
+---
+
+## 10. CHAT SUPPORT SYSTEM
+
+**Status:** Not Implemented — MEDIUM PRIORITY
+
+Implementasi live chat support untuk user assistance:
+
+```php
+// app/services/ChatSupportService.php
+class ChatSupportService {
+    public function sendMessage(int $userId, string $message): void {
+        $sql = "INSERT INTO chat_messages 
+                (user_id, sender_type, message, created_at) 
+                VALUES (:user_id, 'user', :message, NOW())";
+        
+        $this->db->query($sql, ['user_id' => $userId, 'message' => $message]);
+        
+        // Notify admin
+        $this->notificationService->notifyAdmin('new_chat_message', [
+            'user_id' => $userId,
+            'message' => $message
+        ]);
+    }
+
+    public function getChatHistory(int $userId): array {
+        $sql = "SELECT * FROM chat_messages 
+                WHERE user_id = :user_id 
+                ORDER BY created_at ASC";
+        
+        return $this->db->query($sql, ['user_id' => $userId])->fetchAll();
+    }
+
+    public function sendAdminResponse(int $userId, string $message): void {
+        $sql = "INSERT INTO chat_messages 
+                (user_id, sender_type, message, created_at) 
+                VALUES (:user_id, 'admin', :message, NOW())";
+        
+        $this->db->query($sql, ['user_id' => $userId, 'message' => $message]);
+    }
+}
+```
+
+### Chat Messages Table
+
+```sql
+CREATE TABLE chat_messages (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    sender_type ENUM('user', 'admin') NOT NULL,
+    message TEXT NOT NULL,
+    is_read TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
 
 ---
 

@@ -3,7 +3,7 @@
 > **Aplikasi:** Tour Guide Application  
 > **Versi Dokumen:** 1.0  
 > **Tanggal:** 2026-06-30  
-> **Total Dokumen:** 33 modul
+> **Total Dokumen:** 42 modul
 
 ---
 
@@ -95,6 +95,21 @@ mulai dari konsep, analisis, desain, implementasi modul, hingga deployment.
 | 31 | `31_KAMUS_ISTILAH_GLOSARIUM.md` | Kamus istilah bisnis & pariwisata, teknis (backend, frontend, database, security, infrastruktur, DevOps), singkatan, dan kode format |
 | 32 | `32_AUDIT_KEAMANAN_CHECKLIST.md` | Checklist audit keamanan berbasis OWASP Top 10 (2021) + ASVS Level 1: access control, crypto, injection, auth, logging, security headers, file upload, API, database, deployment |
 
+### Bagian X — Panduan Tambahan (100% Completion)
+
+| No | Dokumen | Deskripsi |
+|----|---------|-----------|
+| 33 | `33_API_DOCUMENTATION_SWAGGER.md` | API documentation lengkap dalam format OpenAPI/Swagger untuk semua endpoint |
+| 34 | `34_USER_MANUAL.md` | Panduan penggunaan aplikasi untuk wisatawan (end-user) |
+| 35 | `35_ADMIN_MANUAL.md` | Panduan lengkap untuk admin panel dan manajemen sistem |
+| 36 | `36_TROUBLESHOOTING_GUIDE.md` | Panduan troubleshooting untuk masalah umum dan solusinya |
+| 37 | `37_PERFORMANCE_TUNING_GUIDE.md` | Panduan optimasi performance PHP, MySQL, web server, caching, dan scaling |
+| 38 | `38_TESTING_GUIDE.md` | Test cases lengkap per modul dengan expected results |
+| 39 | `39_AUTOMATION_TESTING_GUIDE.md` | Panduan automation testing dengan Selenium dan Puppeteer |
+| 40 | `40_LOAD_TESTING_SCENARIOS.md` | Scenarios load testing dengan JMeter dan k6 |
+| 41 | `41_VISUAL_DIAGRAMS.md` | Kumpulan diagram visual (architecture, ERD, flow, sequence) dalam format Mermaid |
+| 42 | `42_THIRD_PARTY_API_INTEGRATION.md` | Integrasi dengan platform pihak ketiga (Traveloka, Booking.com, Agoda) untuk menerima pesanan hotel/homestay dan pembayaran via webhook |
+
 ---
 
 ## CARA MEMBACA DOKUMENTASI
@@ -117,6 +132,8 @@ Bagian VII (23-26) → Pahami OPERASIONAL & DEPLOYMENT
 Bagian VIII (27-29)→ Pahami PANDUAN DEVELOPMENT
         ↓
 Bagian IX (30-32) → Pahami DIAGRAM, GLOSARIUM & AUDIT
+        ↓
+Bagian X (33-41)  → Pahami PANDUAN TAMBAHAN (100% COMPLETION)
 ```
 
 ---

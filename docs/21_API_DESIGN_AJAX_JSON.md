@@ -1,6 +1,6 @@
 # MODUL 21 — API DESIGN (AJAX + JSON)
 
-> **Versi:** 1.0 · **Tanggal:** 2026-06-30
+> **Versi:** 1.1 · **Tanggal:** 2026-06-30 · **Last Updated:** 2026-06-30
 
 ---
 
@@ -11,7 +11,100 @@ backend (PHP Native). Semua response dalam format JSON.
 
 ---
 
-## 2. FORMAT RESPONSE STANDAR
+## 2. REST API BEST PRACTICES
+
+### HTTP Methods
+
+| Method | Use Case | Idempotent | Safe |
+|--------|----------|------------|------|
+| GET | Retrieve data | Yes | Yes |
+| POST | Create resource | No | No |
+| PUT | Update/Replace resource | Yes | No |
+| PATCH | Partial update | No | No |
+| DELETE | Delete resource | Yes | No |
+
+### Status Codes
+
+| Code | Meaning | Use Case |
+|------|---------|----------|
+| 200 | OK | Successful GET, PUT, PATCH |
+| 201 | Created | Successful POST |
+| 204 | No Content | Successful DELETE |
+| 400 | Bad Request | Invalid input |
+| 401 | Unauthorized | Not authenticated |
+| 403 | Forbidden | No permission |
+| 404 | Not Found | Resource not found |
+| 409 | Conflict | Duplicate resource |
+| 422 | Unprocessable Entity | Validation error |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Server Error | Server error |
+
+### URL Design Patterns
+
+```
+# Resource-based URLs
+GET    /api/destinations           # List all destinations
+GET    /api/destinations/{id}      # Get specific destination
+POST   /api/destinations           # Create destination
+PUT    /api/destinations/{id}      # Update destination
+DELETE /api/destinations/{id}      # Delete destination
+
+# Nested resources
+GET    /api/destinations/{id}/reviews
+POST   /api/destinations/{id}/reviews
+
+# Action-based URLs (when REST doesn't fit)
+POST   /api/bookings/{id}/cancel
+POST   /api/bookings/{id}/confirm
+```
+
+### Pagination
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "current_page": 1,
+    "per_page": 20,
+    "total": 100,
+    "last_page": 5
+  },
+  "links": {
+    "first": "/api/destinations?page=1",
+    "last": "/api/destinations?page=5",
+    "next": "/api/destinations?page=2",
+    "prev": null
+  }
+}
+```
+
+### Filtering & Sorting
+
+```
+# Filtering
+GET /api/destinations?city=Jakarta&category_id=1&is_active=true
+
+# Sorting
+GET /api/destinations?sort=rating_avg&order=desc
+
+# Search
+GET /api/destinations?search=bali
+
+# Combined
+GET /api/destinations?city=Jakarta&sort=rating_avg&order=desc&page=1
+```
+
+### Rate Limiting
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 55
+X-RateLimit-Reset: 1625097600
+```
+
+---
+
+## 3. FORMAT RESPONSE STANDAR
 
 ```json
 {
@@ -45,9 +138,75 @@ backend (PHP Native). Semua response dalam format JSON.
 
 ---
 
-## 4. DAFTAR ENDPOINTS LENGKAP
+## 4. INTEGRATION REMINDERS — API LAYER
 
-### 4.1 Auth
+### ⚠️ CRITICAL: API Must Integrate Properly with All Layers
+
+Saat membangun API endpoints, pastikan integrasi berikut:
+
+#### 4.1 API ↔ Frontend Integration
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Consistent Response Format** | Semua endpoint return JSON dengan struktur `{status, message, data, meta}` |
+| **CSRF Token Validation** | POST/PUT/DELETE harus validasi CSRF token dari frontend |
+| **Error Messages** | Error response harus user-friendly dan actionable |
+| **HTTP Status Codes** | Gunakan status code yang sesuai (200, 201, 400, 401, 403, 404, 422, 500) |
+| **Rate Limiting Headers** | Return rate limit info di response headers |
+
+#### 4.2 API ↔ Middleware Integration
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Authentication Check** | Middleware cek session/token sebelum reach controller |
+| **Authorization Check** | Middleware cek role/permission sebelum akses resource |
+| **Input Validation** | Middleware validasi input sebelum reach controller |
+| **Request Logging** | Log semua API requests untuk audit trail |
+| **Error Handling** | Middleware catch errors dan return consistent error response |
+
+#### 4.3 API ↔ Backend Integration
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Service Layer Usage** | Business logic di service layer, bukan di controller |
+| **Repository Pattern** | Data access via repository, bukan direct query di controller |
+| **Transaction Management** | Gunakan transaction untuk operasi multi-step |
+| **Error Propagation** | Catch service errors dan convert ke API response |
+| **Data Transformation** | Transform data dari model ke API response format |
+
+#### 4.4 API ↔ Database Integration
+
+| Requirement | Implementation |
+|-------------|----------------|
+| **Prepared Statements** | Semua query menggunakan prepared statements |
+| **Connection Management** | Gunakan singleton pattern untuk database connection |
+| **Query Optimization** | Gunakan indexes dan avoid N+1 queries |
+| **Error Handling** | Catch database errors dan log dengan detail |
+| **Data Validation** | Validasi data sebelum insert/update |
+
+### 4.5 API Flow Validation Checklist
+
+Sebelum deploy endpoint API, pastikan:
+
+- [ ] Request validasi di middleware
+- [ ] Authentication/authorization check
+- [ ] Business logic di service layer
+- [ ] Data access via repository
+- [ ] Transaction untuk multi-step operations
+- [ ] Error handling dengan try-catch
+- [ ] Response format konsisten
+- [ ] HTTP status code sesuai
+- [ ] Rate limiting applied
+- [ ] Audit log tercatat
+- [ ] CSRF token validasi (untuk state-changing)
+- [ ] Input sanitization
+- [ ] Output escaping untuk XSS prevention
+
+---
+
+## 5. DAFTAR ENDPOINTS LENGKAP
+
+### 5.1 Auth
 
 | Method | URL | Body | Response |
 |--------|-----|------|----------|
@@ -57,7 +216,7 @@ backend (PHP Native). Semua response dalam format JSON.
 | POST | `api/auth/forgot-password` | email | success |
 | GET | `api/auth/me` | - | current user |
 
-### 4.2 Tour Guide
+### 5.2 Tour Guide
 
 | Method | URL | Params | Response |
 |--------|-----|--------|----------|
