@@ -67,6 +67,8 @@ if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/helpers/Validator.php';
     require_once APP_ROOT . '/app/helpers/Logger.php';
     require_once APP_ROOT . '/app/helpers/FileUpload.php';
+    require_once APP_ROOT . '/app/helpers/Email.php';
+    require_once APP_ROOT . '/app/helpers/SMS.php';
     
     // Start session
     Session::start();
