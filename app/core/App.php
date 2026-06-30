@@ -24,6 +24,10 @@ class App {
         if (!empty($url) && file_exists(APP_ROOT . '/app/controllers/' . ucfirst($url[0]) . 'Controller.php')) {
             $this->controller = ucfirst($url[0]);
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'api') {
+            // API routes
+            $this->controller = 'Api';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

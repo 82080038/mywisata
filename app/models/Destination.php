@@ -17,12 +17,12 @@ class Destination extends Model {
     protected $table = 'destinations';
     
     /**
-     * Get all destinations
+     * Get all destinations with filters
      * 
      * @param array $filters Optional filters
      * @return array
      */
-    public function getAll($filters = []) {
+    public function getAllWithFilters($filters = []) {
         $where = ['1=1'];
         $params = [];
         
@@ -42,8 +42,9 @@ class Destination extends Model {
         }
         
         if (!empty($filters['search'])) {
-            $where[] = "(name LIKE :search OR description LIKE :search)";
-            $params['search'] = "%{$filters['search']}%";
+            $where[] = "(d.name LIKE :search_name OR d.description LIKE :search_desc)";
+            $params['search_name'] = "%{$filters['search']}%";
+            $params['search_desc'] = "%{$filters['search']}%";
         }
         
         $whereClause = implode(' AND ', $where);

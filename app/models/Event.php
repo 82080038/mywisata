@@ -17,12 +17,12 @@ class Event extends Model {
     protected $table = 'events';
     
     /**
-     * Get all events
+     * Get all events with filters
      * 
      * @param array $filters Optional filters
      * @return array
      */
-    public function getAll($filters = []) {
+    public function getAllWithFilters($filters = []) {
         $where = ['1=1'];
         $params = [];
         
@@ -32,17 +32,18 @@ class Event extends Model {
         }
         
         if (!empty($filters['is_approved'])) {
-            $where[] = "is_approved = :is_approved";
-            $params['is_approved'] = $filters['is_approved'];
+            $where[] = "is_active = :is_active";
+            $params['is_active'] = $filters['is_approved'];
         }
         
         if (!empty($filters['search'])) {
-            $where[] = "(name LIKE :search OR description LIKE :search)";
-            $params['search'] = "%{$filters['search']}%";
+            $where[] = "(e.title LIKE :search_name OR e.description LIKE :search_desc)";
+            $params['search_name'] = "%{$filters['search']}%";
+            $params['search_desc'] = "%{$filters['search']}%";
         }
         
         if (!empty($filters['upcoming'])) {
-            $where[] = "event_date >= CURDATE()";
+            $where[] = "start_date >= CURDATE()";
         }
         
         $whereClause = implode(' AND ', $where);
@@ -52,7 +53,7 @@ class Event extends Model {
                 (SELECT COUNT(*) FROM event_reviews WHERE event_id = e.id) as review_count
                 FROM {$this->table} e 
                 WHERE {$whereClause} 
-                ORDER BY e.event_date ASC";
+                ORDER BY e.start_date ASC";
         
         return $this->db->query($sql, $params)->fetchAll();
     }

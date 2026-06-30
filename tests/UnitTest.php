@@ -120,6 +120,7 @@ class MyWisataTestSuite {
         require_once APP_ROOT . '/app/core/Database.php';
         require_once APP_ROOT . '/app/helpers/Validator.php';
         require_once APP_ROOT . '/app/helpers/Session.php';
+        require_once APP_ROOT . '/app/helpers/Logger.php';
         require_once APP_ROOT . '/app/helpers/Cache.php';
         require_once APP_ROOT . '/app/helpers/Search.php';
         

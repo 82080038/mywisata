@@ -9,6 +9,13 @@
  * @since 2026-07-01
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/Destination.php';
+require_once APP_ROOT . '/app/models/TourGuide.php';
+require_once APP_ROOT . '/app/models/Hotel.php';
+require_once APP_ROOT . '/app/models/Restaurant.php';
+require_once APP_ROOT . '/app/models/Event.php';
+
 class ApiController extends Controller {
     
     /**
@@ -16,7 +23,7 @@ class ApiController extends Controller {
      */
     public function getDestinations() {
         $destinationModel = new Destination();
-        $destinations = $destinationModel->getAll(['is_active' => 1]);
+        $destinations = $destinationModel->getAllWithFilters(['is_active' => 1]);
         
         $this->json(['status' => 'success', 'data' => $destinations]);
     }
@@ -44,7 +51,7 @@ class ApiController extends Controller {
      */
     public function getTourGuides() {
         $tourGuideModel = new TourGuide();
-        $guides = $tourGuideModel->getAll(['is_verified' => 1, 'is_available' => 1]);
+        $guides = $tourGuideModel->getAllWithFilters(['is_verified' => 1, 'is_available' => 1]);
         
         $this->json(['status' => 'success', 'data' => $guides]);
     }
@@ -72,7 +79,7 @@ class ApiController extends Controller {
      */
     public function getHotels() {
         $hotelModel = new Hotel();
-        $hotels = $hotelModel->getAll(['is_approved' => 1]);
+        $hotels = $hotelModel->getAllWithFilters(['is_approved' => 1]);
         
         $this->json(['status' => 'success', 'data' => $hotels]);
     }
@@ -82,7 +89,7 @@ class ApiController extends Controller {
      */
     public function getRestaurants() {
         $restaurantModel = new Restaurant();
-        $restaurants = $restaurantModel->getAll(['is_approved' => 1]);
+        $restaurants = $restaurantModel->getAllWithFilters(['is_approved' => 1]);
         
         $this->json(['status' => 'success', 'data' => $restaurants]);
     }
@@ -92,7 +99,7 @@ class ApiController extends Controller {
      */
     public function getEvents() {
         $eventModel = new Event();
-        $events = $eventModel->getAll(['is_approved' => 1, 'upcoming' => true]);
+        $events = $eventModel->getAllWithFilters(['is_approved' => 1, 'upcoming' => true]);
         
         $this->json(['status' => 'success', 'data' => $events]);
     }
@@ -108,27 +115,27 @@ class ApiController extends Controller {
         
         if ($type === 'all' || $type === 'destinations') {
             $destinationModel = new Destination();
-            $results['destinations'] = $destinationModel->getAll(['search' => $query, 'is_active' => 1]);
+            $results['destinations'] = $destinationModel->getAllWithFilters(['search' => $query, 'is_active' => 1]);
         }
         
         if ($type === 'all' || $type === 'guides') {
             $tourGuideModel = new TourGuide();
-            $results['guides'] = $tourGuideModel->getAll(['is_verified' => 1]);
+            $results['guides'] = $tourGuideModel->getAllWithFilters(['is_verified' => 1]);
         }
         
         if ($type === 'all' || $type === 'hotels') {
             $hotelModel = new Hotel();
-            $results['hotels'] = $hotelModel->getAll(['search' => $query, 'is_approved' => 1]);
+            $results['hotels'] = $hotelModel->getAllWithFilters(['search' => $query, 'is_approved' => 1]);
         }
         
         if ($type === 'all' || $type === 'restaurants') {
             $restaurantModel = new Restaurant();
-            $results['restaurants'] = $restaurantModel->getAll(['search' => $query, 'is_approved' => 1]);
+            $results['restaurants'] = $restaurantModel->getAllWithFilters(['search' => $query, 'is_approved' => 1]);
         }
         
         if ($type === 'all' || $type === 'events') {
             $eventModel = new Event();
-            $results['events'] = $eventModel->getAll(['search' => $query, 'is_approved' => 1]);
+            $results['events'] = $eventModel->getAllWithFilters(['search' => $query, 'is_approved' => 1]);
         }
         
         $this->json(['status' => 'success', 'data' => $results]);

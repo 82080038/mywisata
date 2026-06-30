@@ -45,12 +45,12 @@ class TourGuide extends Model {
     }
     
     /**
-     * Get all tour guides
+     * Get all tour guides with filters
      * 
      * @param array $filters Optional filters
      * @return array
      */
-    public function getAll($filters = []) {
+    public function getAllWithFilters($filters = []) {
         $where = ['1=1'];
         $params = [];
         
