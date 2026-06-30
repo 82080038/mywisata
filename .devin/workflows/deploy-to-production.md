@@ -24,28 +24,28 @@ description: How to deploy the application to a production Linux VPS server
 
 3. Create database and user:
    ```bash
-   sudo mysql -e "CREATE DATABASE tour_guide_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   sudo mysql -e "CREATE USER 'tourguide'@'localhost' IDENTIFIED BY 'strong_password_here';"
-   sudo mysql -e "GRANT ALL PRIVILEGES ON tour_guide_app.* TO 'tourguide'@'localhost';"
+   sudo mysql -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   sudo mysql -e "CREATE USER 'mywisata'@'localhost' IDENTIFIED BY 'strong_password_here';"
+   sudo mysql -e "GRANT ALL PRIVILEGES ON mywisata.* TO 'mywisata'@'localhost';"
    sudo mysql -e "FLUSH PRIVILEGES;"
    ```
 
 4. Clone project:
    ```bash
-   sudo git clone https://github.com/82080038/wisata.git /var/www/wisata
+   sudo git clone https://github.com/82080038/mywisata.git /var/www/mywisata
    ```
 
 5. Import database:
    ```bash
-   mysql -u tourguide -p tour_guide_app < /var/www/wisata/database/migration.sql
-   mysql -u tourguide -p tour_guide_app < /var/www/wisata/database/seed.sql
+   mysql -u mywisata -p mywisata < /var/www/mywisata/database/migration.sql
+   mysql -u mywisata -p mywisata < /var/www/mywisata/database/seed.sql
    ```
 
 6. Set permissions:
    ```bash
-   sudo chown -R www-data:www-data /var/www/wisata
-   sudo chmod -R 755 /var/www/wisata
-   sudo chmod -R 775 /var/www/wisata/public/uploads /var/www/wisata/logs /var/www/wisata/database/backup
+   sudo chown -R www-data:www-data /var/www/mywisata
+   sudo chmod -R 755 /var/www/mywisata
+   sudo chmod -R 775 /var/www/mywisata/public/uploads /var/www/mywisata/logs /var/www/mywisata/database/backup
    ```
 
 7. Configure production settings:
@@ -56,8 +56,8 @@ description: How to deploy the application to a production Linux VPS server
    ```apache
    <VirtualHost *:80>
        ServerName yourdomain.com
-       DocumentRoot /var/www/wisata
-       <Directory /var/www/wisata>
+       DocumentRoot /var/www/mywisata
+       <Directory /var/www/mywisata>
            AllowOverride All
            Require all granted
        </Directory>
@@ -67,7 +67,7 @@ description: How to deploy the application to a production Linux VPS server
 9. Enable modules and site:
    ```bash
    sudo a2enmod rewrite headers
-   sudo a2ensite tourguide.conf
+   sudo a2ensite mywisata.conf
    sudo systemctl reload apache2
    ```
 
@@ -82,7 +82,7 @@ description: How to deploy the application to a production Linux VPS server
     # Database backup daily at 02:00
     0 2 * * * /opt/scripts/backup_db.sh
     # Event reminder at 09:00
-    0 9 * * * php /var/www/wisata/cron/event_reminder.php
+    0 9 * * * php /var/www/mywisata/cron/event_reminder.php
     ```
 
 12. Smoke test: Open `https://yourdomain.com/` and test login

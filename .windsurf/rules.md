@@ -1,7 +1,7 @@
 # Windsurf Project Rules — Tour Guide Application
 
 ## Project Type
-PHP Native MVC web application (no framework, no Composer required)
+PHP Native MVC web application (no framework, no Composer required) with Repository Pattern + Service Layer
 
 ## Key Rules
 
@@ -12,6 +12,7 @@ PHP Native MVC web application (no framework, no Composer required)
 - Every view must escape output with `Helper::e($var)` or `htmlspecialchars($var, ENT_QUOTES, 'UTF-8')`
 - Every API endpoint returns JSON via `$this->json(['status' => 'success|error', 'message' => '...', 'data' => ...])`
 - Every model extends `Model` base class and uses `$this->db->query($sql, $params)` pattern
+- Use Repository Pattern for data access and Service Layer for business logic
 - File uploads must validate MIME type, extension, and size (max 5MB)
 - Passwords must be hashed with `password_hash($pass, PASSWORD_BCRYPT)`, never plain text
 
@@ -21,6 +22,7 @@ PHP Native MVC web application (no framework, no Composer required)
 - Views: `app/views/role/snake_case_view.php`
 - Assets: `public/assets/css/` or `public/assets/js/`
 - SQL: `database/migration.sql` (schema), `database/seed.sql` (data)
+- Database name: `mywisata` (utf8mb4, utf8mb4_unicode_ci)
 
 ### Naming
 - Class: PascalCase (`TourGuideController`)
@@ -37,6 +39,14 @@ PHP Native MVC web application (no framework, no Composer required)
 - Security: `docs/20_SECURITY_SYSTEM.md`
 - Coding Standards: `docs/28_STANDAR_KODE_KONTRIBUSI.md`
 - Checklist: `docs/29_CHECKLIST_PENGEMBANGAN.md`
+- Prompting System: `prompting/README.md` (autonomous development framework)
+- Config: `prompting/config.json` (multi-environment: Linux/Windows)
+
+### Key Constants
+- `APP_ROOT` — project root path (defined in `index.php`)
+- `BASE_URL` — app base URL
+- `APP_ENV` — `development` or `production`
+- `APP_DEBUG` — `true` in dev, `false` in prod
 
 ### Do NOT
 - Do not use `var` in JavaScript (use `const` or `let`)

@@ -20,20 +20,20 @@ description: How to set up the local development environment for Tour Guide Appl
 
 3. Create database:
    ```bash
-   /opt/lampp/bin/mysql -u root -e "CREATE DATABASE tour_guide_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   /opt/lampp/bin/mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
 
 4. Import schema and seed data:
    ```bash
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/seed.sql
+   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/migration.sql
+   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/seed.sql
    ```
 
 5. Configure database connection in `app/config/database.php`:
    ```php
    return [
        'host'    => 'localhost',
-       'dbname'  => 'tour_guide_app',
+       'dbname'  => 'mywisata',
        'user'    => 'root',
        'pass'    => '',
        'charset' => 'utf8mb4',

@@ -7,9 +7,9 @@ description: How to deploy the application to a production Linux VPS server
 ## Steps
 
 1. Install LAMP stack on Ubuntu 20.04+
-2. Create database `tour_guide_app` and user
+2. Create database `mywisata` and user
 3. Clone project to `/var/www/mywisata`
-4. Import `database/migration.sql` and `database/seed.sql`
+4. Import `database/migration.sql` and `database/seed.sql` into `mywisata` database
 5. Set permissions: `chown www-data`, `chmod 755`, `chmod 775` for uploads/logs/backup
 6. Configure `config.php` (APP_ENV=production, APP_DEBUG=false) and `database.php`
 7. Configure Apache VirtualHost with `AllowOverride All`

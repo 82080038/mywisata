@@ -57,10 +57,19 @@ date_default_timezone_set('Asia/Jakarta');
 
 // Load core classes
 if (file_exists(APP_ROOT . '/app/core/App.php')) {
+    require_once APP_ROOT . '/app/core/Database.php';
     require_once APP_ROOT . '/app/core/App.php';
     require_once APP_ROOT . '/app/core/Controller.php';
     require_once APP_ROOT . '/app/core/Model.php';
     require_once APP_ROOT . '/app/core/View.php';
+    require_once APP_ROOT . '/app/middleware/Middleware.php';
+    require_once APP_ROOT . '/app/helpers/Session.php';
+    require_once APP_ROOT . '/app/helpers/Validator.php';
+    require_once APP_ROOT . '/app/helpers/Logger.php';
+    require_once APP_ROOT . '/app/helpers/FileUpload.php';
+    
+    // Start session
+    Session::start();
     
     // Initialize and run the application
     $app = new App();

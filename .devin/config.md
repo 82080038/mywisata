@@ -1,24 +1,25 @@
 # Project Context — Tour Guide Application
 
 ## Project Overview
-Tour Guide Application is a tourism marketplace web app built with PHP Native (Simple MVC), MySQL, Bootstrap 5, jQuery, and OpenStreetMap/Leaflet. It connects tourists with tour guides, destinations, hotels, restaurants, and cultural events.
+Tour Guide Application (MyWisata) is a tourism marketplace web app built with PHP Native (Simple MVC + Repository Pattern + Service Layer), MySQL, Bootstrap 5, jQuery, and OpenStreetMap/Leaflet. It connects tourists with tour guides, destinations, hotels, restaurants, and cultural events.
 
 ## Tech Stack
 - **Backend:** PHP 8.1+ (Native, no framework — custom MVC in `app/core/`)
-- **Database:** MySQL 8.0+ (utf8mb4, 33 tables, InnoDB)
+- **Database:** MySQL 8.0+ (utf8mb4, 33 tables, InnoDB, database name: `mywisata`)
 - **Frontend:** Bootstrap 5.3, jQuery 3.7, Font Awesome 6, SweetAlert2, DataTables, Select2, Chart.js
 - **Map:** OpenStreetMap + Leaflet 1.9 (free, no API key needed)
 - **Web Server:** Apache (mod_rewrite) or Nginx (PHP-FPM)
 - **Local Dev:** XAMPP/LAMPP at `/opt/lampp/htdocs/mywisata/`
 
 ## Architecture
-- **Pattern:** Simple MVC (Model-View-Controller)
+- **Pattern:** Simple MVC (Model-View-Controller) + Repository Pattern + Service Layer
 - **Entry Point:** `index.php` (front controller → `app/core/App.php` router)
 - **Routing:** URL-based (`?url=controller/method/params`) via `.htaccess` rewrite
 - **Database:** PDO Singleton (`app/core/Database.php`), prepared statements only
 - **Autoload:** `spl_autoload_register()` — no Composer needed (optional)
 - **Auth:** Session-based, bcrypt password hash, RBAC middleware
 - **API:** AJAX + JSON, all responses via `$this->json()` method
+- **Prompting System:** Autonomous development framework in `prompting/` (config.json, cycle management, state tracking)
 
 ## Three User Roles
 1. **admin** — Full system access (dashboard, user mgmt, approvals, reports, settings)
@@ -26,7 +27,8 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 3. **tour_guide** — Provider (profile, schedule, accept bookings, earnings, reviews)
 
 ## Key Directories
-- `docs/` — 33 documentation files (the blueprint for building this app)
+- `docs/` — 43 documentation files (00-42, the blueprint for building this app)
+- `prompting/` — Autonomous development prompting system (config.json, cycle templates, state tracking)
 - `app/config/` — Configuration files (config.php, database.php)
 - `app/core/` — Framework classes (App, Controller, Model, View, Database, Middleware, etc.)
 - `app/controllers/` — Business logic controllers
@@ -38,12 +40,13 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 - `logs/` — Error log and audit log
 - `cron/` — Cron job scripts (event reminder, rate limit cleanup)
 
-## Important Constants (defined in app/config/config.php)
+## Important Constants (defined in index.php and app/config/config.php)
+- `APP_ROOT` — Absolute path to project root (defined in `index.php`)
+- `APP_START_TIME` — Microtime for performance tracking (defined in `index.php`)
 - `BASE_URL` — App base URL (e.g., `http://localhost/mywisata/`)
-- `BASE_PATH` — Absolute path to project root
 - `APP_ENV` — `development` or `production`
 - `APP_DEBUG` — `true` in dev, `false` in prod
-- `CSRF_TOKEN` — Cross-site request forgery token
+- `CSRF_TOKEN` — Cross-site request forgery token (auto-generated per session)
 - `MAX_UPLOAD_SIZE` — Max file upload size (default 5MB)
 
 ## Security Practices
@@ -64,6 +67,7 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 - **Files:** PascalCase for class files, snake_case for view files
 
 ## Database
+- Database name: `mywisata` (utf8mb4, utf8mb4_unicode_ci)
 - 33 tables in `database/migration.sql`
 - Seed data in `database/seed.sql`
 - Default admin: `admin@mywisata.com` / `admin123`
@@ -72,16 +76,30 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 
 ## How to Run Locally
 1. Start XAMPP/LAMPP (Apache + MySQL)
-2. Create database `tour_guide_app` (utf8mb4)
+2. Create database `mywisata` (utf8mb4, utf8mb4_unicode_ci)
 3. Import `database/migration.sql` then `database/seed.sql`
 4. Configure `app/config/database.php` and `app/config/config.php`
 5. Set permissions: `chmod -R 777 public/uploads logs database/backup`
 6. Open `http://localhost/mywisata/` in browser
+7. Alternatively, configure via `prompting/config.json` for multi-environment setup (Linux/Windows)
 
 ## Current Status
-- **Phase:** Documentation complete (33 docs), code not yet implemented
+- **Phase:** Documentation complete (43 docs, 00-42), code not yet implemented
+- **Entry Point:** `index.php` shows setup page (core classes not yet created)
 - **Next Step:** Begin Fase 1 MVP — setup project structure, core classes, auth module
+- **Starting Module:** `05_DESAIN_DATABASE_MYSQL_ERD` (per `prompting/config.json`)
 - **Roadmap:** 22 weeks (5.5 months) from MVP to Go Live (see `docs/26_ROADMAP_PENGEMBANGAN.md`)
+- **Prompting System:** Ready for autonomous development (see `prompting/README.md`)
+
+## Configuration Files
+- `.env.example` — Environment configuration template (copy to `.env`)
+- `prompting/config.json` — Multi-environment config (Linux/Windows, DB credentials, API keys, permissions)
+- `.editorconfig` — Editor formatting rules (4-space PHP, 2-space JS/CSS)
+- `.gitignore` — Git ignore rules (excludes .env, logs, uploads, vendor)
+- `CONTRIBUTING.md` — Contribution guide (Git workflow, coding standards, review checklist)
 
 ## Documentation Index
-See `docs/00_DAFTAR_ISI.md` for complete table of contents of all 33 documentation files.
+See `docs/00_DAFTAR_ISI.md` for complete table of contents of all 43 documentation files (00-42).
+
+## GitHub Repository
+- **URL:** https://github.com/82080038/mywisata
