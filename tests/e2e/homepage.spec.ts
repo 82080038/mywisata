@@ -26,7 +26,7 @@ test.describe('Homepage Tests', () => {
     await page.goto(BASE_URL);
 
     // Check for hero section
-    const hero = page.locator('.hero, .jumbotron, header');
+    const hero = page.locator('.hero-section, .hero, .jumbotron, header');
     await expect(hero.first()).toBeVisible();
   });
 
