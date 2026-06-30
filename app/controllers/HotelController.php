@@ -9,6 +9,9 @@
  * @since 2026-07-01
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/Hotel.php';
+
 class HotelController extends Controller {
     
     /**
@@ -23,7 +26,7 @@ class HotelController extends Controller {
             'is_approved' => 1
         ];
         
-        $hotels = $hotelModel->getAll($filters);
+        $hotels = $hotelModel->getAllWithFilters($filters);
         
         $data = [
             'title' => 'Hotel & Homestay - MyWisata',

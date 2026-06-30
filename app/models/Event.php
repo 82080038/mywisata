@@ -84,8 +84,8 @@ class Event extends Model {
         $sql = "SELECT e.*, 
                 (SELECT AVG(rating) FROM event_reviews WHERE event_id = e.id) as rating_avg
                 FROM {$this->table} e 
-                WHERE e.is_approved = 1 AND e.event_date >= CURDATE()
-                ORDER BY e.event_date ASC
+                WHERE e.is_active = 1 AND e.start_date >= CURDATE()
+                ORDER BY e.start_date ASC
                 LIMIT :limit";
         
         return $this->db->query($sql, ['limit' => $limit])->fetchAll();

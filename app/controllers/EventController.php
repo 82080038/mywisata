@@ -9,6 +9,9 @@
  * @since 2026-07-01
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/Event.php';
+
 class EventController extends Controller {
     
     /**
@@ -20,11 +23,11 @@ class EventController extends Controller {
         $filters = [
             'city' => $this->get('city'),
             'search' => $this->get('search'),
-            'is_approved' => 1,
+            'is_active' => 1,
             'upcoming' => true
         ];
         
-        $events = $eventModel->getAll($filters);
+        $events = $eventModel->getAllWithFilters($filters);
         $upcoming = $eventModel->getUpcoming(6);
         
         $data = [

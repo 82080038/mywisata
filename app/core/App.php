@@ -32,6 +32,22 @@ class App {
             // Handle plural 'destinations' to singular 'Destination' controller
             $this->controller = 'Destination';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'tourguides') {
+            // Handle plural 'tourguides' to singular 'TourGuide' controller
+            $this->controller = 'TourGuide';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'hotels') {
+            // Handle plural 'hotels' to singular 'Hotel' controller
+            $this->controller = 'Hotel';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'restaurants') {
+            // Handle plural 'restaurants' to singular 'Restaurant' controller
+            $this->controller = 'Restaurant';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'events') {
+            // Handle plural 'events' to singular 'Event' controller
+            $this->controller = 'Event';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

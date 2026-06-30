@@ -9,6 +9,9 @@
  * @since 2026-07-01
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/Restaurant.php';
+
 class RestaurantController extends Controller {
     
     /**
@@ -23,7 +26,7 @@ class RestaurantController extends Controller {
             'is_approved' => 1
         ];
         
-        $restaurants = $restaurantModel->getAll($filters);
+        $restaurants = $restaurantModel->getAllWithFilters($filters);
         
         $data = [
             'title' => 'Restoran & UMKM - MyWisata',
