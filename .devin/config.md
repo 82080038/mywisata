@@ -9,7 +9,7 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 - **Frontend:** Bootstrap 5.3, jQuery 3.7, Font Awesome 6, SweetAlert2, DataTables, Select2, Chart.js
 - **Map:** OpenStreetMap + Leaflet 1.9 (free, no API key needed)
 - **Web Server:** Apache (mod_rewrite) or Nginx (PHP-FPM)
-- **Local Dev:** XAMPP/LAMPP at `/opt/lampp/htdocs/wisata/`
+- **Local Dev:** XAMPP/LAMPP at `/opt/lampp/htdocs/mywisata/`
 
 ## Architecture
 - **Pattern:** Simple MVC (Model-View-Controller)
@@ -39,7 +39,7 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 - `cron/` — Cron job scripts (event reminder, rate limit cleanup)
 
 ## Important Constants (defined in app/config/config.php)
-- `BASE_URL` — App base URL (e.g., `http://localhost/wisata/`)
+- `BASE_URL` — App base URL (e.g., `http://localhost/mywisata/`)
 - `BASE_PATH` — Absolute path to project root
 - `APP_ENV` — `development` or `production`
 - `APP_DEBUG` — `true` in dev, `false` in prod
@@ -66,7 +66,7 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 ## Database
 - 33 tables in `database/migration.sql`
 - Seed data in `database/seed.sql`
-- Default admin: `admin@tourguide.app` / `admin123`
+- Default admin: `admin@mywisata.com` / `admin123`
 - All PKs: `BIGINT UNSIGNED AUTO_INCREMENT`
 - Coordinates: `DECIMAL(10,7)` for GPS accuracy
 
@@ -76,7 +76,7 @@ Tour Guide Application is a tourism marketplace web app built with PHP Native (S
 3. Import `database/migration.sql` then `database/seed.sql`
 4. Configure `app/config/database.php` and `app/config/config.php`
 5. Set permissions: `chmod -R 777 public/uploads logs database/backup`
-6. Open `http://localhost/wisata/` in browser
+6. Open `http://localhost/mywisata/` in browser
 
 ## Current Status
 - **Phase:** Documentation complete (33 docs), code not yet implemented

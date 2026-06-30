@@ -13,7 +13,7 @@ description: How to set up the local development environment for Tour Guide Appl
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/82080038/wisata.git /opt/lampp/htdocs/wisata
+   git clone https://github.com/82080038/mywisata.git /opt/lampp/htdocs/mywisata
    ```
 
 2. Start Apache and MySQL via XAMPP/LAMPP control panel
@@ -25,8 +25,8 @@ description: How to set up the local development environment for Tour Guide Appl
 
 4. Import schema and seed data:
    ```bash
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/seed.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/migration.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/seed.sql
    ```
 
 5. Configure database connection in `app/config/database.php`:
@@ -42,21 +42,21 @@ description: How to set up the local development environment for Tour Guide Appl
 
 6. Configure app in `app/config/config.php`:
    ```php
-   define('BASE_URL', 'http://localhost/wisata/');
+   define('BASE_URL', 'http://localhost/mywisata/');
    define('APP_ENV', 'development');
    define('APP_DEBUG', true);
    ```
 
 7. Set folder permissions (Linux):
    ```bash
-   chmod -R 777 /opt/lampp/htdocs/wisata/public/uploads
-   chmod -R 777 /opt/lampp/htdocs/wisata/logs
-   chmod -R 777 /opt/lampp/htdocs/wisata/database/backup
+   chmod -R 777 /opt/lampp/htdocs/mywisata/public/uploads
+   chmod -R 777 /opt/lampp/htdocs/mywisata/logs
+   chmod -R 777 /opt/lampp/htdocs/mywisata/database/backup
    ```
 
-8. Open browser: `http://localhost/wisata/`
+8. Open browser: `http://localhost/mywisata/`
 
-9. Login with default admin: `admin@tourguide.app` / `admin123`
+9. Login with default admin: `admin@mywisata.com` / `admin123`
 
 ## Troubleshooting
 - **Blank page:** Check `logs/error.log`, ensure `display_errors = On` in php.ini (dev only)

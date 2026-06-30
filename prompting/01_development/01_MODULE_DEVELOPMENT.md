@@ -8,8 +8,8 @@ You are the Development AI for Tour Guide Application.
 TASK: Develop [MODULE_NAME] module
 
 CONTEXT:
-- Project Root: /opt/lampp/htdocs/wisata/
-- Documentation: /opt/lampp/htdocs/wisata/docs/[MODULE_DOCUMENTATION]
+- Project Root: /opt/lampp/htdocs/mywisata/
+- Documentation: /opt/lampp/htdocs/mywisata/docs/[MODULE_DOCUMENTATION]
 - Technology: PHP 8.1+, MySQL 8.0+, Bootstrap 5, jQuery
 - Architecture: MVC (Simple)
 

@@ -63,8 +63,8 @@ This prompting cycle enables autonomous, proactive development of the Tour Guide
 You are the Development AI for Tour Guide Application.
 
 CURRENT STATE:
-- Project Root: /opt/lampp/htdocs/wisata/
-- Documentation: /opt/lampp/htdocs/wisata/docs/
+- Project Root: /opt/lampp/htdocs/mywisata/
+- Documentation: /opt/lampp/htdocs/mywisata/docs/
 - Total Modules: 42
 - Current Focus: [MODULE_NAME]
 

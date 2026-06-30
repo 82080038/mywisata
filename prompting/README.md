@@ -107,7 +107,7 @@ When the development direction needs adjustment, use `05_cycle/03_ADJUST_PROMPTI
 
 Track progress using the state tracking template in `05_cycle/01_STATE_TRACKING.md`.
 
-State file location: `/opt/lampp/htdocs/wisata/prompting/state.json`
+State file location: `/opt/lampp/htdocs/mywisata/prompting/state.json`
 
 ## MODULE PRIORITY
 

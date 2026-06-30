@@ -13,7 +13,7 @@ description: How to set up the local development environment for Tour Guide Appl
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/82080038/wisata.git /opt/lampp/htdocs/wisata
+   git clone https://github.com/82080038/mywisata.git /opt/lampp/htdocs/mywisata
    ```
 
 2. Start Apache and MySQL via XAMPP/LAMPP control panel
@@ -25,8 +25,8 @@ description: How to set up the local development environment for Tour Guide Appl
 
 4. Import schema and seed data:
    ```bash
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/seed.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/migration.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/seed.sql
    ```
 
 5. Configure database connection in `app/config/database.php` and app settings in `app/config/config.php`
@@ -36,9 +36,9 @@ description: How to set up the local development environment for Tour Guide Appl
    chmod -R 777 public/uploads logs database/backup
    ```
 
-7. Open browser: `http://localhost/wisata/`
+7. Open browser: `http://localhost/mywisata/`
 
-8. Login with default admin: `admin@tourguide.app` / `admin123`
+8. Login with default admin: `admin@mywisata.com` / `admin123`
 
 ## Full guide
 See `docs/27_PANDUAN_INSTALASI_LOKAL.md` for detailed instructions.

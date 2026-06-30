@@ -9,11 +9,11 @@ Terima kasih atas minat Anda untuk berkontribusi! Ikuti panduan di bawah ini.
 1. **Fork** repository di GitHub
 2. **Clone** fork Anda:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/wisata.git /opt/lampp/htdocs/wisata
+   git clone https://github.com/YOUR_USERNAME/mywisata.git /opt/lampp/htdocs/mywisata
    ```
 3. **Add upstream:**
    ```bash
-   git remote add upstream https://github.com/82080038/wisata.git
+   git remote add upstream https://github.com/82080038/mywisata.git
    ```
 4. **Setup local dev** — ikuti [docs/27_PANDUAN_INSTALASI_LOKAL.md](docs/27_PANDUAN_INSTALASI_LOKAL.md)
 5. **Baca dokumentasi** — mulai dari [docs/00_DAFTAR_ISI.md](docs/00_DAFTAR_ISI.md)

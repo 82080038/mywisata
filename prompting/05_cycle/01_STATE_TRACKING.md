@@ -2,7 +2,7 @@
 
 ## STATE FILE
 
-Location: `/opt/lampp/htdocs/wisata/prompting/state.json`
+Location: `/opt/lampp/htdocs/mywisata/prompting/state.json`
 
 ## STATE FILE FORMAT
 
