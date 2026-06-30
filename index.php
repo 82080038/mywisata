@@ -69,6 +69,7 @@ if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/helpers/FileUpload.php';
     require_once APP_ROOT . '/app/helpers/Email.php';
     require_once APP_ROOT . '/app/helpers/SMS.php';
+    require_once APP_ROOT . '/app/helpers/RateLimiter.php';
     
     // Start session
     Session::start();
