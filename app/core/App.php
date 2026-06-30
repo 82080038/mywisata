@@ -28,6 +28,10 @@ class App {
             // API routes
             $this->controller = 'Api';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'destinations') {
+            // Handle plural 'destinations' to singular 'Destination' controller
+            $this->controller = 'Destination';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

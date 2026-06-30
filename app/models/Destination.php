@@ -162,11 +162,11 @@ class Destination extends Model {
     public function getPopular($limit = 6) {
         $sql = "SELECT d.*, c.name as category_name,
                 (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg,
-                (SELECT COUNT(*) FROM ticket_orders WHERE destination_id = d.id) as order_count
+                (SELECT COUNT(*) FROM destination_reviews WHERE destination_id = d.id) as review_count
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1
-                ORDER BY order_count DESC, rating_avg DESC
+                ORDER BY review_count DESC, rating_avg DESC
                 LIMIT :limit";
         
         return $this->db->query($sql, ['limit' => $limit])->fetchAll();

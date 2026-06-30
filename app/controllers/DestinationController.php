@@ -9,6 +9,9 @@
  * @since 2026-07-01
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/Destination.php';
+
 class DestinationController extends Controller {
     
     /**
@@ -24,7 +27,7 @@ class DestinationController extends Controller {
             'is_active' => 1
         ];
         
-        $destinations = $destinationModel->getAll($filters);
+        $destinations = $destinationModel->getAllWithFilters($filters);
         $featured = $destinationModel->getFeatured(6);
         $popular = $destinationModel->getPopular(6);
         

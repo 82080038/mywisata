@@ -28,31 +28,23 @@ test.describe('Destinations Tests', () => {
   test('should have search functionality', async ({ page }) => {
     await page.goto(`${BASE_URL}/destinations`);
 
-    // Check for search input (may not be present on current implementation)
-    const searchInput = page.locator('input[type="search"], input[placeholder*="cari"], input[placeholder*="search"]');
+    // Check for search input
+    const searchInput = page.locator('input[name="search"], input[placeholder*="Cari"], input[placeholder*="cari"], input[placeholder*="search"]');
     const searchCount = await searchInput.count();
 
-    // Search input is optional - skip if not present
-    if (searchCount > 0) {
-      expect(searchCount).toBeGreaterThan(0);
-    } else {
-      console.log('Search input not found - skipping test');
-    }
+    // Search input should be present
+    expect(searchCount).toBeGreaterThan(0);
   });
 
   test('should have filter options', async ({ page }) => {
     await page.goto(`${BASE_URL}/destinations`);
 
-    // Check for filter dropdowns (may not be present on current implementation)
-    const filters = page.locator('select, .filter');
+    // Check for filter dropdowns
+    const filters = page.locator('select[name="category"], select');
     const filterCount = await filters.count();
 
-    // Filters are optional - skip if not present
-    if (filterCount > 0) {
-      expect(filterCount).toBeGreaterThan(0);
-    } else {
-      console.log('Filter options not found - skipping test');
-    }
+    // Filters should be present
+    expect(filterCount).toBeGreaterThan(0);
   });
 
   test('should navigate to destination detail', async ({ page }) => {
