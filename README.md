@@ -1,4 +1,4 @@
-# Tour Guide Application
+# MyWisata Application
 
 > Aplikasi pemandu wisata berbasis web yang menghubungkan wisatawan dengan tour guide profesional, destinasi wisata, hotel, restoran, dan event budaya.
 
@@ -11,7 +11,7 @@
 
 ## Tentang Aplikasi
 
-**Tour Guide Application** adalah platform marketplace untuk layanan pariwisata yang dibangun dengan **PHP Native (Simple MVC)**, **MySQL**, dan **OpenStreetMap/Leaflet**. Aplikasi ini menghubungkan tiga jenis pengguna:
+**MyWisata Application** adalah platform marketplace untuk layanan pariwisata yang dibangun dengan **PHP Native (Simple MVC)**, **MySQL**, dan **OpenStreetMap/Leaflet**. Aplikasi ini menghubungkan tiga jenis pengguna:
 
 | Role | Deskripsi |
 |------|-----------|
@@ -57,7 +57,7 @@
 ## Struktur Project
 
 ```
-wisata/
+mywisata/
 ├── docs/                 # 33 file dokumentasi (.md)
 ├── app/
 │   ├── config/           # Konfigurasi (config.php, database.php)
@@ -93,10 +93,10 @@ wisata/
 1. **Copy project ke htdocs**
    ```bash
    # Linux
-   cp -r wisata /opt/lampp/htdocs/wisata
+   cp -r mywisata /opt/lampp/htdocs/mywisata
 
    # Windows
-   xcopy wisata C:\xampp\htdocs\wisata /E /I
+   xcopy mywisata C:\xampp\htdocs\mywisata /E /I
    ```
 
 2. **Start Apache & MySQL** via XAMPP Control Panel
@@ -108,26 +108,26 @@ wisata/
 
 4. **Import schema & seed data**
    ```bash
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/wisata/database/seed.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/migration.sql
+   /opt/lampp/bin/mysql -u root tour_guide_app < /opt/lampp/htdocs/mywisata/database/seed.sql
    ```
 
 5. **Konfigurasi koneksi** di `app/config/database.php` dan `app/config/config.php`
 
 6. **Set permissions (Linux)**
    ```bash
-   chmod -R 777 /opt/lampp/htdocs/wisata/public/uploads
-   chmod -R 777 /opt/lampp/htdocs/wisata/logs
-   chmod -R 777 /opt/lampp/htdocs/wisata/database/backup
+   chmod -R 777 /opt/lampp/htdocs/mywisata/public/uploads
+   chmod -R 777 /opt/lampp/htdocs/mywisata/logs
+   chmod -R 777 /opt/lampp/htdocs/mywisata/database/backup
    ```
 
-7. **Akses aplikasi** di browser: `http://localhost/wisata/`
+7. **Akses aplikasi** di browser: `http://localhost/mywisata/`
 
 ### Login Default
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@tourguide.app | admin123 |
+| Admin | admin@mywisata.com | admin123 |
 
 > **Penting:** Ganti password admin setelah login pertama!
 
@@ -247,13 +247,13 @@ Lihat [`docs/24_TESTING_SYSTEM.md`](docs/24_TESTING_SYSTEM.md) untuk test cases 
 sudo apt install apache2 mysql-server php8.1 php8.1-mysql php8.1-gd php8.1-mbstring php8.1-xml php8.1-curl php8.1-zip php8.1-intl
 
 # 2. Copy project
-sudo cp -r wisata /var/www/wisata
-sudo chown -R www-data:www-data /var/www/wisata
+sudo cp -r mywisata /var/www/mywisata
+sudo chown -R www-data:www-data /var/www/mywisata
 
 # 3. Import database
 mysql -u root -p -e "CREATE DATABASE tour_guide_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p tour_guide_app < /var/www/wisata/database/migration.sql
-mysql -u root -p tour_guide_app < /var/www/wisata/database/seed.sql
+mysql -u root -p tour_guide_app < /var/www/mywisata/database/migration.sql
+mysql -u root -p tour_guide_app < /var/www/mywisata/database/seed.sql
 
 # 4. Setup SSL
 sudo apt install certbot python3-certbot-apache
@@ -302,8 +302,9 @@ MIT License — bebas digunakan, dimodifikasi, dan didistribusikan.
 
 ## Kontak
 
-- **Email:** admin@tourguide.app
-- **Repository:** https://github.com/yourrepo/tour-guide-app
+- **Email:** admin@mywisata.com
+- **Repository:** https://github.com/82080038/mywisata
+- **Domain:** mywisata.com (akan dibeli sebagai DNS aplikasi)
 
 ---
 
