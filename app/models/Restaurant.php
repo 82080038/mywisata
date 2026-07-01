@@ -45,8 +45,8 @@ class Restaurant extends Model {
         $whereClause = implode(' AND ', $where);
         
         $sql = "SELECT r.*, 
-                (SELECT AVG(rating) FROM restaurant_reviews WHERE restaurant_id = r.id) as rating_avg,
-                (SELECT COUNT(*) FROM restaurant_reviews WHERE restaurant_id = r.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'restaurant' AND reviewable_id = r.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'restaurant' AND reviewable_id = r.id) as review_count
                 FROM {$this->table} r 
                 WHERE {$whereClause} 
                 ORDER BY r.name";
@@ -62,8 +62,8 @@ class Restaurant extends Model {
      */
     public function findById($id) {
         $sql = "SELECT r.*, 
-                (SELECT AVG(rating) FROM restaurant_reviews WHERE restaurant_id = r.id) as rating_avg,
-                (SELECT COUNT(*) FROM restaurant_reviews WHERE restaurant_id = r.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'restaurant' AND reviewable_id = r.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'restaurant' AND reviewable_id = r.id) as review_count
                 FROM {$this->table} r 
                 WHERE r.id = :id";
         
@@ -89,11 +89,11 @@ class Restaurant extends Model {
      * @return array
      */
     public function getReviews($restaurantId, $limit = null) {
-        $sql = "SELECT rr.*, u.name as user_name 
-                FROM restaurant_reviews rr 
-                LEFT JOIN users u ON rr.user_id = u.id 
-                WHERE rr.restaurant_id = :restaurant_id 
-                ORDER BY rr.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name 
+                FROM reviews r 
+                LEFT JOIN users u ON r.user_id = u.id 
+                WHERE r.reviewable_type = 'restaurant' AND r.reviewable_id = :restaurant_id 
+                ORDER BY r.created_at DESC";
         
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -109,10 +109,10 @@ class Restaurant extends Model {
      * @return bool
      */
     public function addReview($data) {
-        $sql = "INSERT INTO restaurant_reviews 
-                (restaurant_id, user_id, rating, comment, created_at)
+        $sql = "INSERT INTO reviews 
+                (reviewable_type, reviewable_id, user_id, rating, comment, created_at)
                 VALUES 
-                (:restaurant_id, :user_id, :rating, :comment, NOW())";
+                ('restaurant', :restaurant_id, :user_id, :rating, :comment, NOW())";
         
         return $this->db->query($sql, $data);
     }

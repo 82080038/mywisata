@@ -38,9 +38,7 @@ class HomeController extends Controller {
      * Contact page
      */
     public function contact() {
-        $data = [
-            'title' => 'Hubungi Kami',
-        ];
+        $data = [];
         
         $this->view('home/contact', $data);
     }

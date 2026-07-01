@@ -85,76 +85,63 @@ mywisata/
 
 ### Prasyarat
 
-- XAMPP / LAMPP dengan PHP 8.1+ dan MySQL 8.0+
+- PHP 8.1+ dengan MySQL 8.0+ (XAMPP/LAMPP atau native)
+- Node.js 18+ (untuk Playwright testing)
 - Browser modern (Chrome/Firefox/Edge)
 
 ### Langkah Instalasi
 
-1. **Copy project ke htdocs**
+1. **Clone repository**
    ```bash
-   # Linux
-   cp -r mywisata /opt/lampp/htdocs/mywisata
-
-   # Windows
-   xcopy mywisata C:\xampp\htdocs\mywisata /E /I
+   git clone https://github.com/82080038/mywisata.git
+   cd mywisata
    ```
 
-2. **Konfigurasi Environment**
-   
-   Edit file `prompting/config.json` sesuai environment Anda (Linux/Windows):
-   ```json
-   {
-     "environments": {
-       "local": {
-         "os_specific": {
-           "linux": {
-             "project_root": "/opt/lampp/htdocs/mywisata",
-             "php_path": "/opt/lampp/bin/php",
-             "mysql_path": "/opt/lampp/bin/mysql"
-           },
-           "windows": {
-             "project_root": "C:\\xampp\\htdocs\\mywisata",
-             "php_path": "C:\\xampp\\php\\php.exe",
-             "mysql_path": "C:\\xampp\\mysql\\bin\\mysql.exe"
-           }
-         }
-       }
-     }
-   }
-   ```
-
-3. **Start Apache & MySQL** via XAMPP Control Panel
-
-4. **Buat database**
+2. **Start MySQL server**
    ```bash
-   # Linux
-   /opt/lampp/bin/mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   # XAMPP/LAMPP
+   sudo /opt/lampp/lampp start
 
-   # Windows
-   C:\xampp\mysql\bin\mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   # Atau native MySQL
+   sudo systemctl start mysql
    ```
 
-5. **Import schema & seed data**
+3. **Buat database**
    ```bash
-   # Linux
-   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/migration.sql
-   /opt/lampp/bin/mysql -u root mywisata < /opt/lampp/htdocs/mywisata/database/seed.sql
-
-   # Windows
-   C:\xampp\mysql\bin\mysql -u root mywisata < C:\xampp\htdocs\mywisata\database\migration.sql
-   C:\xampp\mysql\bin\mysql -u root mywisata < C:\xampp\htdocs\mywisata\database\seed.sql
+   mysql -u root -e "CREATE DATABASE mywisata CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
 
-6. **Konfigurasi koneksi** di `app/config/database.php` dan `app/config/config.php`
-
-7. **Set permissions (Linux)**
+4. **Import schema & seed data**
    ```bash
-   chmod -R 777 /opt/lampp/htdocs/mywisata/public/uploads
-   chmod -R 777 /opt/lampp/htdocs/mywisata/logs
-   chmod -R 777 /opt/lampp/htdocs/mywisata/database/backup
+   mysql -u root mywisata < database/migration.sql
+   mysql -u root mywisata < database/seed.sql
    ```
 
-8. **Akses aplikasi** di browser: `http://localhost/mywisata/`
+5. **Install dependencies untuk testing**
+   ```bash
+   npm install
+   npx playwright install chromium
+   ```
+
+6. **Start PHP development server**
+   ```bash
+   php -S localhost:8080 router.php
+   ```
+
+7. **Akses aplikasi** di browser: `http://localhost:8080/`
+
+### Menjalankan Tests
+
+```bash
+# Jalankan semua tests
+npx playwright test
+
+# Jalankan dengan browser visible (headed)
+npx playwright test --project=chromium --headed
+
+# Lihat test report
+npx playwright show-report
+```
 
 ### Multi-Environment Support
 

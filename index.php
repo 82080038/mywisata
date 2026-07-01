@@ -70,10 +70,14 @@ if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/helpers/Email.php';
     require_once APP_ROOT . '/app/helpers/SMS.php';
     require_once APP_ROOT . '/app/helpers/RateLimiter.php';
+    require_once APP_ROOT . '/app/helpers/Language.php';
     
     // Start session
     Session::start();
+    // Language helper
+    Language::getLanguage();
     
+    // Initialize 
     // Initialize and run the application
     $app = new App();
     $app->run();

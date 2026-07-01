@@ -21,12 +21,12 @@ class App {
         $url = $this->parseUrl();
         
         // Check if controller exists
-        if (!empty($url) && file_exists(APP_ROOT . '/app/controllers/' . ucfirst($url[0]) . 'Controller.php')) {
-            $this->controller = ucfirst($url[0]);
-            unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'api') {
-            // API routes
+        if (!empty($url) && $url[0] === 'api') {
+            // API routes - check first
             $this->controller = 'Api';
+            unset($url[0]);
+        } elseif (!empty($url) && file_exists(APP_ROOT . '/app/controllers/' . ucfirst($url[0]) . 'Controller.php')) {
+            $this->controller = ucfirst($url[0]);
             unset($url[0]);
         } elseif (!empty($url) && $url[0] === 'destinations') {
             // Handle plural 'destinations' to singular 'Destination' controller
@@ -68,6 +68,9 @@ class App {
         if (!empty($url) && isset($url[1]) && method_exists($this->controller, $url[1])) {
             $this->method = $url[1];
             unset($url[1]);
+        } elseif (!empty($url) && isset($url[1])) {
+            // Method specified but doesn't exist
+            die('Method not found: ' . $url[1]);
         }
         
         // Get parameters
@@ -114,7 +117,26 @@ class App {
             echo '<p>' . $e->getMessage() . '</p>';
             echo '<pre>' . $e->getTraceAsString() . '</pre>';
         } else {
+            http_response_code(500);
             require_once APP_ROOT . '/app/views/errors/500.php';
         }
+    }
+    
+    /**
+     * Handle 404 errors
+     */
+    public function handle404() {
+        http_response_code(404);
+        require_once APP_ROOT . '/app/views/errors/404.php';
+        exit;
+    }
+    
+    /**
+     * Handle 403 errors
+     */
+    public function handle403() {
+        http_response_code(403);
+        require_once APP_ROOT . '/app/views/errors/403.php';
+        exit;
     }
 }

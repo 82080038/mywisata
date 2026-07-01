@@ -45,8 +45,8 @@ class Hotel extends Model {
         $whereClause = implode(' AND ', $where);
         
         $sql = "SELECT h.*, 
-                (SELECT AVG(rating) FROM hotel_reviews WHERE hotel_id = h.id) as rating_avg,
-                (SELECT COUNT(*) FROM hotel_reviews WHERE hotel_id = h.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'hotel' AND reviewable_id = h.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'hotel' AND reviewable_id = h.id) as review_count
                 FROM {$this->table} h 
                 WHERE {$whereClause} 
                 ORDER BY h.name";
@@ -62,8 +62,8 @@ class Hotel extends Model {
      */
     public function findById($id) {
         $sql = "SELECT h.*, 
-                (SELECT AVG(rating) FROM hotel_reviews WHERE hotel_id = h.id) as rating_avg,
-                (SELECT COUNT(*) FROM hotel_reviews WHERE hotel_id = h.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'hotel' AND reviewable_id = h.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'hotel' AND reviewable_id = h.id) as review_count
                 FROM {$this->table} h 
                 WHERE h.id = :id";
         
@@ -89,11 +89,11 @@ class Hotel extends Model {
      * @return array
      */
     public function getReviews($hotelId, $limit = null) {
-        $sql = "SELECT hr.*, u.name as user_name 
-                FROM hotel_reviews hr 
-                LEFT JOIN users u ON hr.user_id = u.id 
-                WHERE hr.hotel_id = :hotel_id 
-                ORDER BY hr.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name 
+                FROM reviews r 
+                LEFT JOIN users u ON r.user_id = u.id 
+                WHERE r.reviewable_type = 'hotel' AND r.reviewable_id = :hotel_id 
+                ORDER BY r.created_at DESC";
         
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -109,10 +109,10 @@ class Hotel extends Model {
      * @return bool
      */
     public function addReview($data) {
-        $sql = "INSERT INTO hotel_reviews 
-                (hotel_id, user_id, rating, comment, created_at)
+        $sql = "INSERT INTO reviews 
+                (reviewable_type, reviewable_id, user_id, rating, comment, created_at)
                 VALUES 
-                (:hotel_id, :user_id, :rating, :comment, NOW())";
+                ('hotel', :hotel_id, :user_id, :rating, :comment, NOW())";
         
         return $this->db->query($sql, $data);
     }

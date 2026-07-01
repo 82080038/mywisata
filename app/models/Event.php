@@ -49,8 +49,8 @@ class Event extends Model {
         $whereClause = implode(' AND ', $where);
         
         $sql = "SELECT e.*, 
-                (SELECT AVG(rating) FROM event_reviews WHERE event_id = e.id) as rating_avg,
-                (SELECT COUNT(*) FROM event_reviews WHERE event_id = e.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'event' AND reviewable_id = e.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'event' AND reviewable_id = e.id) as review_count
                 FROM {$this->table} e 
                 WHERE {$whereClause} 
                 ORDER BY e.start_date ASC";
@@ -66,8 +66,8 @@ class Event extends Model {
      */
     public function findById($id) {
         $sql = "SELECT e.*, 
-                (SELECT AVG(rating) FROM event_reviews WHERE event_id = e.id) as rating_avg,
-                (SELECT COUNT(*) FROM event_reviews WHERE event_id = e.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'event' AND reviewable_id = e.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'event' AND reviewable_id = e.id) as review_count
                 FROM {$this->table} e 
                 WHERE e.id = :id";
         
@@ -82,7 +82,7 @@ class Event extends Model {
      */
     public function getUpcoming($limit = 6) {
         $sql = "SELECT e.*, 
-                (SELECT AVG(rating) FROM event_reviews WHERE event_id = e.id) as rating_avg
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'event' AND reviewable_id = e.id) as rating_avg
                 FROM {$this->table} e 
                 WHERE e.is_active = 1 AND e.start_date >= CURDATE()
                 ORDER BY e.start_date ASC
@@ -99,11 +99,11 @@ class Event extends Model {
      * @return array
      */
     public function getReviews($eventId, $limit = null) {
-        $sql = "SELECT er.*, u.name as user_name 
-                FROM event_reviews er 
-                LEFT JOIN users u ON er.user_id = u.id 
-                WHERE er.event_id = :event_id 
-                ORDER BY er.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name 
+                FROM reviews r 
+                LEFT JOIN users u ON r.user_id = u.id 
+                WHERE r.reviewable_type = 'event' AND r.reviewable_id = :event_id 
+                ORDER BY r.created_at DESC";
         
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -119,10 +119,10 @@ class Event extends Model {
      * @return bool
      */
     public function addReview($data) {
-        $sql = "INSERT INTO event_reviews 
-                (event_id, user_id, rating, comment, created_at)
+        $sql = "INSERT INTO reviews 
+                (reviewable_type, reviewable_id, user_id, rating, comment, created_at)
                 VALUES 
-                (:event_id, :user_id, :rating, :comment, NOW())";
+                ('event', :event_id, :user_id, :rating, :comment, NOW())";
         
         return $this->db->query($sql, $data);
     }

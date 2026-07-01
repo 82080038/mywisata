@@ -43,10 +43,12 @@ if (session_status() === PHP_SESSION_NONE) {
 define('CSRF_TOKEN', bin2hex(random_bytes(32)));
 
 // Session settings
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', APP_ENV === 'production');
-ini_set('session.cookie_samesite', 'Strict');
-ini_set('session.gc_maxlifetime', 1800); // 30 minutes
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', APP_ENV === 'production');
+    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.gc_maxlifetime', 1800); // 30 minutes
+}
 
 // ============================================
 // FILE UPLOAD SETTINGS

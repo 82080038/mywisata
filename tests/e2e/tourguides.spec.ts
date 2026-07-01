@@ -1,14 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost/mywisata';
+const BASE_URL = 'http://localhost:8080';
 
 test.describe('Tour Guides Tests', () => {
-  test('should redirect tour guides page to login for guests', async ({ page }) => {
+  test('should display tour guides page for guests', async ({ page }) => {
     await page.goto(`${BASE_URL}/tourguides`);
 
-    // Tour guides page requires login, should redirect
-    const currentUrl = page.url();
-    expect(currentUrl).toMatch(/login|auth/);
+    // Tour guides page is public, should display
+    await expect(page.locator('h1')).toContainText('Tour Guide');
   });
 
   test('tour guide dashboard requires authentication', async ({ page }) => {

@@ -189,9 +189,9 @@ Fase 4: Production (Minggu 19-22)
 - Multi-bahasa UI (i18n: ID, EN, JP)
 - Search engine optimization (sitemap, meta tags, schema.org)
 
-### Q2 2027 — Mobile Ready & Offline
+### Q2 2027 — Web Enhancement & Offline Features
 
-- Responsive optimization untuk tablet
+- Responsive optimization untuk tablet & mobile web
 - Offline mode untuk peta (Leaflet offline tiles + cached data)
 - Bookmark/favorit destinasi
 - Share destinasi ke social media (WhatsApp, Facebook, Instagram)
@@ -199,6 +199,8 @@ Fase 4: Production (Minggu 19-22)
 - Currency converter (untuk wisatawan mancanegara)
 - Itinerary builder drag & drop (rencana harian multi-destinasi)
 - Voucher management (e-ticket, hotel voucher, PDF storage)
+
+> **CATATAN PENTING:** Pengembangan mobile app (React Native/Flutter) **DITUNDA** hingga setelah Q4 2027. Fokus pada optimasi web responsive dan PWA (Progressive Web App) terlebih dahulu.
 
 ### Q3 2027 — AI Enhancement & Gamification
 
@@ -217,7 +219,7 @@ Fase 4: Production (Minggu 19-22)
 - Load balancer untuk multi-server
 - CDN untuk static assets (Cloudflare)
 - Elasticsearch untuk full-text search
-- Mobile app (React Native / Flutter)
+- ~~Mobile app (React Native / Flutter)~~ **DITUNDA** - fokus pada PWA
 - Car rental module (sewa kendaraan)
 - Flight booking module (integrasi Tiket.com/Duffel API)
 - Newsletter module (email marketing campaign)

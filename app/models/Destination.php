@@ -50,8 +50,8 @@ class Destination extends Model {
         $whereClause = implode(' AND ', $where);
         
         $sql = "SELECT d.*, c.name as category_name, 
-                (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg,
-                (SELECT COUNT(*) FROM destination_reviews WHERE destination_id = d.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as review_count
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE {$whereClause} 
@@ -68,8 +68,8 @@ class Destination extends Model {
      */
     public function findById($id) {
         $sql = "SELECT d.*, c.name as category_name,
-                (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg,
-                (SELECT COUNT(*) FROM destination_reviews WHERE destination_id = d.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as review_count
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.id = :id";
@@ -96,11 +96,11 @@ class Destination extends Model {
      * @return array
      */
     public function getReviews($destinationId, $limit = null) {
-        $sql = "SELECT dr.*, u.name as user_name 
-                FROM destination_reviews dr 
-                LEFT JOIN users u ON dr.user_id = u.id 
-                WHERE dr.destination_id = :destination_id 
-                ORDER BY dr.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name 
+                FROM reviews r 
+                LEFT JOIN users u ON r.user_id = u.id 
+                WHERE r.reviewable_type = 'destination' AND r.reviewable_id = :destination_id 
+                ORDER BY r.created_at DESC";
         
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -143,7 +143,7 @@ class Destination extends Model {
      */
     public function getFeatured($limit = 6) {
         $sql = "SELECT d.*, c.name as category_name,
-                (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as rating_avg
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1 AND d.is_featured = 1
@@ -161,8 +161,8 @@ class Destination extends Model {
      */
     public function getPopular($limit = 6) {
         $sql = "SELECT d.*, c.name as category_name,
-                (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg,
-                (SELECT COUNT(*) FROM destination_reviews WHERE destination_id = d.id) as review_count
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as rating_avg,
+                (SELECT COUNT(*) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as review_count
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1
@@ -179,10 +179,10 @@ class Destination extends Model {
      * @return bool
      */
     public function addReview($data) {
-        $sql = "INSERT INTO destination_reviews 
-                (destination_id, user_id, rating, comment, created_at)
+        $sql = "INSERT INTO reviews 
+                (reviewable_type, reviewable_id, user_id, rating, comment, created_at)
                 VALUES 
-                (:destination_id, :user_id, :rating, :comment, NOW())";
+                ('destination', :destination_id, :user_id, :rating, :comment, NOW())";
         
         return $this->db->query($sql, $data);
     }
@@ -197,8 +197,8 @@ class Destination extends Model {
         $sql = "UPDATE {$this->table} 
                 SET rating_avg = (
                     SELECT COALESCE(AVG(rating), 0) 
-                    FROM destination_reviews 
-                    WHERE destination_id = :destination_id
+                    FROM reviews 
+                    WHERE reviewable_type = 'destination' AND reviewable_id = :destination_id
                 )
                 WHERE id = :destination_id";
         

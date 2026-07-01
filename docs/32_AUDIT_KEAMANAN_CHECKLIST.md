@@ -23,128 +23,128 @@ production release.
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| AC-01 | Setiap controller memiliki middleware role check | [ ] | `Middleware::requireRole()` di constructor |
+| AC-01 | Setiap controller memiliki middleware role check | [x] | `Middleware::requireRole()` di constructor |
 | AC-02 | User hanya bisa akses data miliknya (own data) | [ ] | Cek `user_id` di setiap query |
-| AC-03 | Admin-only endpoints terproteksi | [ ] | `Middleware::requireRole('admin')` |
+| AC-03 | Admin-only endpoints terproteksi | [x] | `Middleware::requireRole('admin')` |
 | AC-04 | IDOR dicegah (tidak bisa akses data orang lain via ID) | [ ] | Validasi ownership di controller |
-| AC-05 | API endpoints memiliki autentikasi | [ ] | Session check di `ApiController` |
+| AC-05 | API endpoints memiliki autentikasi | [x] | Session check di `ApiController` |
 | AC-06 | Direct object reference dicegah | [ ] | Cek `booking.user_id === session.user_id` |
-| AC-07 | Default deny (deny by default, allow by exception) | [ ] | Middleware menolak jika tidak match |
-| AC-08 | Privilege escalation dicegah | [ ] | Role tidak bisa diubah via form biasa |
+| AC-07 | Default deny (deny by default, allow by exception) | [x] | Middleware menolak jika tidak match |
+| AC-08 | Privilege escalation dicegah | [x] | Role tidak bisa diubah via form biasa |
 
 ### A02: Cryptographic Failures
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| CR-01 | Password di-hash dengan bcrypt | [ ] | `password_hash($pass, PASSWORD_BCRYPT)` |
+| CR-01 | Password di-hash dengan bcrypt | [x] | `password_hash($pass, PASSWORD_BCRYPT)` |
 | CR-02 | Password tidak pernah dikirim plain text | [ ] | HTTPS di production |
-| CR-03 | Password tidak pernah di-log | [ ] | Logger tidak mencatat field password |
-| CR-04 | Session ID di-regenerate setelah login | [ ] | `session_regenerate_id(true)` |
-| CR-05 | Session cookie: HttpOnly + Secure + SameSite | [ ] | `session_set_cookie_params()` |
-| CR-06 | CSRF token di-generate dengan `random_bytes()` | [ ] | `bin2hex(random_bytes(32))` |
-| CR-07 | API keys / secrets tidak hardcoded | [ ] | Di config file, tidak di git |
-| CR-08 | File upload: nama file di-randomize | [ ] | `bin2hex(random_bytes(16))` |
+| CR-03 | Password tidak pernah di-log | [x] | Logger tidak mencatat field password |
+| CR-04 | Session ID di-regenerate setelah login | [x] | `session_regenerate_id(true)` |
+| CR-05 | Session cookie: HttpOnly + Secure + SameSite | [x] | `session_set_cookie_params()` |
+| CR-06 | CSRF token di-generate dengan `random_bytes()` | [x] | `bin2hex(random_bytes(32))` |
+| CR-07 | API keys / secrets tidak hardcoded | [x] | Di config file, tidak di git |
+| CR-08 | File upload: nama file di-randomize | [x] | `bin2hex(random_bytes(16))` |
 
 ### A03: Injection
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| IN-01 | Semua query menggunakan PDO prepared statements | [ ] | `$db->query($sql, $params)` |
-| IN-02 | Tidak ada string concatenation di query SQL | [ ] | Code review: grep `$sql.*\$` |
-| IN-03 | Input user tidak pernah dieksekusi sebagai code | [ ] | Tidak ada `eval()` / `exec()` dengan input |
+| IN-01 | Semua query menggunakan PDO prepared statements | [x] | `$db->query($sql, $params)` |
+| IN-02 | Tidak ada string concatenation di query SQL | [x] | Code review: grep `$sql.*\$` |
+| IN-03 | Input user tidak pernah dieksekusi sebagai code | [x] | Tidak ada `eval()` / `exec()` dengan input |
 | IN-04 | Order by / limit tidak dari input langsung | [ ] | Whitelist kolom sort |
 | IN-05 | LIKE query di-escape wildcard | [ ] | `addcslashes($input, '%_')` |
-| IN-06 | Command injection dicegah | [ ] | `escapeshellarg()` di BackupController |
+| IN-06 | Command injection dicegah | [x] | `escapeshellarg()` di BackupController |
 
 ### A04: Insecure Design
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| DS-01 | Threat modeling dilakukan untuk flow kritis | [ ] | Booking, payment, file upload |
-| DS-02 | Rate limiting di endpoint API | [ ] | `RateLimiter::check()` 60 req/menit |
-| DS-03 | Rate limiting di endpoint auth (login) | [ ] | 5 attempt per menit |
+| DS-01 | Threat modeling dilakukan untuk flow kritis | [x] | Booking, payment, file upload |
+| DS-02 | Rate limiting di endpoint API | [x] | `RateLimiter::check()` 60 req/menit |
+| DS-03 | Rate limiting di endpoint auth (login) | [x] | 5 attempt per menit |
 | DS-04 | Account lockout setelah N failed login | [ ] | 5x gagal → lock 15 menit |
-| DS-05 | Password minimum 8 karakter | [ ] | Validator: `min:8` |
+| DS-05 | Password minimum 8 karakter | [x] | Validator: `min:8` |
 | DS-06 | Password complexity (huruf + angka) | [ ] | Validator: regex check |
-| DS-07 | Confirm password di registrasi | [ ] | Field `password_confirmation` |
+| DS-07 | Confirm password di registrasi | [x] | Field `password_confirmation` |
 | DS-08 | Email verification (opsional) | [ ] | Token verifikasi via email |
 
 ### A05: Security Misconfiguration
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| MC-01 | `display_errors = Off` di production | [ ] | `APP_DEBUG = false` |
-| MC-02 | `error_reporting(0)` di production | [ ] | Di `App::run()` |
-| MC-03 | Error log ditulis ke file, tidak tampil | [ ] | `ini_set('log_errors', 1)` |
-| MC-04 | Directory listing disabled | [ ] | `.htaccess: Options -Indexes` |
-| MC-05 | File sensitif tidak accessible | [ ] | `.htaccess: deny .sql, .md, .log, .env` |
-| MC-06 | Folder `app/` tidak directly accessible | [ ] | `.htaccess: Deny from all` |
+| MC-01 | `display_errors = Off` di production | [x] | `APP_DEBUG = false` |
+| MC-02 | `error_reporting(0)` di production | [x] | Di `App::run()` |
+| MC-03 | Error log ditulis ke file, tidak tampil | [x] | `ini_set('log_errors', 1)` |
+| MC-04 | Directory listing disabled | [x] | `.htaccess: Options -Indexes` |
+| MC-05 | File sensitif tidak accessible | [x] | `.htaccess: deny .sql, .md, .log, .env` |
+| MC-06 | Folder `app/` tidak directly accessible | [x] | `.htaccess: Deny from all` |
 | MC-07 | Default credentials diganti | [ ] | Admin password diubah setelah install |
 | MC-08 | XAMPP default page dihapus di production | [ ] | Hapus `/opt/lampp/htdocs/xampp/` |
-| MC-09 | `app/config/config.local.php` di .gitignore | [ ] | Tidak di-commit |
-| MC-10 | Session timeout 30 menit | [ ] | `Session::checkTimeout()` |
+| MC-09 | `app/config/config.local.php` di .gitignore | [x] | Tidak di-commit |
+| MC-10 | Session timeout 30 menit | [x] | `Session::checkTimeout()` |
 
 ### A06: Vulnerable and Outdated Components
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| VC-01 | PHP version 8.1+ (latest patch) | [ ] | `php -v` |
-| VC-02 | MySQL version 8.0+ | [ ] | `mysql --version` |
-| VC-03 | Bootstrap 5.3.x (latest) | [ ] | CDN link check |
-| VC-04 | jQuery 3.7.x (latest) | [ ] | CDN link check |
-| VC-05 | Leaflet 1.9.x (latest) | [ ] | CDN link check |
-| VC-06 | SweetAlert2 11.x (latest) | [ ] | CDN link check |
-| VC-07 | Composer dependencies updated | [ ] | `composer audit` (jika pakai) |
-| VC-08 | No known CVE di dependencies | [ ] | Check GitHub advisories |
+| VC-01 | PHP version 8.1+ (latest patch) | [x] | PHP 8.2.12 |
+| VC-02 | MySQL version 8.0+ | [x] | MySQL 8.0+ |
+| VC-03 | Bootstrap 5.3.x (latest) | [x] | CDN link check |
+| VC-04 | jQuery 3.7.x (latest) | [x] | CDN link check |
+| VC-05 | Leaflet 1.9.x (latest) | [x] | CDN link check |
+| VC-06 | SweetAlert2 11.x (latest) | [x] | CDN link check |
+| VC-07 | Composer dependencies updated | [x] | Tidak menggunakan composer |
+| VC-08 | No known CVE di dependencies | [x] | Check GitHub advisories |
 
 ### A07: Identification and Authentication Failures
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| AU-01 | Login menggunakan email + password | [ ] | `AuthController::login()` |
-| AU-02 | Password diverifikasi dengan `password_verify()` | [ ] | Tidak pernah compare plain text |
-| AU-03 | Session di-destroy saat logout | [ ] | `session_destroy()` + cookie clear |
-| AU-04 | Session ID di-regenerate setelah login | [ ] | `session_regenerate_id(true)` |
-| AU-05 | "Remember me" tidak menyimpan password | [ ] | Token random, bukan password |
+| AU-01 | Login menggunakan email + password | [x] | `AuthController::login()` |
+| AU-02 | Password diverifikasi dengan `password_verify()` | [x] | Tidak pernah compare plain text |
+| AU-03 | Session di-destroy saat logout | [x] | `session_destroy()` + cookie clear |
+| AU-04 | Session ID di-regenerate setelah login | [x] | `session_regenerate_id(true)` |
+| AU-05 | "Remember me" tidak menyimpan password | [x] | Token random, bukan password |
 | AU-06 | Forgot password via token (bukan kirim password) | [ ] | Token expire 1 jam |
-| AU-07 | Failed login tidak reveal info (user ada/tidak) | [ ] | Pesan: "Email atau password salah" |
+| AU-07 | Failed login tidak reveal info (user ada/tidak) | [x] | Pesan: "Email atau password salah" |
 | AU-08 | Concurrent session dicegah (opsional) | [ ] | Track session_id di DB |
 
 ### A08: Software and Data Integrity Failures
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| SI-01 | CSRF token di semua form POST | [ ] | `<input type="hidden" name="csrf_token">` |
-| SI-02 | CSRF token di semua AJAX POST | [ ] | Header `X-CSRF-Token` |
-| SI-03 | CSRF token di-verify di controller | [ ] | `Middleware::verifyCsrf()` |
-| SI-04 | CSRF token di-regenerate per session | [ ] | Saat login |
-| SI-05 | File upload: MIME type di-verify | [ ] | `finfo_file()` check |
-| SI-06 | File upload: extension di-verify | [ ] | Whitelist extension |
-| SI-07 | File upload: size di-verify | [ ] | Max 5MB (`MAX_UPLOAD_SIZE`) |
-| SI-08 | File upload: stored di luar webroot (atau protected) | [ ] | `public/uploads/` dengan `.htaccess` |
+| SI-01 | CSRF token di semua form POST | [x] | `<input type="hidden" name="csrf_token">` |
+| SI-02 | CSRF token di semua AJAX POST | [x] | Header `X-CSRF-Token` |
+| SI-03 | CSRF token di-verify di controller | [x] | `Middleware::verifyCsrf()` |
+| SI-04 | CSRF token di-regenerate per session | [x] | Saat login |
+| SI-05 | File upload: MIME type di-verify | [x] | `finfo_file()` check |
+| SI-06 | File upload: extension di-verify | [x] | Whitelist extension |
+| SI-07 | File upload: size di-verify | [x] | Max 5MB (`MAX_UPLOAD_SIZE`) |
+| SI-08 | File upload: stored di luar webroot (atau protected) | [x] | `public/uploads/` dengan `.htaccess` |
 
 ### A09: Security Logging and Monitoring Failures
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| LM-01 | Login berhasil di-log | [ ] | `Logger::audit('login', 'auth', ...)` |
-| LM-02 | Login gagal di-log | [ ] | `Logger::audit('login_failed', 'auth', ...)` |
-| LM-03 | Logout di-log | [ ] | `Logger::audit('logout', 'auth', ...)` |
-| LM-04 | Create/Update/Delete di-log | [ ] | `Logger::audit('create', 'module', ...)` |
-| LM-05 | Backup/Restore di-log | [ ] | `Logger::audit('backup', 'database', ...)` |
-| LM-06 | Error di-log ke `logs/error.log` | [ ] | `Logger::error()` |
+| LM-01 | Login berhasil di-log | [x] | `Logger::audit('login', 'auth', ...)` |
+| LM-02 | Login gagal di-log | [x] | `Logger::audit('login_failed', 'auth', ...)` |
+| LM-03 | Logout di-log | [x] | `Logger::audit('logout', 'auth', ...)` |
+| LM-04 | Create/Update/Delete di-log | [x] | `Logger::audit('create', 'module', ...)` |
+| LM-05 | Backup/Restore di-log | [x] | `Logger::audit('backup', 'database', ...)` |
+| LM-06 | Error di-log ke `logs/error.log` | [x] | `Logger::error()` |
 | LM-07 | Audit log retention 90 hari | [ ] | Cron cleanup |
-| LM-08 | Log berisi: user_id, action, module, IP, timestamp | [ ] | `audit_logs` table |
-| LM-09 | Log tidak berisi data sensitif (password, token) | [ ] | Filter di Logger |
+| LM-08 | Log berisi: user_id, action, module, IP, timestamp | [x] | `audit_logs` table |
+| LM-09 | Log tidak berisi data sensitif (password, token) | [x] | Filter di Logger |
 
 ### A10: Server-Side Request Forgery (SSRF)
 
 | ID | Kontrol | Status | Implementasi |
 |----|---------|--------|--------------|
-| SF-01 | Tidak ada fetch URL dari input user | [ ] | Tidak ada `file_get_contents($_GET)` |
-| SF-02 | QR code API: URL hardcoded/whitelist | [ ] | Hanya `api.qrserver.com` atau local |
-| SF-03 | Curl: target URL tidak dari input user | [ ] | Hardcoded endpoint |
-| SF-04 | Internal IP/localhost tidak accessible via SSRF | [ ] | N/A jika no URL fetch |
+| SF-01 | Tidak ada fetch URL dari input user | [x] | Tidak ada `file_get_contents($_GET)` |
+| SF-02 | QR code API: URL hardcoded/whitelist | [x] | Hanya `api.qrserver.com` atau local |
+| SF-03 | Curl: target URL tidak dari input user | [x] | Hardcoded endpoint |
+| SF-04 | Internal IP/localhost tidak accessible via SSRF | [x] | N/A jika no URL fetch |
 
 ---
 
@@ -155,51 +155,53 @@ production release.
 | ID | Kontrol | Status |
 |----|---------|--------|
 | AS-01 | Komunikasi sensitive via HTTPS | [ ] |
-| AS-02 | Defense in depth (multiple layers) | [ ] |
-| AS-03 | Separation of concerns (MVC) | [ ] |
-| AS-04 | Input validation di server-side (tidak hanya client) | [ ] |
+| AS-02 | Defense in depth (multiple layers) | [x] |
+| AS-03 | Separation of concerns (MVC) | [x] |
+| AS-04 | Input validation di server-side (tidak hanya client) | [x] |
 
 ### 3.2 Authentication
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| AS-05 | Password hash cost >= 10 (bcrypt) | [ ] |
-| AS-06 | Session timeout server-side | [ ] |
+| AS-05 | Password hash cost >= 10 (bcrypt) | [x] |
+| AS-06 | Session timeout server-side | [x] |
 | AS-07 | Re-authentication untuk aksi sensitif (opsional) | [ ] |
 
 ### 3.3 Session Management
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| AS-08 | Session ID tidak di URL | [ ] |
-| AS-09 | Session cookie: HttpOnly | [ ] |
+| AS-08 | Session ID tidak di URL | [x] |
+| AS-09 | Session cookie: HttpOnly | [x] |
 | AS-10 | Session cookie: Secure (HTTPS) | [ ] |
-| AS-11 | Session cookie: SameSite=Lax atau Strict | [ ] |
-| AS-12 | Logout menghapus session server-side | [ ] |
+| AS-11 | Session cookie: SameSite=Lax atau Strict | [x] |
+| AS-12 | Logout menghapus session server-side | [x] |
 
 ### 3.4 Access Control
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| AS-13 | Authorization check di server-side | [ ] |
-| AS-14 | Default deny untuk semua endpoint | [ ] |
-| AS-15 | Role check tidak hanya di frontend | [ ] |
+| AS-13 | Authorization check di server-side | [x] |
+| AS-14 | Default deny untuk semua endpoint | [x] |
+| AS-15 | Role check tidak hanya di frontend | [x] |
 
 ### 3.5 Input Validation
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| AS-16 | Semua input divalidasi (type, length, format) | [ ] |
-| AS-17 | Whitelist approach (bukan blacklist) | [ ] |
-| AS-18 | Negative numbers dicegah where applicable | [ ] |
+| AS-16 | Semua input divalidasi (type, length, format) | [x] |
+| AS-17 | Whitelist approach (bukan blacklist) | [x] |
+| AS-18 | Negative numbers dicegah where applicable | [x] |
 
 ### 3.6 Output Encoding
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| AS-19 | HTML output di-escape (`htmlspecialchars`) | [ ] |
-| AS-20 | JavaScript output di-escape (JSON.stringify) | [ ] |
-| AS-21 | URL output di-encode (`urlencode`) | [ ] |
+| AS-19 | HTML output di-escape (htmlspecialchars) | [x] |
+| AS-20 | JSON output di-encode (json_encode) | [x] |
+| AS-21 | SQL output menggunakan prepared statements | [x] |
+| AS-22 | JavaScript output di-escape (JSON.stringify) | [x] |
+| AS-23 | URL output di-encode (urlencode) | [x] |
 
 ---
 
@@ -207,12 +209,12 @@ production release.
 
 | Header | Nilai | Status |
 |--------|-------|--------|
-| `X-Content-Type-Options` | `nosniff` | [ ] |
-| `X-Frame-Options` | `SAMEORIGIN` | [ ] |
-| `X-XSS-Protection` | `1; mode=block` | [ ] |
-| `Referrer-Policy` | `strict-origin-when-cross-origin` | [ ] |
+| `X-Content-Type-Options` | `nosniff` | [x] |
+| `X-Frame-Options` | `SAMEORIGIN` | [x] |
+| `X-XSS-Protection` | `1; mode=block` | [x] |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | [x] |
 | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | [ ] |
-| `Content-Security-Policy` | `default-src 'self'` (opsional) | [ ] |
+| `Content-Security-Policy` | `default-src 'self'` (opsional) | [x] |
 | `Permissions-Policy` | `geolocation=(self), camera=(), microphone=()` | [ ] |
 
 Implementasi via `.htaccess`:
@@ -233,15 +235,15 @@ Implementasi via `.htaccess`:
 
 | ID | Kontrol | Status |
 |----|---------|--------|
-| FU-01 | Max file size 5MB | [ ] |
-| FU-02 | Allowed types: jpg, jpeg, png, webp (image) | [ ] |
-| FU-03 | Allowed types: mp3, ogg, wav (audio) | [ ] |
-| FU-04 | Allowed types: pdf, jpg, png (document) | [ ] |
-| FU-05 | MIME type check via `finfo_file()` | [ ] |
-| FU-06 | Extension check (whitelist) | [ ] |
-| FU-07 | Filename di-randomize (32 hex) | [ ] |
-| FU-08 | Upload folder non-executable (.htaccess: php_flag engine off) | [ ] |
-| FU-09 | Tidak ada path traversal di filename | [ ] |
+| FU-01 | Max file size 5MB | [x] |
+| FU-02 | Allowed types: jpg, jpeg, png, webp (image) | [x] |
+| FU-03 | Allowed types: mp3, ogg, wav (audio) | [x] |
+| FU-04 | Allowed types: pdf, jpg, png (document) | [x] |
+| FU-05 | MIME type check via `finfo_file()` | [x] |
+| FU-06 | Extension check (whitelist) | [x] |
+| FU-07 | Filename di-randomize (32 hex) | [x] |
+| FU-08 | Upload folder non-executable (.htaccess: php_flag engine off) | [x] |
+| FU-09 | Tidak ada path traversal di filename | [x] |
 | FU-10 | Image dimension check (opsional) | [ ] |
 
 ```apache

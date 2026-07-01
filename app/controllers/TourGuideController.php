@@ -9,20 +9,38 @@
  * @since 2026-06-30
  */
 
+// Load required models
+require_once APP_ROOT . '/app/models/TourGuide.php';
+
 class TourGuideController extends Controller {
     
     /**
-     * Constructor - Require tour_guide role
+     * Constructor
      */
     public function __construct() {
         parent::__construct();
-        Middleware::requireRole('tour_guide');
     }
     
     /**
-     * Dashboard - Main tour guide dashboard
+     * Index - List all tour guides (public)
+     */
+    public function index() {
+        $tourGuideModel = new TourGuide();
+        $guides = $tourGuideModel->getAllWithFilters(['is_verified' => 1, 'is_available' => 1]);
+        
+        $data = [
+            'title' => 'Tour Guide - MyWisata',
+            'guides' => $guides
+        ];
+        
+        $this->view('tourguide/index', $data);
+    }
+    
+    /**
+     * Dashboard - Main tour guide dashboard (protected)
      */
     public function dashboard() {
+        Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
@@ -79,9 +97,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Profile - Edit tour guide profile
+     * Profile - Edit tour guide profile (protected)
      */
     public function profile() {
+        Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
@@ -185,9 +204,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Add language
+     * Add language (protected)
      */
     public function addLanguage() {
+        Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
@@ -216,9 +236,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Add specialization
+     * Add specialization (protected)
      */
     public function addSpecialization() {
+        Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
@@ -249,8 +270,6 @@ class TourGuideController extends Controller {
      * Bookings - View bookings
      */
     public function bookings() {
-        $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
         
         if (!$guide) {
@@ -272,9 +291,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Accept booking
+     * Accept booking (protected)
      */
     public function acceptBooking() {
+        Middleware::requireRole('tour_guide');
         $bookingId = $this->post('booking_id');
         $userId = Session::get('user_id');
         
@@ -302,9 +322,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Reject booking
+     * Reject booking (protected)
      */
     public function rejectBooking() {
+        Middleware::requireRole('tour_guide');
         $bookingId = $this->post('booking_id');
         $reason = $this->post('reason');
         $userId = Session::get('user_id');
@@ -334,9 +355,10 @@ class TourGuideController extends Controller {
     }
     
     /**
-     * Earnings - View earnings
+     * Earnings - View earnings (protected)
      */
     public function earnings() {
+        Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
