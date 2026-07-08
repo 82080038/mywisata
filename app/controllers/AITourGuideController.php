@@ -1,78 +1,141 @@
 <?php
+
 /**
  * MyWisata Application - AI Tour Guide Controller
- * 
+ *
  * Handles AI chat functionality for tour guidance.
- * 
- * @package MyWisata
+ *
  * @version 1.0.0
+ *
  * @since 2026-07-01
  */
-
-class AITourGuideController extends Controller {
-    
+class AITourGuideController extends Controller
+{
     /**
      * Index - Show AI chat interface
      */
-    public function index() {
+    public function index()
+    {
         $data = [
-            'title' => 'AI Tour Guide - MyWisata'
+            'title' => 'AI Tour Guide - MyWisata',
         ];
-        
+
         $this->view('aitourguide/index', $data);
     }
-    
+
     /**
      * Chat - Process AI chat message
      */
-    public function chat() {
+    public function chat()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('aitourguide');
+        }
+
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
         $message = $this->post('message');
+        $conversationHistory = $this->post('history', []);
         $userId = Session::get('user_id');
-        
+
         if (empty($message)) {
             $this->json(['status' => 'error', 'message' => 'Message cannot be empty'], 400);
         }
-        
-        // Simple AI response (in production, integrate with actual AI API)
-        $response = $this->generateAIResponse($message);
-        
+
+        // Use AI helper for response
+        $result = AIHelper::chat($message, $conversationHistory);
+
         // Log the conversation
         $db = Database::getInstance();
-        $db->query("INSERT INTO ai_conversations (user_id, user_message, ai_response, created_at) 
-                    VALUES (:user_id, :user_message, :ai_response, NOW())", 
-                    ['user_id' => $userId, 'user_message' => $message, 'ai_response' => $response]);
-        
-        $this->json(['status' => 'success', 'response' => $response]);
+        $db->query(
+            "INSERT INTO ai_conversations (user_id, user_message, ai_response, tokens_used, created_at) 
+                    VALUES (:user_id, :user_message, :ai_response, :tokens_used, NOW())",
+            [
+                'user_id' => $userId, 
+                'user_message' => $message, 
+                'ai_response' => $result['response'],
+                'tokens_used' => $result['tokens_used'],
+            ]
+        );
+
+        $this->json([
+            'status' => 'success', 
+            'response' => $result['response'],
+            'tokens_used' => $result['tokens_used'],
+        ]);
     }
-    
+
     /**
-     * Generate AI response (placeholder - integrate with actual AI API)
+     * Get recommendations
      */
-    private function generateAIResponse($message) {
-        $message = strtolower($message);
-        
-        // Simple keyword-based responses
-        if (strpos($message, 'destinasi') !== false || strpos($message, 'wisata') !== false) {
-            return "Untuk destinasi wisata terbaik, saya merekomendasikan Bali, Yogyakarta, dan Raja Ampat. Destinasi mana yang ingin Anda ketahui lebih lanjut?";
+    public function recommendations()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('aitourguide');
         }
-        
-        if (strpos($message, 'hotel') !== false || strpos($message, 'penginapan') !== false) {
-            return "Kami memiliki berbagai pilihan hotel mulai dari budget hingga luxury. Apakah Anda memiliki preferensi lokasi atau harga?";
+
+        $location = $this->post('location');
+        $interests = $this->post('interests', []);
+        $budget = $this->post('budget');
+        $duration = $this->post('duration');
+        $groupSize = $this->post('group_size');
+
+        $context = [
+            'location' => $location,
+            'interests' => is_array($interests) ? $interests : explode(',', $interests),
+            'budget' => $budget,
+            'duration' => $duration,
+            'group_size' => $groupSize,
+        ];
+
+        $result = AIHelper::getTourRecommendations($context);
+
+        $this->json([
+            'status' => 'success',
+            'recommendations' => $result['recommendations'],
+            'source' => $result['source'] ?? 'ai',
+        ]);
+    }
+
+    /**
+     * Get destination info
+     */
+    public function destinationInfo()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('aitourguide');
         }
-        
-        if (strpos($message, 'makanan') !== false || strpos($message, 'kuliner') !== false || strpos($message, 'restoran') !== false) {
-            return "Indonesia memiliki kuliner yang beragam seperti Rendang, Nasi Goreng, dan Sate. Apakah Anda ingin rekomendasi restoran di kota tertentu?";
+
+        $destinationName = $this->post('destination_name');
+
+        if (empty($destinationName)) {
+            $this->json(['status' => 'error', 'message' => 'Destination name required'], 400);
         }
-        
-        if (strpos($message, 'tour guide') !== false || strpos($message, 'pemandu') !== false) {
-            return "Kami menyediakan layanan tour guide profesional yang berbicara berbagai bahasa. Apakah Anda ingin mencari tour guide untuk destinasi tertentu?";
+
+        $result = AIHelper::getDestinationInfo($destinationName);
+
+        $this->json([
+            'status' => 'success',
+            'description' => $result['description'],
+            'source' => $result['source'],
+        ]);
+    }
+
+    /**
+     * Check AI configuration status
+     */
+    public function status()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('aitourguide');
         }
-        
-        if (strpos($message, 'harga') !== false || strpos($message, 'biaya') !== false) {
-            return "Harga bervariasi tergantung layanan yang Anda pilih. Tiket destinasi mulai dari Rp 50.000, tour guide mulai dari Rp 150.000 per jam. Apakah Anda ingin detail harga layanan tertentu?";
-        }
-        
-        // Default response
-        return "Terima kasih atas pertanyaan Anda. Saya adalah AI Tour Guide yang dapat membantu Anda merencanakan perjalanan wisata. Silakan tanyakan tentang destinasi, hotel, restoran, atau layanan tour guide.";
+
+        $this->json([
+            'status' => 'success',
+            'configured' => AIHelper::isConfigured(),
+        ]);
     }
 }

@@ -1,39 +1,41 @@
 <?php
+
 /**
  * MyWisata Application - TourGuide Controller
- * 
+ *
  * Handles tour guide dashboard and management functions.
- * 
- * @package MyWisata
+ *
  * @version 1.0.0
+ *
  * @since 2026-06-30
  */
-
-class TourGuideController extends Controller {
-    
+class TourGuideController extends Controller
+{
     /**
      * Constructor - Require tour_guide role
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         Middleware::requireRole('tour_guide');
     }
-    
+
     /**
      * Dashboard - Main tour guide dashboard
      */
-    public function dashboard() {
+    public function dashboard()
+    {
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if (!$guide) {
             Session::flash('error', 'Profil tour guide belum diisi');
             $this->redirect('tourguide/profile');
         }
-        
+
         $db = Database::getInstance();
-        
+
         // Get statistics
         $stats = [
             'active_bookings' => $db->query("SELECT COUNT(*) as count FROM bookings WHERE guide_id = :guide_id AND status = 'confirmed'", ['guide_id' => $guide['id']])->fetch()['count'],
@@ -41,30 +43,34 @@ class TourGuideController extends Controller {
             'completed_tours' => $db->query("SELECT COUNT(*) as count FROM bookings WHERE guide_id = :guide_id AND status = 'completed'", ['guide_id' => $guide['id']])->fetch()['count'],
             'rating_avg' => $guide['rating_avg'],
         ];
-        
+
         // Get monthly earnings
         $earnings = $tourGuideModel->getEarnings($guide['id'], 'month');
-        
+
         // Get pending bookings
         $pendingBookings = $tourGuideModel->getBookings($guide['id'], 'pending');
-        
+
         // Get today's bookings
-        $todayBookings = $db->query("SELECT b.*, u.name as user_name 
+        $todayBookings = $db->query(
+            "SELECT b.*, u.name as user_name 
                                       FROM bookings b 
                                       LEFT JOIN users u ON b.user_id = u.id 
                                       WHERE b.guide_id = :guide_id 
                                       AND b.status = 'confirmed' 
-                                      AND DATE(b.booking_date) = CURDATE()", 
-                                      ['guide_id' => $guide['id']])->fetchAll();
-        
+                                      AND DATE(b.booking_date) = CURDATE()",
+            ['guide_id' => $guide['id']]
+        )->fetchAll();
+
         // Get recent reviews
-        $recentReviews = $db->query("SELECT gr.*, u.name as user_name 
+        $recentReviews = $db->query(
+            "SELECT gr.*, u.name as user_name 
                                       FROM guide_reviews gr 
                                       LEFT JOIN users u ON gr.user_id = u.id 
                                       WHERE gr.guide_id = :guide_id 
-                                      ORDER BY gr.created_at DESC LIMIT 5", 
-                                      ['guide_id' => $guide['id']])->fetchAll();
-        
+                                      ORDER BY gr.created_at DESC LIMIT 5",
+            ['guide_id' => $guide['id']]
+        )->fetchAll();
+
         $data = [
             'title' => 'Dashboard Tour Guide - MyWisata',
             'guide' => $guide,
@@ -72,34 +78,42 @@ class TourGuideController extends Controller {
             'earnings' => $earnings,
             'pending_bookings' => $pendingBookings,
             'today_bookings' => $todayBookings,
-            'recent_reviews' => $recentReviews
+            'recent_reviews' => $recentReviews,
         ];
-        
+
         $this->view('tourguide/dashboard', $data);
     }
-    
+
     /**
      * Profile - Edit tour guide profile
      */
-    public function profile() {
+    public function profile()
+    {
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         $data = [
             'title' => 'Profil Tour Guide - MyWisata',
-            'guide' => $guide
+            'guide' => $guide,
         ];
-        
+
         $this->view('tourguide/profile', $data);
     }
-    
+
     /**
      * Update profile
      */
-    public function updateProfile() {
+    public function updateProfile()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('tourguide/profile');
+        }
+
         $userId = Session::get('user_id');
-        
+
         $data = [
             'user_id' => $userId,
             'name' => $this->post('name'),
@@ -112,262 +126,309 @@ class TourGuideController extends Controller {
             'city' => $this->post('city'),
             'latitude' => $this->post('latitude'),
             'longitude' => $this->post('longitude'),
-            'is_available' => $this->post('is_available') ? 1 : 0
+            'is_available' => $this->post('is_available') ? 1 : 0,
         ];
-        
+
         $validator = new Validator($_POST);
         $validator->required(['name', 'phone', 'hourly_rate', 'daily_rate'])
                   ->numeric(['hourly_rate', 'daily_rate', 'experience_years']);
-        
+
         if ($validator->fails()) {
             Session::flash('error', $validator->firstError());
             $this->redirect('tourguide/profile');
         }
-        
+
         $tourGuideModel = new TourGuide();
         $guideId = $tourGuideModel->save($data);
-        
+
         // Handle avatar upload
         if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
             try {
                 $avatar = FileUpload::upload($_FILES['avatar'], APP_ROOT . '/public/uploads/avatars/');
                 $db = Database::getInstance();
-                $db->query("UPDATE tour_guides SET avatar = :avatar WHERE id = :guide_id", 
-                          ['avatar' => $avatar, 'guide_id' => $guideId]);
+                $db->query(
+                    "UPDATE tour_guides SET avatar = :avatar WHERE id = :guide_id",
+                    ['avatar' => $avatar, 'guide_id' => $guideId]
+                );
             } catch (Exception $e) {
                 Session::flash('error', 'Gagal upload avatar: ' . $e->getMessage());
             }
         }
-        
+
         Logger::audit('UPDATE_GUIDE_PROFILE', 'tour_guides', "Updated guide profile for user ID: {$userId}", [], $data);
-        
+
         Session::flash('success', 'Profil berhasil diperbarui');
         $this->redirect('tourguide/profile');
     }
-    
+
     /**
      * Skills - Manage languages and specializations
      */
-    public function skills() {
+    public function skills()
+    {
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if (!$guide) {
             Session::flash('error', 'Profil tour guide belum diisi');
             $this->redirect('tourguide/profile');
         }
-        
+
         $db = Database::getInstance();
-        
+
         // Get all languages
         $languages = $db->query("SELECT * FROM languages ORDER BY name")->fetchAll();
-        
+
         // Get all specializations
         $specializations = $db->query("SELECT * FROM specializations ORDER BY name")->fetchAll();
-        
+
         // Get guide's languages
         $guideLanguages = $tourGuideModel->getLanguages($guide['id']);
-        
+
         // Get guide's specializations
         $guideSpecializations = $tourGuideModel->getSpecializations($guide['id']);
-        
+
         $data = [
             'title' => 'Bahasa & Spesialisasi - MyWisata',
             'guide' => $guide,
             'languages' => $languages,
             'specializations' => $specializations,
             'guide_languages' => $guideLanguages,
-            'guide_specializations' => $guideSpecializations
+            'guide_specializations' => $guideSpecializations,
         ];
-        
+
         $this->view('tourguide/skills', $data);
     }
-    
+
     /**
      * Add language
      */
-    public function addLanguage() {
+    public function addLanguage()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         $languageId = $this->post('language_id');
         $proficiency = $this->post('proficiency');
-        
+
         $tourGuideModel->addLanguage($guide['id'], $languageId, $proficiency);
-        
+
         $this->json(['status' => 'success', 'message' => 'Bahasa berhasil ditambahkan']);
     }
-    
+
     /**
      * Remove language
      */
-    public function removeLanguage() {
+    public function removeLanguage()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         $languageId = $this->post('language_id');
-        
+
         $tourGuideModel->removeLanguage($guide['id'], $languageId);
-        
+
         $this->json(['status' => 'success', 'message' => 'Bahasa berhasil dihapus']);
     }
-    
+
     /**
      * Add specialization
      */
-    public function addSpecialization() {
+    public function addSpecialization()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         $specializationId = $this->post('specialization_id');
-        
+
         $tourGuideModel->addSpecialization($guide['id'], $specializationId);
-        
+
         $this->json(['status' => 'success', 'message' => 'Spesialisasi berhasil ditambahkan']);
     }
-    
+
     /**
      * Remove specialization
      */
-    public function removeSpecialization() {
+    public function removeSpecialization()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         $specializationId = $this->post('specialization_id');
-        
+
         $tourGuideModel->removeSpecialization($guide['id'], $specializationId);
-        
+
         $this->json(['status' => 'success', 'message' => 'Spesialisasi berhasil dihapus']);
     }
-    
+
     /**
      * Bookings - View bookings
      */
-    public function bookings() {
+    public function bookings()
+    {
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if (!$guide) {
             Session::flash('error', 'Profil tour guide belum diisi');
             $this->redirect('tourguide/profile');
         }
-        
+
         $status = $this->get('status', 'all');
         $bookings = $tourGuideModel->getBookings($guide['id'], $status === 'all' ? null : $status);
-        
+
         $data = [
             'title' => 'Booking Tour Guide - MyWisata',
             'guide' => $guide,
             'bookings' => $bookings,
-            'status_filter' => $status
+            'status_filter' => $status,
         ];
-        
+
         $this->view('tourguide/bookings', $data);
     }
-    
+
     /**
      * Accept booking
      */
-    public function acceptBooking() {
+    public function acceptBooking()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('tourguide/bookings');
+        }
+
         $bookingId = $this->post('booking_id');
         $userId = Session::get('user_id');
-        
+
         $db = Database::getInstance();
-        
+
         // Verify booking belongs to this guide
         $booking = $db->query("SELECT * FROM bookings WHERE id = :id", ['id' => $bookingId])->fetch();
-        
+
         if (!$booking) {
             $this->json(['status' => 'error', 'message' => 'Booking tidak ditemukan'], 404);
         }
-        
+
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if ($booking['guide_id'] != $guide['id']) {
             $this->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
-        
+
         $db->query("UPDATE bookings SET status = 'confirmed', updated_at = NOW() WHERE id = :id", ['id' => $bookingId]);
-        
+
         Logger::audit('ACCEPT_BOOKING', 'bookings', "Accepted booking ID: {$bookingId}", [], ['booking_id' => $bookingId]);
-        
+
         $this->json(['status' => 'success', 'message' => 'Booking berhasil diterima']);
     }
-    
+
     /**
      * Reject booking
      */
-    public function rejectBooking() {
+    public function rejectBooking()
+    {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('tourguide/bookings');
+        }
+
         $bookingId = $this->post('booking_id');
         $reason = $this->post('reason');
         $userId = Session::get('user_id');
-        
+
         $db = Database::getInstance();
-        
+
         // Verify booking belongs to this guide
         $booking = $db->query("SELECT * FROM bookings WHERE id = :id", ['id' => $bookingId])->fetch();
-        
+
         if (!$booking) {
             $this->json(['status' => 'error', 'message' => 'Booking tidak ditemukan'], 404);
         }
-        
+
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if ($booking['guide_id'] != $guide['id']) {
             $this->json(['status' => 'error', 'message' => 'Unauthorized'], 403);
         }
-        
-        $db->query("UPDATE bookings SET status = 'rejected', rejection_reason = :reason, updated_at = NOW() WHERE id = :id", 
-                  ['id' => $bookingId, 'reason' => $reason]);
-        
+
+        $db->query(
+            "UPDATE bookings SET status = 'rejected', rejection_reason = :reason, updated_at = NOW() WHERE id = :id",
+            ['id' => $bookingId, 'reason' => $reason]
+        );
+
         Logger::audit('REJECT_BOOKING', 'bookings', "Rejected booking ID: {$bookingId}", [], ['booking_id' => $bookingId, 'reason' => $reason]);
-        
+
         $this->json(['status' => 'success', 'message' => 'Booking berhasil ditolak']);
     }
-    
+
     /**
      * Earnings - View earnings
      */
-    public function earnings() {
+    public function earnings()
+    {
         $userId = Session::get('user_id');
         $tourGuideModel = new TourGuide();
         $guide = $tourGuideModel->findByUserId($userId);
-        
+
         if (!$guide) {
             Session::flash('error', 'Profil tour guide belum diisi');
             $this->redirect('tourguide/profile');
         }
-        
+
         $monthlyEarnings = $tourGuideModel->getEarnings($guide['id'], 'month');
         $yearlyEarnings = $tourGuideModel->getEarnings($guide['id'], 'year');
         $totalEarnings = $tourGuideModel->getEarnings($guide['id'], 'all');
-        
+
         $db = Database::getInstance();
-        $transactions = $db->query("SELECT t.*, b.booking_code 
+        $transactions = $db->query(
+            "SELECT t.*, b.booking_code 
                                      FROM transactions t 
                                      LEFT JOIN bookings b ON t.booking_id = b.id 
                                      WHERE t.guide_id = :guide_id 
                                      AND t.payment_status = 'paid' 
-                                     ORDER BY t.created_at DESC LIMIT 20", 
-                                     ['guide_id' => $guide['id']])->fetchAll();
-        
+                                     ORDER BY t.created_at DESC LIMIT 20",
+            ['guide_id' => $guide['id']]
+        )->fetchAll();
+
         $data = [
             'title' => 'Pendapatan Tour Guide - MyWisata',
             'guide' => $guide,
             'monthly_earnings' => $monthlyEarnings,
             'yearly_earnings' => $yearlyEarnings,
             'total_earnings' => $totalEarnings,
-            'transactions' => $transactions
+            'transactions' => $transactions,
         ];
-        
+
         $this->view('tourguide/earnings', $data);
     }
 }

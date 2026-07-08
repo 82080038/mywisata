@@ -1,11 +1,12 @@
 <?php
+
 /**
  * MyWisata Application - Main Configuration
- * 
+ *
  * This file contains the main application configuration settings.
- * 
- * @package MyWisata
+ *
  * @version 1.0.0
+ *
  * @since 2026-06-30
  */
 
@@ -17,15 +18,15 @@ if (!defined('APP_ROOT')) {
 // ============================================
 // APPLICATION SETTINGS
 // ============================================
-define('APP_NAME', 'MyWisata Application');
-define('APP_ENV', 'development'); // development, staging, production
-define('APP_DEBUG', true); // true in development, false in production
+define('APP_NAME', $_ENV['APP_NAME'] ?? 'MyWisata Application');
+define('APP_ENV', $_ENV['APP_ENV'] ?? 'development');
+define('APP_DEBUG', ($_ENV['APP_DEBUG'] ?? 'true') === 'true');
 define('APP_VERSION', '1.0.0');
 
 // ============================================
 // URL SETTINGS
 // ============================================
-define('BASE_URL', 'http://localhost/mywisata/');
+define('BASE_URL', $_ENV['BASE_URL'] ?? 'http://localhost/mywisata/');
 define('ASSETS_URL', BASE_URL . 'public/assets/');
 
 // ============================================
@@ -51,7 +52,7 @@ ini_set('session.gc_maxlifetime', 1800); // 30 minutes
 // ============================================
 // FILE UPLOAD SETTINGS
 // ============================================
-define('MAX_UPLOAD_SIZE', 5242880); // 5MB in bytes
+define('MAX_UPLOAD_SIZE', $_ENV['MAX_UPLOAD_SIZE'] ?? 5242880);
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 define('ALLOWED_AUDIO_TYPES', ['audio/mpeg', 'audio/wav', 'audio/ogg']);
 define('ALLOWED_DOCUMENT_TYPES', ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
@@ -84,7 +85,7 @@ if (APP_DEBUG) {
 // ============================================
 // LOGGING
 // ============================================
-define('LOG_PATH', APP_ROOT . '/logs/');
+define('LOG_PATH', $_ENV['LOG_PATH'] ?? APP_ROOT . '/logs/');
 define('ERROR_LOG_FILE', LOG_PATH . 'error.log');
 define('AUDIT_LOG_FILE', LOG_PATH . 'audit.log');
 
@@ -137,9 +138,11 @@ define('PAYMENT_TIMEOUT_HOURS', 24);
 if (!defined('CURRENCY')) {
     define('CURRENCY', 'IDR');
 }
+
 if (!defined('CURRENCY_SYMBOL')) {
     define('CURRENCY_SYMBOL', 'Rp');
 }
+
 if (!defined('CURRENCY_DECIMALS')) {
     define('CURRENCY_DECIMALS', 0);
 }

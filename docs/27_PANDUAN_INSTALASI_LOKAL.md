@@ -385,9 +385,9 @@ Buka browser: **http://localhost/wisata/**
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@tourguide.app | admin123 |
+| Admin | (Lihat database tabel users) | (Lihat database tabel users) |
 
-> **Penting:** Ganti password admin setelah login pertama!
+> **PENTING:** Login credentials tersimpan di database. Untuk development, buat admin baru melalui seed data atau SQL manual. JANGAN gunakan password default di production!
 
 ### 8.3 Cek Database Connection
 

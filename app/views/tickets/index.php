@@ -58,11 +58,17 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <?php
                                     $statusClass = 'secondary';
-                                    if ($ticket['status'] === 'pending') $statusClass = 'warning';
-                                    elseif ($ticket['status'] === 'paid') $statusClass = 'success';
-                                    elseif ($ticket['status'] === 'used') $statusClass = 'primary';
-                                    elseif ($ticket['status'] === 'cancelled') $statusClass = 'danger';
-                                    ?>
+
+                        if ($ticket['status'] === 'pending') {
+                            $statusClass = 'warning';
+                        } elseif ($ticket['status'] === 'paid') {
+                            $statusClass = 'success';
+                        } elseif ($ticket['status'] === 'used') {
+                            $statusClass = 'primary';
+                        } elseif ($ticket['status'] === 'cancelled') {
+                            $statusClass = 'danger';
+                        }
+                        ?>
                                     <span class="badge bg-<?= $statusClass ?>">
                                         <?= View::e(ucfirst($ticket['status'])) ?>
                                     </span>

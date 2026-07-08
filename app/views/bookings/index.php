@@ -52,11 +52,17 @@
                                 <td>
                                     <?php
                                     $statusClass = 'secondary';
-                                    if ($booking['status'] === 'pending') $statusClass = 'warning';
-                                    elseif ($booking['status'] === 'confirmed') $statusClass = 'success';
-                                    elseif ($booking['status'] === 'completed') $statusClass = 'primary';
-                                    elseif ($booking['status'] === 'cancelled') $statusClass = 'danger';
-                                    ?>
+
+                                if ($booking['status'] === 'pending') {
+                                    $statusClass = 'warning';
+                                } elseif ($booking['status'] === 'confirmed') {
+                                    $statusClass = 'success';
+                                } elseif ($booking['status'] === 'completed') {
+                                    $statusClass = 'primary';
+                                } elseif ($booking['status'] === 'cancelled') {
+                                    $statusClass = 'danger';
+                                }
+                                ?>
                                     <span class="badge bg-<?= $statusClass ?>">
                                         <?= View::e(ucfirst($booking['status'])) ?>
                                     </span>

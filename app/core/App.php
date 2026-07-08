@@ -1,25 +1,27 @@
 <?php
+
 /**
  * MyWisata Application - App Class
- * 
+ *
  * Main application class that handles routing and request processing.
- * 
- * @package MyWisata
+ *
  * @version 1.0.0
+ *
  * @since 2026-06-30
  */
-
-class App {
+class App
+{
     private $controller = 'Home';
     private $method = 'index';
     private $params = [];
-    
+
     /**
      * Constructor - Parse URL and route request
      */
-    public function __construct() {
+    public function __construct()
+    {
         $url = $this->parseUrl();
-        
+
         // Check if controller exists
         if (!empty($url) && file_exists(APP_ROOT . '/app/controllers/' . ucfirst($url[0]) . 'Controller.php')) {
             $this->controller = ucfirst($url[0]);
@@ -48,13 +50,18 @@ class App {
             // Handle plural 'events' to singular 'Event' controller
             $this->controller = 'Event';
             unset($url[0]);
+        } elseif (!empty($url)) {
+            // Non-existent route - return 404
+            $this->handle404();
+            return;
         } else {
             // Default to Home controller
             $this->controller = 'Home';
         }
-        
+
         // Require controller file
         $controllerFile = APP_ROOT . '/app/controllers/' . $this->controller . 'Controller.php';
+
         if (file_exists($controllerFile)) {
             require_once $controllerFile;
             // Instantiate controller with full class name
@@ -63,58 +70,80 @@ class App {
         } else {
             die('Controller not found: ' . $this->controller . 'Controller.php');
         }
-        
+
         // Check if method exists
         if (!empty($url) && isset($url[1]) && method_exists($this->controller, $url[1])) {
             $this->method = $url[1];
             unset($url[1]);
         }
-        
+
         // Get parameters
         $this->params = !empty($url) ? array_values($url) : [];
-        
+
         // Call controller method with parameters
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
-    
+
     /**
      * Parse URL from GET parameter
-     * 
+     *
      * @return array URL segments
      */
-    private function parseUrl() {
+    private function parseUrl()
+    {
         if (isset($_GET['url'])) {
             $url = rtrim($_GET['url'], '/');
             $url = filter_var($url, FILTER_SANITIZE_URL);
             $url = explode('/', $url);
+
             return $url;
         }
+
         return [];
     }
-    
+
     /**
      * Run the application
      */
-    public function run() {
+    public function run()
+    {
         try {
-            $this->__construct();
+            // Wrap with access logging middleware
+            AccessLogMiddleware::handle(function () {
+                $this->__construct();
+            });
         } catch (Exception $e) {
             $this->handleError($e);
         }
     }
-    
+
     /**
      * Handle errors
-     * 
+     *
      * @param Exception $e Exception object
      */
-    private function handleError($e) {
+    private function handleError($e)
+    {
         if (APP_DEBUG) {
             echo '<h1>Error</h1>';
             echo '<p>' . $e->getMessage() . '</p>';
             echo '<pre>' . $e->getTraceAsString() . '</pre>';
         } else {
             require_once APP_ROOT . '/app/views/errors/500.php';
+        }
+    }
+
+    /**
+     * Handle 404 errors
+     */
+    private function handle404()
+    {
+        http_response_code(404);
+        if (APP_DEBUG) {
+            echo '<h1>404 Not Found</h1>';
+            echo '<p>The page you requested could not be found.</p>';
+        } else {
+            require_once APP_ROOT . '/app/views/errors/404.php';
         }
     }
 }

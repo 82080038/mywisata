@@ -32,15 +32,27 @@
 define('APP_ROOT', dirname(__FILE__));
 define('APP_START_TIME', microtime(true));
 
+// Load environment variables from .env file
+if (file_exists(APP_ROOT . '/vendor/autoload.php')) {
+    require_once APP_ROOT . '/vendor/autoload.php';
+}
+
+use Dotenv\Dotenv;
+
+if (file_exists(APP_ROOT . '/.env')) {
+    $dotenv = Dotenv::createImmutable(APP_ROOT);
+    $dotenv->load();
+}
+
 // Load environment configuration
 if (file_exists(APP_ROOT . '/app/config/config.php')) {
     require_once APP_ROOT . '/app/config/config.php';
 } else {
     // Fallback if config doesn't exist yet
-    define('APP_ENV', 'development');
-    define('APP_DEBUG', true);
-    define('BASE_URL', 'http://localhost/mywisata/');
-    define('APP_NAME', 'MyWisata Application');
+    define('APP_ENV', $_ENV['APP_ENV'] ?? 'development');
+    define('APP_DEBUG', $_ENV['APP_DEBUG'] === 'true');
+    define('BASE_URL', $_ENV['BASE_URL'] ?? 'http://localhost/mywisata/');
+    define('APP_NAME', $_ENV['APP_NAME'] ?? 'MyWisata Application');
 }
 
 // Error reporting based on environment
@@ -55,9 +67,39 @@ if (APP_DEBUG) {
 // Set timezone
 date_default_timezone_set('Asia/Jakarta');
 
+// Set security headers
+if (!headers_sent()) {
+    // Content Security Policy
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'; frame-ancestors 'self';");
+
+    // X-Frame-Options
+    header("X-Frame-Options: SAMEORIGIN");
+
+    // X-Content-Type-Options
+    header("X-Content-Type-Options: nosniff");
+
+    // X-XSS-Protection
+    header("X-XSS-Protection: 1; mode=block");
+
+    // Strict-Transport-Security (only in production with HTTPS)
+    if (APP_ENV === 'production' && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+    }
+
+    // Referrer-Policy
+    header("Referrer-Policy: strict-origin-when-cross-origin");
+
+    // Permissions-Policy
+    header("Permissions-Policy: geolocation=(self), microphone=(), camera=()");
+}
+
 // Load core classes
 if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/core/Database.php';
+    require_once APP_ROOT . '/app/core/ExceptionHandler.php';
+    require_once APP_ROOT . '/app/core/exceptions/ValidationException.php';
+    require_once APP_ROOT . '/app/core/exceptions/NotFoundException.php';
+    require_once APP_ROOT . '/app/core/exceptions/UnauthorizedException.php';
     require_once APP_ROOT . '/app/core/App.php';
     require_once APP_ROOT . '/app/core/Controller.php';
     require_once APP_ROOT . '/app/core/Model.php';
@@ -70,10 +112,14 @@ if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/helpers/Email.php';
     require_once APP_ROOT . '/app/helpers/SMS.php';
     require_once APP_ROOT . '/app/helpers/RateLimiter.php';
-    
+    require_once APP_ROOT . '/app/middleware/AccessLogMiddleware.php';
+
+    // Register exception handler
+    ExceptionHandler::register();
+
     // Start session
     Session::start();
-    
+
     // Initialize and run the application
     $app = new App();
     $app->run();

@@ -18,7 +18,8 @@
                                 <?php $hasLanguage = false; ?>
                                 <?php foreach ($guide_languages as $gl): ?>
                                     <?php if ($gl['language_id'] == $lang['id']): ?>
-                                        <?php $hasLanguage = true; break; ?>
+                                        <?php $hasLanguage = true;
+                                        break; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                                 <?php if (!$hasLanguage): ?>
@@ -78,7 +79,8 @@
                                 <?php $hasSpec = false; ?>
                                 <?php foreach ($guide_specializations as $gs): ?>
                                     <?php if ($gs['specialization_id'] == $spec['id']): ?>
-                                        <?php $hasSpec = true; break; ?>
+                                        <?php $hasSpec = true;
+                                        break; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                                 <?php if (!$hasSpec): ?>

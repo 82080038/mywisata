@@ -164,9 +164,9 @@ Aplikasi ini mendukung development di multiple komputer (Windows & Linux) dengan
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@mywisata.com | admin123 |
+| Admin | (Lihat database tabel users) | (Lihat database tabel users) |
 
-> **Penting:** Ganti password admin setelah login pertama!
+> **PENTING:** Login credentials tersimpan di database. Untuk development, buat admin baru melalui seed data atau SQL manual. JANGAN gunakan password default di production!
 
 ---
 
@@ -339,7 +339,7 @@ MIT License — bebas digunakan, dimodifikasi, dan didistribusikan.
 
 ## Kontak
 
-- **Email:** admin@mywisata.com
+- **Email:** (Lihat .env untuk konfigurasi email)
 - **Repository:** https://github.com/82080038/mywisata
 - **Domain:** mywisata.com (akan dibeli sebagai DNS aplikasi)
 

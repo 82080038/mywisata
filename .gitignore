@@ -30,9 +30,16 @@ desktop.ini
 vendor/
 composer.lock
 
+# PHP CS Fixer
+.php-cs-fixer.cache
+
 # Node (if used in future)
 node_modules/
 package-lock.json
 
 # XAMPP temp
 *.tmp
+
+# PHPUnit
+.phpunit.cache/
+tests/coverage/
