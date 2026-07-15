@@ -15,8 +15,8 @@ class MapController extends Controller {
      * Index - Show map with all destinations
      */
     public function index() {
-        $destinationModel = new Destination();
-        $destinations = $destinationModel->getAll(['is_active' => 1]);
+        $destinationModel = $this->model('Destination');
+        $destinations = $destinationModel->getAllWithFilters(['is_active' => 1]);
         
         $data = [
             'title' => 'Peta Destinasi - MyWisata',
@@ -30,8 +30,8 @@ class MapController extends Controller {
      * Get destinations as JSON for map
      */
     public function getDestinations() {
-        $destinationModel = new Destination();
-        $destinations = $destinationModel->getAll(['is_active' => 1]);
+        $destinationModel = $this->model('Destination');
+        $destinations = $destinationModel->getAllWithFilters(['is_active' => 1]);
         
         $markers = [];
         foreach ($destinations as $dest) {
@@ -58,7 +58,7 @@ class MapController extends Controller {
         $longitude = $this->get('lng');
         $radius = $this->get('radius', 10);
         
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         $nearby = $destinationModel->getNearby($latitude, $longitude, $radius);
         
         $markers = [];

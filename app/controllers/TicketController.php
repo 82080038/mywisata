@@ -24,7 +24,7 @@ class TicketController extends Controller {
      */
     public function index() {
         $userId = Session::get('user_id');
-        $ticketModel = new Ticket();
+        $ticketModel = $this->model('Ticket');
         
         $status = $this->get('status', 'all');
         $tickets = $ticketModel->getByUserId($userId, $status === 'all' ? null : $status);
@@ -43,7 +43,7 @@ class TicketController extends Controller {
      */
     public function create() {
         $destinationId = $this->get('destination_id');
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         $destination = $destinationModel->findById($destinationId);
         
         if (!$destination) {
@@ -65,7 +65,7 @@ class TicketController extends Controller {
     public function store() {
         $userId = Session::get('user_id');
         
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         $destination = $destinationModel->findById($this->post('destination_id'));
         
         $quantity = $this->post('quantity');
@@ -91,11 +91,11 @@ class TicketController extends Controller {
             $this->redirect('ticket/create?destination_id=' . $data['destination_id']);
         }
         
-        $ticketModel = new Ticket();
+        $ticketModel = $this->model('Ticket');
         $ticketId = $ticketModel->create($data);
         
         // Create transaction
-        $transactionModel = new Transaction();
+        $transactionModel = $this->model('Transaction');
         $transactionData = [
             'transaction_code' => 'TX' . date('YmdHis') . rand(1000, 9999),
             'user_id' => $userId,

@@ -26,7 +26,9 @@
                                     <?php if ($ticket['main_image']): ?>
                                         <img src="<?= View::asset('uploads/destinations/' . $ticket['main_image']) ?>" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
                                     <?php else: ?>
-                                        <img src="https://via.placeholder.com/80" class="rounded me-3" style="width: 80px; height: 80px;">
+                                        <div class="rounded me-3 bg-secondary d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                            <i class="fas fa-image text-white"></i>
+                                        </div>
                                     <?php endif; ?>
                                     <div>
                                         <h5 class="card-title mb-1"><?= View::e($ticket['destination_name']) ?></h5>

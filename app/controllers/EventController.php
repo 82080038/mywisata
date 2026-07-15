@@ -9,16 +9,13 @@
  * @since 2026-07-01
  */
 
-// Load required models
-require_once APP_ROOT . '/app/models/Event.php';
-
 class EventController extends Controller {
     
     /**
      * Index - List all events
      */
     public function index() {
-        $eventModel = new Event();
+        $eventModel = $this->model('Event');
         
         $filters = [
             'city' => $this->get('city'),
@@ -45,7 +42,7 @@ class EventController extends Controller {
      */
     public function detail() {
         $id = $this->get('id');
-        $eventModel = new Event();
+        $eventModel = $this->model('Event');
         
         $event = $eventModel->findById($id);
         
@@ -91,7 +88,7 @@ class EventController extends Controller {
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
         
-        $eventModel = new Event();
+        $eventModel = $this->model('Event');
         $eventModel->addReview($data);
         
         Logger::audit('ADD_EVENT_REVIEW', 'event_reviews', "Added review for event ID: {$data['event_id']}", [], $data);

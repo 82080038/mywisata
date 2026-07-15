@@ -9,16 +9,13 @@
  * @since 2026-07-01
  */
 
-// Load required models
-require_once APP_ROOT . '/app/models/Restaurant.php';
-
 class RestaurantController extends Controller {
     
     /**
      * Index - List all restaurants
      */
     public function index() {
-        $restaurantModel = new Restaurant();
+        $restaurantModel = $this->model('Restaurant');
         
         $filters = [
             'city' => $this->get('city'),
@@ -42,7 +39,7 @@ class RestaurantController extends Controller {
      */
     public function detail() {
         $id = $this->get('id');
-        $restaurantModel = new Restaurant();
+        $restaurantModel = $this->model('Restaurant');
         
         $restaurant = $restaurantModel->findById($id);
         
@@ -90,7 +87,7 @@ class RestaurantController extends Controller {
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
         
-        $restaurantModel = new Restaurant();
+        $restaurantModel = $this->model('Restaurant');
         $restaurantModel->addReview($data);
         
         Logger::audit('ADD_RESTAURANT_REVIEW', 'restaurant_reviews', "Added review for restaurant ID: {$data['restaurant_id']}", [], $data);

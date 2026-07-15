@@ -26,7 +26,7 @@ class FavoriteController extends Controller {
      */
     public function index() {
         $userId = Session::get('user_id');
-        $favoriteModel = new Favorite();
+        $favoriteModel = $this->model('Favorite');
         
         $itemType = $this->get('type', 'all');
         $favorites = $favoriteModel->getUserFavorites($userId, $itemType === 'all' ? null : $itemType);
@@ -48,7 +48,7 @@ class FavoriteController extends Controller {
         $itemType = $this->post('item_type');
         $itemId = $this->post('item_id');
         
-        $favoriteModel = new Favorite();
+        $favoriteModel = $this->model('Favorite');
         $favoriteModel->add($userId, $itemType, $itemId);
         
         Logger::audit('ADD_FAVORITE', 'user_favorites', "Added favorite: {$itemType} ID: {$itemId}");
@@ -64,7 +64,7 @@ class FavoriteController extends Controller {
         $itemType = $this->post('item_type');
         $itemId = $this->post('item_id');
         
-        $favoriteModel = new Favorite();
+        $favoriteModel = $this->model('Favorite');
         $favoriteModel->remove($userId, $itemType, $itemId);
         
         Logger::audit('REMOVE_FAVORITE', 'user_favorites', "Removed favorite: {$itemType} ID: {$itemId}");

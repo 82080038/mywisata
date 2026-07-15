@@ -24,7 +24,7 @@ class BookingController extends Controller {
      */
     public function index() {
         $userId = Session::get('user_id');
-        $bookingModel = new Booking();
+        $bookingModel = $this->model('Booking');
         
         $status = $this->get('status', 'all');
         $bookings = $bookingModel->getByUserId($userId, $status === 'all' ? null : $status);
@@ -43,7 +43,7 @@ class BookingController extends Controller {
      */
     public function create() {
         $guideId = $this->get('guide_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findById($guideId);
         
         if (!$guide) {
@@ -87,11 +87,11 @@ class BookingController extends Controller {
             $this->redirect('booking/create?guide_id=' . $data['guide_id']);
         }
         
-        $bookingModel = new Booking();
+        $bookingModel = $this->model('Booking');
         $bookingId = $bookingModel->create($data);
         
         // Create transaction
-        $transactionModel = new Transaction();
+        $transactionModel = $this->model('Transaction');
         $transactionData = [
             'transaction_code' => 'TX' . date('YmdHis') . rand(1000, 9999),
             'user_id' => $userId,
@@ -119,7 +119,7 @@ class BookingController extends Controller {
         $reason = $this->post('reason');
         $userId = Session::get('user_id');
         
-        $bookingModel = new Booking();
+        $bookingModel = $this->model('Booking');
         $booking = $bookingModel->findById($bookingId);
         
         if (!$booking || $booking['user_id'] != $userId) {

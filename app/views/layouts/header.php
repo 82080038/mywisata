@@ -18,6 +18,10 @@ $currentLang = Language::getLanguage();
     
     <!-- Custom CSS -->
     <link href="<?= View::asset('css/style.css') ?>" rel="stylesheet">
+    
+    <script>
+        window.APP_URL = '<?= BASE_URL ?>';
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -33,6 +37,12 @@ $currentLang = Language::getLanguage();
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="<?= View::url() ?>"><?= Language::trans('nav.home') ?></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= View::url('map') ?>"><i class="fas fa-map me-1"></i>Peta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= View::url('destinations') ?>"><i class="fas fa-landmark me-1"></i>Destinasi</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= View::url('home/about') ?>"><?= Language::trans('nav.about') ?></a>

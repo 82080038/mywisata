@@ -9,16 +9,13 @@
  * @since 2026-07-01
  */
 
-// Load required models
-require_once APP_ROOT . '/app/models/Destination.php';
-
 class DestinationController extends Controller {
     
     /**
      * Index - List all destinations
      */
     public function index() {
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         
         $filters = [
             'category_id' => $this->get('category'),
@@ -51,7 +48,7 @@ class DestinationController extends Controller {
      */
     public function detail() {
         $id = $this->get('id');
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         
         $destination = $destinationModel->findById($id);
         
@@ -103,7 +100,7 @@ class DestinationController extends Controller {
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
         
-        $destinationModel = new Destination();
+        $destinationModel = $this->model('Destination');
         $destinationModel->addReview($data);
         $destinationModel->updateRating($data['destination_id']);
         

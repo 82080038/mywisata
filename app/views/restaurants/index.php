@@ -42,7 +42,9 @@
                             <?php if (!empty($restaurant['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/restaurants/' . $restaurant['main_image']) ?>" class="card-img-top" alt="<?= View::e($restaurant['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($restaurant['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-utensils text-white" style="font-size: 2rem;"></i>
+                                </div>
                             <?php endif; ?>
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($restaurant['name']) ?></h5>

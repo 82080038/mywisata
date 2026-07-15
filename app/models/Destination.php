@@ -119,9 +119,9 @@ class Destination extends Model {
      */
     public function getNearby($latitude, $longitude, $radius = 10) {
         $sql = "SELECT d.*, c.name as category_name,
-                (6371 * ACOS(COS(RADIANS(:latitude)) * COS(RADIANS(d.latitude)) 
-                * COS(RADIANS(d.longitude) - RADIANS(:longitude)) 
-                + SIN(RADIANS(:latitude)) * SIN(RADIANS(d.latitude)))) AS distance
+                (6371 * ACOS(COS(RADIANS(:lat1)) * COS(RADIANS(d.latitude)) 
+                * COS(RADIANS(d.longitude) - RADIANS(:lng)) 
+                + SIN(RADIANS(:lat2)) * SIN(RADIANS(d.latitude)))) AS distance
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1
@@ -129,8 +129,9 @@ class Destination extends Model {
                 ORDER BY distance ASC";
         
         return $this->db->query($sql, [
-            'latitude' => $latitude,
-            'longitude' => $longitude,
+            'lat1' => $latitude,
+            'lng' => $longitude,
+            'lat2' => $latitude,
             'radius' => $radius
         ])->fetchAll();
     }

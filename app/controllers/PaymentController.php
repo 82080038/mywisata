@@ -26,7 +26,7 @@ class PaymentController extends Controller {
      */
     public function index() {
         $transactionId = $this->get('transaction_id');
-        $transactionModel = new Transaction();
+        $transactionModel = $this->model('Transaction');
         $transaction = $transactionModel->findById($transactionId);
         
         if (!$transaction || $transaction['user_id'] != Session::get('user_id')) {
@@ -50,7 +50,7 @@ class PaymentController extends Controller {
         $paymentMethod = $this->post('payment_method');
         $userId = Session::get('user_id');
         
-        $transactionModel = new Transaction();
+        $transactionModel = $this->model('Transaction');
         $transaction = $transactionModel->findById($transactionId);
         
         if (!$transaction || $transaction['user_id'] != $userId) {
@@ -67,7 +67,7 @@ class PaymentController extends Controller {
         
         // Update related booking/ticket status
         if ($transaction['type'] === 'booking_guide' && $transaction['booking_id']) {
-            $bookingModel = new Booking();
+            $bookingModel = $this->model('Booking');
             $bookingModel->updateStatus($transaction['booking_id'], 'confirmed');
         }
         

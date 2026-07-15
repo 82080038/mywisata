@@ -9,16 +9,13 @@
  * @since 2026-07-01
  */
 
-// Load required models
-require_once APP_ROOT . '/app/models/Hotel.php';
-
 class HotelController extends Controller {
     
     /**
      * Index - List all hotels
      */
     public function index() {
-        $hotelModel = new Hotel();
+        $hotelModel = $this->model('Hotel');
         
         $filters = [
             'city' => $this->get('city'),
@@ -42,7 +39,7 @@ class HotelController extends Controller {
      */
     public function detail() {
         $id = $this->get('id');
-        $hotelModel = new Hotel();
+        $hotelModel = $this->model('Hotel');
         
         $hotel = $hotelModel->findById($id);
         
@@ -90,7 +87,7 @@ class HotelController extends Controller {
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
         
-        $hotelModel = new Hotel();
+        $hotelModel = $this->model('Hotel');
         $hotelModel->addReview($data);
         
         Logger::audit('ADD_HOTEL_REVIEW', 'hotel_reviews', "Added review for hotel ID: {$data['hotel_id']}", [], $data);

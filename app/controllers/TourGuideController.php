@@ -9,9 +9,6 @@
  * @since 2026-06-30
  */
 
-// Load required models
-require_once APP_ROOT . '/app/models/TourGuide.php';
-
 class TourGuideController extends Controller {
     
     /**
@@ -25,7 +22,7 @@ class TourGuideController extends Controller {
      * Index - List all tour guides (public)
      */
     public function index() {
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guides = $tourGuideModel->getAllWithFilters(['is_verified' => 1, 'is_available' => 1]);
         
         $data = [
@@ -42,7 +39,7 @@ class TourGuideController extends Controller {
     public function dashboard() {
         Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if (!$guide) {
@@ -102,7 +99,7 @@ class TourGuideController extends Controller {
     public function profile() {
         Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         $data = [
@@ -143,7 +140,7 @@ class TourGuideController extends Controller {
             $this->redirect('tourguide/profile');
         }
         
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guideId = $tourGuideModel->save($data);
         
         // Handle avatar upload
@@ -169,7 +166,7 @@ class TourGuideController extends Controller {
      */
     public function skills() {
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if (!$guide) {
@@ -209,7 +206,7 @@ class TourGuideController extends Controller {
     public function addLanguage() {
         Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         $languageId = $this->post('language_id');
@@ -225,7 +222,7 @@ class TourGuideController extends Controller {
      */
     public function removeLanguage() {
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         $languageId = $this->post('language_id');
@@ -241,7 +238,7 @@ class TourGuideController extends Controller {
     public function addSpecialization() {
         Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         $specializationId = $this->post('specialization_id');
@@ -256,7 +253,7 @@ class TourGuideController extends Controller {
      */
     public function removeSpecialization() {
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         $specializationId = $this->post('specialization_id');
@@ -307,7 +304,7 @@ class TourGuideController extends Controller {
             $this->json(['status' => 'error', 'message' => 'Booking tidak ditemukan'], 404);
         }
         
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if ($booking['guide_id'] != $guide['id']) {
@@ -339,7 +336,7 @@ class TourGuideController extends Controller {
             $this->json(['status' => 'error', 'message' => 'Booking tidak ditemukan'], 404);
         }
         
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if ($booking['guide_id'] != $guide['id']) {
@@ -360,7 +357,7 @@ class TourGuideController extends Controller {
     public function earnings() {
         Middleware::requireRole('tour_guide');
         $userId = Session::get('user_id');
-        $tourGuideModel = new TourGuide();
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if (!$guide) {
