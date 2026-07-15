@@ -13,7 +13,7 @@ class Language {
     
     private static $currentLang = 'id';
     private static $translations = [];
-    private static $supportedLangs = ['id', 'en'];
+    private static $supportedLangs = ['id', 'en', 'ja', 'zh', 'ko', 'ar', 'fr', 'de', 'es'];
     
     /**
      * Set current language
@@ -127,7 +127,64 @@ class Language {
     public static function getLanguageName($code) {
         $names = [
             'id' => 'Indonesia',
-            'en' => 'English'
+            'en' => 'English',
+            'ja' => '日本語',
+            'zh' => '中文',
+            'ko' => '한국어',
+            'ar' => 'العربية',
+            'fr' => 'Français',
+            'de' => 'Deutsch',
+            'es' => 'Español'
+        ];
+        
+        return $names[$code] ?? $code;
+    }
+    
+    /**
+     * Get language direction (LTR or RTL)
+     * 
+     * @param string $code Language code
+     * @return string Direction
+     */
+    public static function getLanguageDirection($code) {
+        $rtlLangs = ['ar'];
+        return in_array($code, $rtlLangs) ? 'rtl' : 'ltr';
+    }
+    
+    /**
+     * Get available languages with metadata
+     * 
+     * @return array Languages with name and direction
+     */
+    public static function getAvailableLanguages() {
+        $languages = [];
+        foreach (self::$supportedLangs as $code) {
+            $languages[$code] = [
+                'name' => self::getLanguageName($code),
+                'direction' => self::getLanguageDirection($code),
+                'native_name' => self::getNativeLanguageName($code)
+            ];
+        }
+        return $languages;
+    }
+    
+    /**
+     * Get native language name
+     * 
+     * @param string $code Language code
+     * @return string Native language name
+     */
+    private static function getNativeLanguageName($code) {
+        $names = [
+            'id' => 'Bahasa Indonesia',
+            'en' => 'English',
+            'ja' => '日本語',
+            'zh' => '中文',
+            'ko' => '한국어',
+            'ar' => 'العربية',
+            'fr' => 'Français',
+            'de' => 'Deutsch',
+            'es' => 'Español'
         ];
         
         return $names[$code] ?? $code;

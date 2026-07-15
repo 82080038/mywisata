@@ -309,4 +309,176 @@ class TourGuide extends Model {
         
         return $this->db->query($sql, $params)->fetch();
     }
+    
+    /**
+     * Check availability for specific date and time
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @param string $startTime Start time (H:i:s)
+     * @param string $endTime End time (H:i:s)
+     * @return bool Available or not
+     */
+    public function checkAvailability($guideId, $date, $startTime, $endTime) {
+        // Check if guide is available
+        $guide = $this->findById($guideId);
+        if (!$guide || !$guide['is_available']) {
+            return false;
+        }
+        
+        // Check if date is in schedule
+        $sql = "SELECT COUNT(*) as count FROM guide_schedules 
+                WHERE guide_id = :guide_id 
+                AND available_date = :date 
+                AND is_booked = 0";
+        
+        $result = $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date
+        ])->fetch();
+        
+        if ($result['count'] == 0) {
+            return false;
+        }
+        
+        // Check for overlapping bookings
+        $sql = "SELECT COUNT(*) as count FROM bookings 
+                WHERE guide_id = :guide_id 
+                AND booking_date = :date 
+                AND status IN ('pending', 'confirmed')
+                AND (
+                    (start_time <= :end_time AND end_time >= :start_time)
+                )";
+        
+        $result = $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date,
+            'start_time' => $startTime,
+            'end_time' => $endTime
+        ])->fetch();
+        
+        return $result['count'] == 0;
+    }
+    
+    /**
+     * Reserve availability slot
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @param string $startTime Start time (H:i:s)
+     * @param string $endTime End time (H:i:s)
+     * @return bool Success or not
+     */
+    public function reserveAvailability($guideId, $date, $startTime, $endTime) {
+        // Use transaction to prevent race conditions
+        try {
+            $this->db->beginTransaction();
+            
+            // Check availability again within transaction
+            if (!$this->checkAvailability($guideId, $date, $startTime, $endTime)) {
+                $this->db->rollBack();
+                return false;
+            }
+            
+            // Mark schedule as booked
+            $sql = "UPDATE guide_schedules 
+                    SET is_booked = 1 
+                    WHERE guide_id = :guide_id 
+                    AND available_date = :date 
+                    AND start_time <= :start_time 
+                    AND end_time >= :end_time 
+                    AND is_booked = 0 
+                    LIMIT 1";
+            
+            $result = $this->db->query($sql, [
+                'guide_id' => $guideId,
+                'date' => $date,
+                'start_time' => $startTime,
+                'end_time' => $endTime
+            ]);
+            
+            if ($result) {
+                $this->db->commit();
+                return true;
+            } else {
+                $this->db->rollBack();
+                return false;
+            }
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            Logger::error('Failed to reserve availability', [
+                'guide_id' => $guideId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+    
+    /**
+     * Release availability slot
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @param string $startTime Start time (H:i:s)
+     * @return bool Success or not
+     */
+    public function releaseAvailability($guideId, $date, $startTime) {
+        $sql = "UPDATE guide_schedules 
+                SET is_booked = 0 
+                WHERE guide_id = :guide_id 
+                AND available_date = :date 
+                AND start_time = :start_time";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date,
+            'start_time' => $startTime
+        ]);
+    }
+    
+    /**
+     * Get available time slots for a date
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @return array Available time slots
+     */
+    public function getAvailableSlots($guideId, $date) {
+        $sql = "SELECT * FROM guide_schedules 
+                WHERE guide_id = :guide_id 
+                AND available_date = :date 
+                AND is_booked = 0 
+                ORDER BY start_time ASC";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date
+        ])->fetchAll();
+    }
+    
+    /**
+     * Add schedule availability
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @param string $startTime Start time (H:i:s)
+     * @param string $endTime End time (H:i:s)
+     * @return bool Success or not
+     */
+    public function addSchedule($guideId, $date, $startTime, $endTime) {
+        $sql = "INSERT INTO guide_schedules 
+                (guide_id, available_date, start_time, end_time, is_booked, created_at)
+                VALUES (:guide_id, :date, :start_time, :end_time, 0, NOW())
+                ON DUPLICATE KEY UPDATE 
+                is_booked = 0, 
+                start_time = :start_time, 
+                end_time = :end_time";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date,
+            'start_time' => $startTime,
+            'end_time' => $endTime
+        ]);
+    }
 }

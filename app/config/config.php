@@ -130,8 +130,35 @@ define('MAX_AUDIO_SIZE', 10485760); // 10MB
 // ============================================
 // PAYMENT SETTINGS
 // ============================================
-define('PAYMENT_GATEWAY', 'manual'); // manual, midtrans, stripe, etc.
+define('PAYMENT_GATEWAY', 'midtrans'); // manual, midtrans, stripe, etc.
 define('PAYMENT_TIMEOUT_HOURS', 24);
+
+// ============================================
+// MIDTRANS PAYMENT GATEWAY SETTINGS
+// ============================================
+define('MIDTRANS_SERVER_KEY', ''); // Your Midtrans Server Key
+define('MIDTRANS_CLIENT_KEY', ''); // Your Midtrans Client Key
+define('MIDTRANS_MERCHANT_ID', ''); // Your Midtrans Merchant ID
+define('MIDTRANS_IS_PRODUCTION', false); // Set to true for production
+define('MIDTRANS_SANITIZATION', true); // Enable payment sanitization
+define('MIDTRANS_3DS_SECURE', true); // Enable 3D Secure
+
+// ============================================
+// REDIS CACHING SETTINGS
+// ============================================
+define('REDIS_ENABLED', false); // Enable Redis caching
+define('REDIS_HOST', '127.0.0.1');
+define('REDIS_PORT', 6379);
+define('REDIS_PASSWORD', '');
+define('REDIS_DATABASE', 0);
+define('CACHE_TTL', 3600); // Default cache TTL in seconds (1 hour)
+
+// ============================================
+// PROMO CODE SETTINGS
+// ============================================
+define('PROMO_ENABLED', true);
+define('PROMO_CODE_LENGTH', 8);
+define('PROMO_DEFAULT_DISCOUNT', 10); // Default discount percentage
 
 // ============================================
 // CURRENCY SETTINGS
