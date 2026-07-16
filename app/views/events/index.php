@@ -39,25 +39,25 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <?php if (!empty($event['main_image'])): ?>
-                            <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['name'] ?? 'Event') ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
                             <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
                                 <i class="fas fa-calendar-alt text-white" style="font-size: 2rem;"></i>
                             </div>
                         <?php endif; ?>
                         <div class="card-body">
-                            <h5 class="card-title"><?= View::e($event['name']) ?></h5>
+                            <h5 class="card-title"><?= View::e($event['name'] ?? 'Event Name') ?></h5>
                             <p class="card-text text-muted small">
-                                <i class="fas fa-calendar me-1"></i><?= View::date($event['event_date']) ?>
+                                <i class="fas fa-calendar me-1"></i><?= View::date($event['event_date'] ?? null) ?>
                             </p>
                             <p class="card-text text-muted small">
-                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($event['city']) ?>
+                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($event['city'] ?? 'Unknown') ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <i class="fas fa-star text-warning"></i> <?= number_format($event['rating_avg'], 1) ?>
+                                    <i class="fas fa-star text-warning"></i> <?= number_format($event['rating_avg'] ?? 0, 1) ?>
                                 </div>
-                                <span class="badge bg-primary"><?= View::e($event['category']) ?></span>
+                                <span class="badge bg-primary"><?= View::e($event['category'] ?? 'General') ?></span>
                             </div>
                             <a href="<?= View::url('events/detail?id=' . $event['id']) ?>" class="btn btn-primary mt-3 w-100">
                                 Lihat Detail
@@ -83,23 +83,23 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <?php if (!empty($event['main_image'])): ?>
-                                <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['name'] ?? 'Event') ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($event['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($event['name'] ?? 'Event') ?>" style="height: 200px; object-fit: cover;">
                             <?php endif; ?>
                             <div class="card-body">
-                                <h5 class="card-title"><?= View::e($event['name']) ?></h5>
+                                <h5 class="card-title"><?= View::e($event['name'] ?? 'Event Name') ?></h5>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-calendar me-1"></i><?= View::date($event['event_date']) ?>
+                                    <i class="fas fa-calendar me-1"></i><?= View::date($event['event_date'] ?? null) ?>
                                 </p>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($event['city']) ?>
+                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($event['city'] ?? 'Unknown') ?>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <i class="fas fa-star text-warning"></i> <?= number_format($event['rating_avg'], 1) ?>
+                                        <i class="fas fa-star text-warning"></i> <?= number_format($event['rating_avg'] ?? 0, 1) ?>
                                     </div>
-                                    <span class="badge bg-secondary"><?= View::e($event['category']) ?></span>
+                                    <span class="badge bg-secondary"><?= View::e($event['category'] ?? 'General') ?></span>
                                 </div>
                                 <a href="<?= View::url('events/detail?id=' . $event['id']) ?>" class="btn btn-primary mt-3 w-100">
                                     Lihat Detail

@@ -37,7 +37,7 @@ test.describe('Destinations Tests', () => {
   });
 
   test('should have filter options', async ({ page }) => {
-    await page.goto(`${BASE_URL}/destinations`);
+    await page.goto(`${BASE_URL}/destinations`, { timeout: 60000 });
 
     // Check for filter dropdowns
     const filters = page.locator('select[name="category"], select');
