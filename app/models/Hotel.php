@@ -116,4 +116,22 @@ class Hotel extends Model {
         
         return $this->db->query($sql, $data);
     }
+    
+    /**
+     * Update rating
+     * 
+     * @param int $hotelId Hotel ID
+     * @return bool
+     */
+    public function updateRating($hotelId) {
+        $sql = "UPDATE {$this->table} 
+                SET rating_avg = (
+                    SELECT COALESCE(AVG(rating), 0) 
+                    FROM reviews 
+                    WHERE reviewable_type = 'hotel' AND reviewable_id = :hotel_id
+                )
+                WHERE id = :hotel_id";
+        
+        return $this->db->query($sql, ['hotel_id' => $hotelId]);
+    }
 }

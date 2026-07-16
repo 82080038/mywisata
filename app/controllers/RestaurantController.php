@@ -89,6 +89,7 @@ class RestaurantController extends Controller {
         
         $restaurantModel = $this->model('Restaurant');
         $restaurantModel->addReview($data);
+        $restaurantModel->updateRating($data['restaurant_id']);
         
         Logger::audit('ADD_RESTAURANT_REVIEW', 'restaurant_reviews', "Added review for restaurant ID: {$data['restaurant_id']}", [], $data);
         

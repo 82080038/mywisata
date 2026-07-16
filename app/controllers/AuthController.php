@@ -217,6 +217,11 @@ class AuthController extends Controller {
             $this->redirect('auth/forgot-password');
         }
         
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+        
         $email = $this->post('email');
         
         if (empty($email)) {
@@ -233,11 +238,119 @@ class AuthController extends Controller {
             ]);
         }
         
-        // TODO: Send reset email with token
-        // For now, just return success
+        // Generate reset token
+        $token = bin2hex(random_bytes(32));
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        
+        // Store token in database
+        $db = Database::getInstance();
+        $db->query("UPDATE users SET reset_token = :token, reset_token_expiry = :expiry WHERE id = :id",
+                  ['token' => $token, 'expiry' => $expiry, 'id' => $user['id']]);
+        
+        // Send reset email
+        $resetLink = BASE_URL . 'auth/reset-password?token=' . $token;
+        $subject = 'Reset Password - MyWisata';
+        $message = "Halo {$user['name']},\n\n";
+        $message .= "Anda telah meminta reset password. Klik link di bawah ini untuk reset password:\n\n";
+        $message .= $resetLink . "\n\n";
+        $message .= "Link ini akan kadaluarsa dalam 1 jam.\n\n";
+        $message .= "Jika Anda tidak meminta reset password, abaikan email ini.\n\n";
+        $message .= "Terima kasih,\nMyWisata Team";
+        
+        $emailSent = Email::send($user['email'], $subject, $message);
+        
+        if ($emailSent) {
+            Logger::audit('PASSWORD_RESET_REQUEST', 'users', "Password reset requested for user ID: {$user['id']}", [], ['email' => $email]);
+            $this->json([
+                'status' => 'success',
+                'message' => 'Link reset password telah dikirim ke email Anda.'
+            ]);
+        } else {
+            $this->json(['status' => 'error', 'message' => 'Gagal mengirim email. Silakan coba lagi.'], 500);
+        }
+    }
+    
+    /**
+     * Reset password page
+     */
+    public function resetPassword() {
+        $token = $this->get('token');
+        
+        if (empty($token)) {
+            Session::flash('error', 'Token reset tidak valid');
+            $this->redirect('auth/forgot-password');
+        }
+        
+        $db = Database::getInstance();
+        $user = $db->query("SELECT * FROM users WHERE reset_token = :token AND reset_token_expiry > NOW()", 
+                          ['token' => $token])->fetch();
+        
+        if (!$user) {
+            Session::flash('error', 'Token reset tidak valid atau telah kadaluarsa');
+            $this->redirect('auth/forgot-password');
+        }
+        
+        $data = [
+            'title' => 'Reset Password - MyWisata',
+            'token' => $token,
+            'csrf_token' => Middleware::csrfToken()
+        ];
+        
+        $this->view('auth/reset-password', $data);
+    }
+    
+    /**
+     * Handle password reset
+     */
+    public function doResetPassword() {
+        if (!$this->isAjax()) {
+            $this->redirect('auth/forgot-password');
+        }
+        
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+        
+        $token = $this->post('token');
+        $password = $this->post('password');
+        $passwordConfirm = $this->post('password_confirm');
+        
+        // Validate input
+        if (empty($password)) {
+            $this->json(['status' => 'error', 'message' => 'Password wajib diisi'], 400);
+        }
+        
+        if (strlen($password) < 6) {
+            $this->json(['status' => 'error', 'message' => 'Password minimal 6 karakter'], 400);
+        }
+        
+        if ($password !== $passwordConfirm) {
+            $this->json(['status' => 'error', 'message' => 'Konfirmasi password tidak cocok'], 400);
+        }
+        
+        // Verify token
+        $db = Database::getInstance();
+        $user = $db->query("SELECT * FROM users WHERE reset_token = :token AND reset_token_expiry > NOW()", 
+                          ['token' => $token])->fetch();
+        
+        if (!$user) {
+            $this->json(['status' => 'error', 'message' => 'Token reset tidak valid atau telah kadaluarsa'], 400);
+        }
+        
+        // Update password
+        $this->userModel->updatePassword($user['id'], $password);
+        
+        // Clear reset token
+        $db->query("UPDATE users SET reset_token = NULL, reset_token_expiry = NULL WHERE id = :id",
+                  ['id' => $user['id']]);
+        
+        Logger::audit('PASSWORD_RESET', 'users', "Password reset for user ID: {$user['id']}", [], []);
+        
         $this->json([
             'status' => 'success',
-            'message' => 'Jika email terdaftar, link reset password akan dikirim.'
+            'message' => 'Password berhasil direset. Silakan login dengan password baru.',
+            'redirect' => BASE_URL . 'auth/login'
         ]);
     }
 }

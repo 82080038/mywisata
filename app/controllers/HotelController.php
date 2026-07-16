@@ -89,6 +89,7 @@ class HotelController extends Controller {
         
         $hotelModel = $this->model('Hotel');
         $hotelModel->addReview($data);
+        $hotelModel->updateRating($data['hotel_id']);
         
         Logger::audit('ADD_HOTEL_REVIEW', 'hotel_reviews', "Added review for hotel ID: {$data['hotel_id']}", [], $data);
         

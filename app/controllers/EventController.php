@@ -90,6 +90,7 @@ class EventController extends Controller {
         
         $eventModel = $this->model('Event');
         $eventModel->addReview($data);
+        $eventModel->updateRating($data['event_id']);
         
         Logger::audit('ADD_EVENT_REVIEW', 'event_reviews', "Added review for event ID: {$data['event_id']}", [], $data);
         

@@ -124,6 +124,38 @@ class Controller {
      */
     protected function validateCsrf() {
         $token = $this->post('csrf_token');
-        return $token === CSRF_TOKEN;
+        return Middleware::verifyCsrf($token);
+    }
+    
+    /**
+     * Escape HTML output (XSS prevention)
+     * 
+     * @param string $string String to escape
+     * @return string
+     */
+    protected function escape($string) {
+        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    }
+    
+    /**
+     * Apply rate limiting to current request
+     * 
+     * @param int $limit Request limit
+     * @param int $window Time window in seconds
+     * @return bool
+     */
+    protected function applyRateLimit($limit = 60, $window = 60) {
+        $identifier = Session::get('user_id') ?? RateLimiter::getClientIP();
+        
+        if (!RateLimiter::allow($identifier, $limit, $window)) {
+            $remaining = RateLimiter::getRemaining($identifier);
+            $this->json([
+                'status' => 'error',
+                'message' => 'Too many requests. Please try again later.',
+                'retry_after' => $remaining['reset_time'] - time()
+            ], 429);
+        }
+        
+        return true;
     }
 }

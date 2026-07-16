@@ -267,6 +267,9 @@ class TourGuideController extends Controller {
      * Bookings - View bookings
      */
     public function bookings() {
+        Middleware::requireRole('tour_guide');
+        $userId = Session::get('user_id');
+        $tourGuideModel = $this->model('TourGuide');
         $guide = $tourGuideModel->findByUserId($userId);
         
         if (!$guide) {

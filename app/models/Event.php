@@ -126,4 +126,22 @@ class Event extends Model {
         
         return $this->db->query($sql, $data);
     }
+    
+    /**
+     * Update rating
+     * 
+     * @param int $eventId Event ID
+     * @return bool
+     */
+    public function updateRating($eventId) {
+        $sql = "UPDATE {$this->table} 
+                SET rating_avg = (
+                    SELECT COALESCE(AVG(rating), 0) 
+                    FROM reviews 
+                    WHERE reviewable_type = 'event' AND reviewable_id = :event_id
+                )
+                WHERE id = :event_id";
+        
+        return $this->db->query($sql, ['event_id' => $eventId]);
+    }
 }

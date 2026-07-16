@@ -481,4 +481,105 @@ class TourGuide extends Model {
             'end_time' => $endTime
         ]);
     }
+    
+    /**
+     * Update verification status
+     * 
+     * @param int $guideId Guide ID
+     * @param bool $isVerified Verification status
+     * @return bool
+     */
+    public function updateVerificationStatus($guideId, $isVerified) {
+        $sql = "UPDATE tour_guides 
+                SET is_verified = :is_verified, 
+                    verified_at = " . ($isVerified ? "NOW()" : "NULL") . "
+                WHERE id = :guide_id";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'is_verified' => $isVerified ? 1 : 0
+        ]);
+    }
+    
+    /**
+     * Bulk add schedules
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param array $schedules Array of schedule arrays
+     * @return bool
+     */
+    public function bulkAddSchedules($guideId, $schedules) {
+        try {
+            $this->db->beginTransaction();
+            
+            foreach ($schedules as $schedule) {
+                $sql = "INSERT INTO guide_schedules 
+                        (guide_id, available_date, start_time, end_time, is_booked, created_at)
+                        VALUES (:guide_id, :date, :start_time, :end_time, 0, NOW())
+                        ON DUPLICATE KEY UPDATE 
+                        is_booked = 0, 
+                        start_time = :start_time, 
+                        end_time = :end_time";
+                
+                $this->db->query($sql, [
+                    'guide_id' => $guideId,
+                    'date' => $schedule['date'],
+                    'start_time' => $schedule['start_time'],
+                    'end_time' => $schedule['end_time']
+                ]);
+            }
+            
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            Logger::error('Failed to bulk add schedules', [
+                'guide_id' => $guideId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+    
+    /**
+     * Delete schedule
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $date Date (Y-m-d)
+     * @param string $startTime Start time (H:i:s)
+     * @return bool
+     */
+    public function deleteSchedule($guideId, $date, $startTime) {
+        $sql = "DELETE FROM guide_schedules 
+                WHERE guide_id = :guide_id 
+                AND available_date = :date 
+                AND start_time = :start_time";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'date' => $date,
+            'start_time' => $startTime
+        ]);
+    }
+    
+    /**
+     * Get schedules for date range
+     * 
+     * @param int $guideId Tour Guide ID
+     * @param string $startDate Start date (Y-m-d)
+     * @param string $endDate End date (Y-m-d)
+     * @return array
+     */
+    public function getSchedulesInRange($guideId, $startDate, $endDate) {
+        $sql = "SELECT * FROM guide_schedules 
+                WHERE guide_id = :guide_id 
+                AND available_date BETWEEN :start_date AND :end_date
+                ORDER BY available_date ASC, start_time ASC";
+        
+        return $this->db->query($sql, [
+            'guide_id' => $guideId,
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ])->fetchAll();
+    }
 }

@@ -116,4 +116,22 @@ class Restaurant extends Model {
         
         return $this->db->query($sql, $data);
     }
+    
+    /**
+     * Update rating
+     * 
+     * @param int $restaurantId Restaurant ID
+     * @return bool
+     */
+    public function updateRating($restaurantId) {
+        $sql = "UPDATE {$this->table} 
+                SET rating_avg = (
+                    SELECT COALESCE(AVG(rating), 0) 
+                    FROM reviews 
+                    WHERE reviewable_type = 'restaurant' AND reviewable_id = :restaurant_id
+                )
+                WHERE id = :restaurant_id";
+        
+        return $this->db->query($sql, ['restaurant_id' => $restaurantId]);
+    }
 }
