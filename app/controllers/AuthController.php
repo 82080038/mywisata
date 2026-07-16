@@ -24,23 +24,101 @@ class AuthController extends Controller {
      * Login page
      */
     public function login() {
-        // Redirect if already logged in
-        if (Middleware::isAuthenticated()) {
-            $this->redirect('dashboard');
+        try {
+            $this->applyRateLimit(30, 60); // 30 login attempts per minute
+            
+            // Redirect if already logged in
+            if (Middleware::isAuthenticated()) {
+                $this->redirect('dashboard');
+            }
+            
+            $data = [
+                'title' => 'Masuk - MyWisata',
+                'csrf_token' => Middleware::csrfToken()
+            ];
+            
+            $this->view('auth/login', $data);
+        } catch (Exception $e) {
+            Logger::error('Login page error', ['error' => $e->getMessage()]);
+            Session::flash('error', 'Terjadi kesalahan. Silakan coba lagi.');
+            $this->redirect('home');
         }
-        
-        $data = [
-            'title' => 'Masuk - MyWisata',
-            'csrf_token' => Middleware::csrfToken()
-        ];
-        
-        $this->view('auth/login', $data);
     }
     
     /**
      * Handle login submission
      */
     public function doLogin() {
+        try {
+            $this->applyRateLimit(10, 60); // 10 login attempts per minute
+            
+            if (!$this->isAjax()) {
+                $this->redirect('auth/login');
+            }
+            
+            // Verify CSRF
+            if (!$this->validateCsrf()) {
+                $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+            }
+            
+            $email = $this->post('email');
+            $password = $this->post('password');
+            $remember = $this->post('remember') === 'true';
+            
+            // Validate input
+            if (empty($email) || empty($password)) {
+                $this->json(['status' => 'error', 'message' => 'Email dan password wajib diisi'], 400);
+            }
+            
+            // Verify credentials
+            $user = $this->userModel->verify($email, $password);
+            
+            if (!$user) {
+                Logger::audit('LOGIN_FAILED', 'users', "Failed login attempt: {$email}", [], ['email' => $email]);
+                $this->json(['status' => 'error', 'message' => 'Email atau password salah'], 401);
+            }
+            
+            // Set session
+            Session::set('user_id', $user['id']);
+            Session::set('user_name', $user['name']);
+            Session::set('user_email', $user['email']);
+            Session::set('role', $user['role']);
+            
+            // Update last login
+            $this->userModel->updateLastLogin($user['id']);
+            
+            // Set remember token if requested
+            if ($remember) {
+                $token = bin2hex(random_bytes(32));
+                Session::set('remember_token', $token);
+                // In production, store token in database and set cookie
+            }
+            
+            // Redirect based on role
+            $redirect = 'dashboard';
+            if ($user['role'] === 'admin') {
+                $redirect = 'admin/dashboard';
+            } elseif ($user['role'] === 'tour_guide') {
+                $redirect = 'tourguide/dashboard';
+            }
+            
+            Logger::audit('USER_LOGIN', 'users', "User logged in: {$user['email']}", [], ['user_id' => $user['id']]);
+            
+            $this->json([
+                'status' => 'success',
+                'message' => 'Login berhasil',
+                'redirect' => BASE_URL . $redirect
+            ]);
+        } catch (Exception $e) {
+            Logger::error('Login process error', ['error' => $e->getMessage()]);
+            $this->json(['status' => 'error', 'message' => 'Terjadi kesalahan saat login'], 500);
+        }
+    }
+    
+    /**
+     * Quick login for demo purposes
+     */
+    public function quickLogin() {
         if (!$this->isAjax()) {
             $this->redirect('auth/login');
         }
@@ -50,20 +128,52 @@ class AuthController extends Controller {
             $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
         }
         
-        $email = $this->post('email');
-        $password = $this->post('password');
-        $remember = $this->post('remember') === 'true';
+        $role = $this->post('role');
         
-        // Validate input
-        if (empty($email) || empty($password)) {
-            $this->json(['status' => 'error', 'message' => 'Email dan password wajib diisi'], 400);
+        // Demo credentials for each role
+        $demoCredentials = [
+            'admin' => [
+                'email' => 'admin@mywisata.com',
+                'password' => 'admin123'
+            ],
+            'wisatawan' => [
+                'email' => 'wisatawan@mywisata.com',
+                'password' => 'wisatawan123'
+            ],
+            'tour_guide' => [
+                'email' => 'guide@mywisata.com',
+                'password' => 'guide123'
+            ]
+        ];
+        
+        if (!isset($demoCredentials[$role])) {
+            $this->json(['status' => 'error', 'message' => 'Role tidak valid'], 400);
         }
         
+        $credentials = $demoCredentials[$role];
+        
         // Verify credentials
-        $user = $this->userModel->verify($email, $password);
+        $user = $this->userModel->verify($credentials['email'], $credentials['password']);
         
         if (!$user) {
-            $this->json(['status' => 'error', 'message' => 'Email atau password salah'], 401);
+            // Create demo user if doesn't exist
+            $userId = $this->userModel->register([
+                'name' => ucfirst(str_replace('_', ' ', $role)),
+                'email' => $credentials['email'],
+                'phone' => '081234567890',
+                'password' => $credentials['password'],
+                'role' => $role,
+                'status' => 'active',
+                'email_verified' => 1
+            ]);
+            
+            if ($userId) {
+                $user = $this->userModel->verify($credentials['email'], $credentials['password']);
+            }
+        }
+        
+        if (!$user) {
+            $this->json(['status' => 'error', 'message' => 'Gagal login sebagai ' . $role], 500);
         }
         
         // Set session
@@ -75,13 +185,6 @@ class AuthController extends Controller {
         // Update last login
         $this->userModel->updateLastLogin($user['id']);
         
-        // Set remember token if requested
-        if ($remember) {
-            $token = bin2hex(random_bytes(32));
-            Session::set('remember_token', $token);
-            // In production, store token in database and set cookie
-        }
-        
         // Redirect based on role
         $redirect = 'dashboard';
         if ($user['role'] === 'admin') {
@@ -92,7 +195,7 @@ class AuthController extends Controller {
         
         $this->json([
             'status' => 'success',
-            'message' => 'Login berhasil',
+            'message' => 'Login berhasil sebagai ' . ucfirst(str_replace('_', ' ', $role)),
             'redirect' => BASE_URL . $redirect
         ]);
     }

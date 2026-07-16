@@ -236,4 +236,51 @@ class Booking extends Model {
         
         return $result['count'];
     }
+    
+    /**
+     * Validate booking data
+     * 
+     * @param array $data Booking data to validate
+     * @return array Validation errors
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        if (empty($data['guide_id'])) {
+            $errors['guide_id'] = 'Tour guide wajib dipilih';
+        }
+        
+        if (empty($data['booking_date'])) {
+            $errors['booking_date'] = 'Tanggal booking wajib diisi';
+        } else {
+            $date = DateTime::createFromFormat('Y-m-d', $data['booking_date']);
+            if (!$date || $date->format('Y-m-d') !== $data['booking_date']) {
+                $errors['booking_date'] = 'Format tanggal tidak valid';
+            } elseif ($date < new DateTime()) {
+                $errors['booking_date'] = 'Tanggal booking tidak boleh di masa lalu';
+            }
+        }
+        
+        if (empty($data['booking_time'])) {
+            $errors['booking_time'] = 'Waktu booking wajib diisi';
+        }
+        
+        if (isset($data['duration_hours']) && !is_numeric($data['duration_hours'])) {
+            $errors['duration_hours'] = 'Durasi harus berupa angka';
+        }
+        
+        if (isset($data['duration_hours']) && $data['duration_hours'] < 1) {
+            $errors['duration_hours'] = 'Durasi minimal 1 jam';
+        }
+        
+        if (isset($data['participants']) && !is_numeric($data['participants'])) {
+            $errors['participants'] = 'Jumlah peserta harus berupa angka';
+        }
+        
+        if (isset($data['participants']) && $data['participants'] < 1) {
+            $errors['participants'] = 'Jumlah peserta minimal 1';
+        }
+        
+        return $errors;
+    }
 }

@@ -97,4 +97,40 @@ class User extends Model {
     public function updateStatus($userId, $status) {
         $this->update($userId, ['status' => $status]);
     }
+    
+    /**
+     * Validate user data
+     * 
+     * @param array $data User data to validate
+     * @return array Validation errors
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        if (empty($data['name'])) {
+            $errors['name'] = 'Nama wajib diisi';
+        } elseif (strlen($data['name']) < 3) {
+            $errors['name'] = 'Nama minimal 3 karakter';
+        }
+        
+        if (empty($data['email'])) {
+            $errors['email'] = 'Email wajib diisi';
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Format email tidak valid';
+        }
+        
+        if (isset($data['password']) && !empty($data['password'])) {
+            if (strlen($data['password']) < 6) {
+                $errors['password'] = 'Password minimal 6 karakter';
+            }
+        }
+        
+        if (isset($data['phone']) && !empty($data['phone'])) {
+            if (!preg_match('/^[0-9\+\-\(\)\s]+$/', $data['phone'])) {
+                $errors['phone'] = 'Format nomor telepon tidak valid';
+            }
+        }
+        
+        return $errors;
+    }
 }

@@ -84,8 +84,13 @@ class Destination extends Model {
      * @return array
      */
     public function getImages($destinationId) {
-        $sql = "SELECT * FROM destination_images WHERE destination_id = :destination_id ORDER BY is_primary DESC";
-        return $this->db->query($sql, ['destination_id' => $destinationId])->fetchAll();
+        $sql = "SELECT * FROM destination_images WHERE destination_id = :destination_id ORDER BY sort_order ASC";
+        try {
+            return $this->db->query($sql, ['destination_id' => $destinationId])->fetchAll();
+        } catch (Exception $e) {
+            Logger::error('Get destination images error', ['destination_id' => $destinationId, 'error' => $e->getMessage()]);
+            return [];
+        }
     }
     
     /**
@@ -120,7 +125,7 @@ class Destination extends Model {
     public function getNearby($latitude, $longitude, $radius = 10) {
         $sql = "SELECT d.*, c.name as category_name,
                 (6371 * ACOS(COS(RADIANS(:lat1)) * COS(RADIANS(d.latitude)) 
-                * COS(RADIANS(d.longitude) - RADIANS(:lng)) 
+                * COS(RADIANS(d.longitude) - RADIANS(:lon1)) 
                 + SIN(RADIANS(:lat2)) * SIN(RADIANS(d.latitude)))) AS distance
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
@@ -130,7 +135,7 @@ class Destination extends Model {
         
         return $this->db->query($sql, [
             'lat1' => $latitude,
-            'lng' => $longitude,
+            'lon1' => $longitude,
             'lat2' => $latitude,
             'radius' => $radius
         ])->fetchAll();
@@ -204,5 +209,39 @@ class Destination extends Model {
                 WHERE id = :destination_id";
         
         return $this->db->query($sql, ['destination_id' => $destinationId]);
+    }
+    
+    /**
+     * Validate destination data
+     * 
+     * @param array $data Destination data to validate
+     * @return array Validation errors
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        if (empty($data['name'])) {
+            $errors['name'] = 'Nama destinasi wajib diisi';
+        } elseif (strlen($data['name']) < 3) {
+            $errors['name'] = 'Nama destinasi minimal 3 karakter';
+        }
+        
+        if (empty($data['city'])) {
+            $errors['city'] = 'Kota wajib diisi';
+        }
+        
+        if (isset($data['latitude']) && !is_numeric($data['latitude'])) {
+            $errors['latitude'] = 'Latitude harus berupa angka';
+        }
+        
+        if (isset($data['longitude']) && !is_numeric($data['longitude'])) {
+            $errors['longitude'] = 'Longitude harus berupa angka';
+        }
+        
+        if (isset($data['entry_fee']) && !is_numeric($data['entry_fee'])) {
+            $errors['entry_fee'] = 'Harga tiket harus berupa angka';
+        }
+        
+        return $errors;
     }
 }

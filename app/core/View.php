@@ -28,10 +28,13 @@ class View {
     /**
      * Escape output for XSS prevention
      * 
-     * @param string $string String to escape
+     * @param string|null $string String to escape
      * @return string Escaped string
      */
     public static function e($string) {
+        if ($string === null) {
+            return '';
+        }
         return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
     

@@ -17,7 +17,9 @@
                 <?php if (!empty($destination['main_image'])): ?>
                     <img src="<?= View::asset('uploads/destinations/' . $destination['main_image']) ?>" class="card-img-top" alt="<?= View::e($destination['name']) ?>" style="height: 400px; object-fit: cover;">
                 <?php else: ?>
-                    <img src="https://via.placeholder.com/800x400" class="card-img-top" alt="<?= View::e($destination['name']) ?>" style="height: 400px; object-fit: cover;">
+                    <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <i class="fas fa-map-marked-alt text-white" style="font-size: 4rem;"></i>
+                    </div>
                 <?php endif; ?>
                 <div class="card-body">
                     <h1 class="card-title"><?= View::e($destination['name']) ?></h1>
@@ -159,7 +161,9 @@
                             <?php if (!empty($near['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/destinations/' . $near['main_image']) ?>" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/60" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div class="rounded me-3 bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-image text-white"></i>
+                                </div>
                             <?php endif; ?>
                             <div class="flex-grow-1">
                                 <h6 class="mb-0"><?= View::e($near['name']) ?></h6>

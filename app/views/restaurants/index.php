@@ -13,11 +13,21 @@
         <div class="card-body">
             <form method="GET" action="<?= View::url('restaurants') ?>">
                 <div class="row">
-                    <div class="col-md-5 mb-3">
+                    <div class="col-md-4 mb-3">
                         <input type="text" class="form-control" name="search" placeholder="Cari restoran..." value="<?= View::e($filters['search'] ?? '') ?>">
                     </div>
-                    <div class="col-md-5 mb-3">
+                    <div class="col-md-3 mb-3">
                         <input type="text" class="form-control" name="city" placeholder="Kota..." value="<?= View::e($filters['city'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" name="type">
+                            <option value="">Semua Tipe</option>
+                            <option value="restoran" <?= (isset($filters['type']) && $filters['type'] == 'restoran') ? 'selected' : '' ?>>Restoran</option>
+                            <option value="warung" <?= (isset($filters['type']) && $filters['type'] == 'warung') ? 'selected' : '' ?>>Warung</option>
+                            <option value="kafe" <?= (isset($filters['type']) && $filters['type'] == 'kafe') ? 'selected' : '' ?>>Kafe</option>
+                            <option value="umkm" <?= (isset($filters['type']) && $filters['type'] == 'umkm') ? 'selected' : '' ?>>UMKM</option>
+                            <option value="street_food" <?= (isset($filters['type']) && $filters['type'] == 'street_food') ? 'selected' : '' ?>>Street Food</option>
+                        </select>
                     </div>
                     <div class="col-md-2 mb-3">
                         <button type="submit" class="btn btn-primary w-100">
@@ -49,16 +59,16 @@
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($restaurant['name']) ?></h5>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($restaurant['city']) ?>
+                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($restaurant['city'] ?? 'Indonesia') ?>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
                                         <i class="fas fa-star text-warning"></i> <?= number_format($restaurant['rating_avg'], 1) ?>
                                     </div>
-                                    <span class="badge bg-success"><?= View::e($restaurant['cuisine_type']) ?></span>
+                                    <span class="badge bg-success"><?= View::e($restaurant['cuisine_type'] ?? 'Kuliner') ?></span>
                                 </div>
                                 <p class="card-text small text-muted">
-                                    <?= View::e($restaurant['address']) ?>
+                                    <?= View::e($restaurant['address'] ?? 'Alamat tidak tersedia') ?>
                                 </p>
                                 <a href="<?= View::url('restaurants/detail?id=' . $restaurant['id']) ?>" class="btn btn-primary w-100">
                                     Lihat Detail

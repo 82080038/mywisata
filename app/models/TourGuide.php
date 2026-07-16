@@ -145,8 +145,8 @@ class TourGuide extends Model {
         $sql = "UPDATE {$this->table} tg 
                 SET rating_avg = (
                     SELECT COALESCE(AVG(rating), 0) 
-                    FROM guide_reviews 
-                    WHERE guide_id = :guide_id
+                    FROM reviews 
+                    WHERE reviewable_type = 'guide' AND reviewable_id = :guide_id
                 ),
                 total_tours = (
                     SELECT COUNT(*) 
@@ -581,5 +581,45 @@ class TourGuide extends Model {
             'start_date' => $startDate,
             'end_date' => $endDate
         ])->fetchAll();
+    }
+    
+    /**
+     * Validate tour guide data
+     * 
+     * @param array $data Tour guide data to validate
+     * @return array Validation errors
+     */
+    public function validate($data) {
+        $errors = [];
+        
+        if (empty($data['name'])) {
+            $errors['name'] = 'Nama wajib diisi';
+        } elseif (strlen($data['name']) < 3) {
+            $errors['name'] = 'Nama minimal 3 karakter';
+        }
+        
+        if (empty($data['phone'])) {
+            $errors['phone'] = 'Nomor telepon wajib diisi';
+        } elseif (!preg_match('/^[0-9\+\-\(\)\s]+$/', $data['phone'])) {
+            $errors['phone'] = 'Format nomor telepon tidak valid';
+        }
+        
+        if (isset($data['hourly_rate']) && !is_numeric($data['hourly_rate'])) {
+            $errors['hourly_rate'] = 'Tarif per jam harus berupa angka';
+        }
+        
+        if (isset($data['daily_rate']) && !is_numeric($data['daily_rate'])) {
+            $errors['daily_rate'] = 'Tarif per hari harus berupa angka';
+        }
+        
+        if (isset($data['experience_years']) && !is_numeric($data['experience_years'])) {
+            $errors['experience_years'] = 'Pengalaman harus berupa angka';
+        }
+        
+        if (isset($data['experience_years']) && $data['experience_years'] < 0) {
+            $errors['experience_years'] = 'Pengalaman tidak boleh negatif';
+        }
+        
+        return $errors;
     }
 }

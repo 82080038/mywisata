@@ -13,11 +13,20 @@
         <div class="card-body">
             <form method="GET" action="<?= View::url('hotels') ?>">
                 <div class="row">
-                    <div class="col-md-5 mb-3">
+                    <div class="col-md-4 mb-3">
                         <input type="text" class="form-control" name="search" placeholder="Cari hotel..." value="<?= View::e($filters['search'] ?? '') ?>">
                     </div>
-                    <div class="col-md-5 mb-3">
+                    <div class="col-md-3 mb-3">
                         <input type="text" class="form-control" name="city" placeholder="Kota..." value="<?= View::e($filters['city'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" name="type">
+                            <option value="">Semua Tipe</option>
+                            <option value="hotel" <?= (isset($filters['type']) && $filters['type'] == 'hotel') ? 'selected' : '' ?>>Hotel</option>
+                            <option value="homestay" <?= (isset($filters['type']) && $filters['type'] == 'homestay') ? 'selected' : '' ?>>Homestay</option>
+                            <option value="villa" <?= (isset($filters['type']) && $filters['type'] == 'villa') ? 'selected' : '' ?>>Villa</option>
+                            <option value="guesthouse" <?= (isset($filters['type']) && $filters['type'] == 'guesthouse') ? 'selected' : '' ?>>Guesthouse</option>
+                        </select>
                     </div>
                     <div class="col-md-2 mb-3">
                         <button type="submit" class="btn btn-primary w-100">
@@ -49,16 +58,16 @@
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($hotel['name']) ?></h5>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($hotel['city']) ?>
+                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($hotel['city'] ?? 'Indonesia') ?>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
                                         <i class="fas fa-star text-warning"></i> <?= number_format($hotel['rating_avg'], 1) ?>
                                     </div>
-                                    <span class="badge bg-info"><?= View::e($hotel['star_rating']) ?> Bintang</span>
+                                    <span class="badge bg-info"><?= View::e($hotel['star_rating'] ?? '0') ?> Bintang</span>
                                 </div>
                                 <p class="card-text small text-muted">
-                                    <?= View::e($hotel['address']) ?>
+                                    <?= View::e($hotel['address'] ?? 'Alamat tidak tersedia') ?>
                                 </p>
                                 <a href="<?= View::url('hotels/detail?id=' . $hotel['id']) ?>" class="btn btn-primary w-100">
                                     Lihat Detail

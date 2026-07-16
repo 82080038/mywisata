@@ -22,15 +22,85 @@ class TourGuideController extends Controller {
      * Index - List all tour guides (public)
      */
     public function index() {
-        $tourGuideModel = $this->model('TourGuide');
-        $guides = $tourGuideModel->getAllWithFilters(['is_verified' => 1, 'is_available' => 1]);
-        
-        $data = [
-            'title' => 'Tour Guide - MyWisata',
-            'guides' => $guides
-        ];
-        
-        $this->view('tourguide/index', $data);
+        try {
+            $this->applyRateLimit(100, 60); // 100 requests per minute
+            
+            $tourGuideModel = $this->model('TourGuide');
+            
+            $filters = [
+                'search' => $this->get('search'),
+                'city' => $this->get('city')
+            ];
+            
+            $guides = $tourGuideModel->getAllWithFilters(['is_verified' => 1, 'is_available' => 1]);
+            
+            $data = [
+                'title' => 'Tour Guide - MyWisata',
+                'guides' => $guides,
+                'filters' => $filters
+            ];
+            
+            $this->view('tourguide/index', $data);
+        } catch (Exception $e) {
+            Logger::error('Tour guide index error', ['error' => $e->getMessage()]);
+            Session::flash('error', 'Terjadi kesalahan saat memuat tour guide');
+            $this->redirect('home');
+        }
+    }
+    
+    /**
+     * Detail - Show tour guide details (public)
+     */
+    public function detail() {
+        try {
+            $id = $this->get('id');
+            $tourGuideModel = $this->model('TourGuide');
+            
+            $guide = $tourGuideModel->findById($id);
+            
+            if (!$guide) {
+                Session::flash('error', 'Tour guide tidak ditemukan');
+                $this->redirect('tourguides');
+            }
+            
+            $db = Database::getInstance();
+            
+            // Get guide reviews
+            $reviews = $db->query("SELECT r.*, u.name as user_name 
+                                  FROM reviews r 
+                                  LEFT JOIN users u ON r.user_id = u.id 
+                                  WHERE r.reviewable_type = 'guide' AND r.reviewable_id = :guide_id 
+                                  ORDER BY r.created_at DESC LIMIT 10", 
+                                  ['guide_id' => $id])->fetchAll();
+            
+            // Get guide languages
+            $languages = $db->query("SELECT gl.*, l.name as language_name, l.native_name 
+                                     FROM guide_languages gl 
+                                     LEFT JOIN languages l ON gl.language_id = l.id 
+                                     WHERE gl.guide_id = :guide_id", 
+                                     ['guide_id' => $id])->fetchAll();
+            
+            // Get guide specializations
+            $specializations = $db->query("SELECT gs.*, s.name as specialization_name 
+                                          FROM guide_specializations gs 
+                                          LEFT JOIN specializations s ON gs.specialization_id = s.id 
+                                          WHERE gs.guide_id = :guide_id", 
+                                          ['guide_id' => $id])->fetchAll();
+            
+            $data = [
+                'title' => 'Detail Tour Guide - MyWisata',
+                'guide' => $guide,
+                'reviews' => $reviews,
+                'languages' => $languages,
+                'specializations' => $specializations
+            ];
+            
+            $this->view('tourguide/detail', $data);
+        } catch (Exception $e) {
+            Logger::error('Tour guide detail error', ['id' => $this->get('id'), 'error' => $e->getMessage()]);
+            Session::flash('error', 'Terjadi kesalahan saat memuat detail tour guide');
+            $this->redirect('tourguides');
+        }
     }
     
     /**

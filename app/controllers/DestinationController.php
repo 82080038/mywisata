@@ -15,32 +15,40 @@ class DestinationController extends Controller {
      * Index - List all destinations
      */
     public function index() {
-        $destinationModel = $this->model('Destination');
-        
-        $filters = [
-            'category_id' => $this->get('category'),
-            'city' => $this->get('city'),
-            'search' => $this->get('search'),
-            'is_active' => 1
-        ];
-        
-        $destinations = $destinationModel->getAllWithFilters($filters);
-        $featured = $destinationModel->getFeatured(6);
-        $popular = $destinationModel->getPopular(6);
-        
-        $db = Database::getInstance();
-        $categories = $db->query("SELECT * FROM destination_categories ORDER BY name")->fetchAll();
-        
-        $data = [
-            'title' => 'Destinasi Wisata - MyWisata',
-            'destinations' => $destinations,
-            'featured' => $featured,
-            'popular' => $popular,
-            'categories' => $categories,
-            'filters' => $filters
-        ];
-        
-        $this->view('destinations/index', $data);
+        try {
+            $this->applyRateLimit(100, 60); // 100 requests per minute
+            
+            $destinationModel = $this->model('Destination');
+            
+            $filters = [
+                'category_id' => $this->get('category'),
+                'city' => $this->get('city'),
+                'search' => $this->get('search'),
+                'is_active' => 1
+            ];
+            
+            $destinations = $destinationModel->getAllWithFilters($filters);
+            $featured = $destinationModel->getFeatured(6);
+            $popular = $destinationModel->getPopular(6);
+            
+            $db = Database::getInstance();
+            $categories = $db->query("SELECT * FROM destination_categories ORDER BY name")->fetchAll();
+            
+            $data = [
+                'title' => 'Destinasi Wisata - MyWisata',
+                'destinations' => $destinations,
+                'featured' => $featured,
+                'popular' => $popular,
+                'categories' => $categories,
+                'filters' => $filters
+            ];
+            
+            $this->view('destinations/index', $data);
+        } catch (Exception $e) {
+            Logger::error('Destination index error', ['error' => $e->getMessage()]);
+            Session::flash('error', 'Terjadi kesalahan saat memuat destinasi');
+            $this->redirect('home');
+        }
     }
     
     /**
@@ -78,34 +86,39 @@ class DestinationController extends Controller {
      * Add review
      */
     public function addReview() {
-        $userId = Session::get('user_id');
-        
-        if (!$userId) {
-            $this->json(['status' => 'error', 'message' => 'Silakan login terlebih dahulu'], 401);
+        try {
+            $userId = Session::get('user_id');
+            
+            if (!$userId) {
+                $this->json(['status' => 'error', 'message' => 'Silakan login terlebih dahulu'], 401);
+            }
+            
+            $data = [
+                'destination_id' => $this->post('destination_id'),
+                'user_id' => $userId,
+                'rating' => $this->post('rating'),
+                'comment' => $this->post('comment')
+            ];
+            
+            $validator = new Validator($_POST);
+            $validator->required(['destination_id', 'rating', 'comment'])
+                      ->numeric(['rating'])
+                      ->in('rating', [1, 2, 3, 4, 5]);
+            
+            if ($validator->fails()) {
+                $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
+            }
+            
+            $destinationModel = $this->model('Destination');
+            $destinationModel->addReview($data);
+            $destinationModel->updateRating($data['destination_id']);
+            
+            Logger::audit('ADD_DESTINATION_REVIEW', 'destination_reviews', "Added review for destination ID: {$data['destination_id']}", [], $data);
+            
+            $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
+        } catch (Exception $e) {
+            Logger::error('Add destination review error', ['error' => $e->getMessage()]);
+            $this->json(['status' => 'error', 'message' => 'Terjadi kesalahan saat menambah review'], 500);
         }
-        
-        $data = [
-            'destination_id' => $this->post('destination_id'),
-            'user_id' => $userId,
-            'rating' => $this->post('rating'),
-            'comment' => $this->post('comment')
-        ];
-        
-        $validator = new Validator($_POST);
-        $validator->required(['destination_id', 'rating', 'comment'])
-                  ->numeric(['rating'])
-                  ->in('rating', [1, 2, 3, 4, 5]);
-        
-        if ($validator->fails()) {
-            $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
-        }
-        
-        $destinationModel = $this->model('Destination');
-        $destinationModel->addReview($data);
-        $destinationModel->updateRating($data['destination_id']);
-        
-        Logger::audit('ADD_DESTINATION_REVIEW', 'destination_reviews', "Added review for destination ID: {$data['destination_id']}", [], $data);
-        
-        $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
     }
 }

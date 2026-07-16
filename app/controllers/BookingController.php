@@ -74,93 +74,98 @@ class BookingController extends Controller {
      * Store - Create new booking
      */
     public function store() {
-        if (!$this->isAjax()) {
-            $this->redirect('home');
-        }
-        
-        // Verify CSRF
-        if (!$this->validateCsrf()) {
-            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
-        }
-        
-        $userId = Session::get('user_id');
-        
-        $data = [
-            'booking_code' => 'BK' . date('YmdHis') . rand(1000, 9999),
-            'user_id' => $userId,
-            'guide_id' => $this->post('guide_id'),
-            'booking_date' => $this->post('booking_date'),
-            'booking_time' => $this->post('booking_time'),
-            'duration_hours' => $this->post('duration_hours'),
-            'participants' => $this->post('participants'),
-            'special_requests' => $this->post('special_requests'),
-            'total_amount' => $this->post('total_amount')
-        ];
-        
-        $validator = new Validator($_POST);
-        $validator->required(['guide_id', 'booking_date', 'booking_time', 'duration_hours', 'participants'])
-                  ->numeric(['duration_hours', 'participants', 'total_amount'])
-                  ->date('booking_date');
-        
-        if ($validator->fails()) {
-            $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
-        }
-        
-        // Check availability
-        $tourGuideModel = $this->model('TourGuide');
-        $isAvailable = $tourGuideModel->checkAvailability(
-            $data['guide_id'], 
-            $data['booking_date'], 
-            $data['booking_time'], 
-            date('H:i:s', strtotime($data['booking_time']) + ($data['duration_hours'] * 3600))
-        );
-        
-        if (!$isAvailable) {
-            $this->json(['status' => 'error', 'message' => 'Tour guide tidak tersedia pada waktu tersebut'], 400);
-        }
-        
-        $bookingId = $this->bookingModel->create($data);
-        
-        if ($bookingId) {
-            // Reserve availability
-            $tourGuideModel->reserveAvailability($data['guide_id'], $data['booking_date'], $data['booking_time']);
+        try {
+            if (!$this->isAjax()) {
+                $this->redirect('home');
+            }
             
-            // Create transaction
-            $transactionModel = $this->model('Transaction');
-            $transactionData = [
-                'transaction_code' => 'TX' . date('YmdHis') . rand(1000, 9999),
+            // Verify CSRF
+            if (!$this->validateCsrf()) {
+                $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+            }
+            
+            $userId = Session::get('user_id');
+            
+            $data = [
+                'booking_code' => 'BK' . date('YmdHis') . rand(1000, 9999),
                 'user_id' => $userId,
-                'booking_id' => $bookingId,
-                'type' => 'booking_guide',
-                'gross_amount' => $data['total_amount'],
-                'discount_amount' => 0,
-                'tax_amount' => 0,
-                'net_amount' => $data['total_amount'],
-                'payment_method' => 'pending'
+                'guide_id' => $this->post('guide_id'),
+                'booking_date' => $this->post('booking_date'),
+                'booking_time' => $this->post('booking_time'),
+                'duration_hours' => $this->post('duration_hours'),
+                'participants' => $this->post('participants'),
+                'special_requests' => $this->post('special_requests'),
+                'total_amount' => $this->post('total_amount')
             ];
-            $transactionModel->create($transactionData);
             
-            // Send notification to guide
-            $notificationModel = $this->model('Notification');
-            $guide = $tourGuideModel->findById($data['guide_id']);
-            $notificationModel->notify(
-                $guide['user_id'],
-                'new_booking',
-                'Booking Baru',
-                'Anda mendapat booking baru. Silakan cek dashboard Anda.',
-                'tourguide/bookings'
+            $validator = new Validator($_POST);
+            $validator->required(['guide_id', 'booking_date', 'booking_time', 'duration_hours', 'participants'])
+                      ->numeric(['duration_hours', 'participants', 'total_amount'])
+                      ->date('booking_date');
+            
+            if ($validator->fails()) {
+                $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
+            }
+            
+            // Check availability
+            $tourGuideModel = $this->model('TourGuide');
+            $isAvailable = $tourGuideModel->checkAvailability(
+                $data['guide_id'], 
+                $data['booking_date'], 
+                $data['booking_time'], 
+                date('H:i:s', strtotime($data['booking_time']) + ($data['duration_hours'] * 3600))
             );
             
-            Logger::audit('CREATE_BOOKING', 'bookings', "Created booking ID: {$bookingId}", [], $data);
+            if (!$isAvailable) {
+                $this->json(['status' => 'error', 'message' => 'Tour guide tidak tersedia pada waktu tersebut'], 400);
+            }
             
-            $this->json([
-                'status' => 'success',
-                'message' => 'Booking berhasil dibuat. Silakan lanjutkan pembayaran.',
-                'booking_id' => $bookingId,
-                'booking_code' => $data['booking_code']
-            ]);
-        } else {
-            $this->json(['status' => 'error', 'message' => 'Gagal membuat booking'], 500);
+            $bookingId = $this->bookingModel->create($data);
+            
+            if ($bookingId) {
+                // Reserve availability
+                $tourGuideModel->reserveAvailability($data['guide_id'], $data['booking_date'], $data['booking_time']);
+                
+                // Create transaction
+                $transactionModel = $this->model('Transaction');
+                $transactionData = [
+                    'transaction_code' => 'TX' . date('YmdHis') . rand(1000, 9999),
+                    'user_id' => $userId,
+                    'booking_id' => $bookingId,
+                    'type' => 'booking_guide',
+                    'gross_amount' => $data['total_amount'],
+                    'discount_amount' => 0,
+                    'tax_amount' => 0,
+                    'net_amount' => $data['total_amount'],
+                    'payment_method' => 'pending'
+                ];
+                $transactionModel->create($transactionData);
+                
+                // Send notification to guide
+                $notificationModel = $this->model('Notification');
+                $guide = $tourGuideModel->findById($data['guide_id']);
+                $notificationModel->notify(
+                    $guide['user_id'],
+                    'new_booking',
+                    'Booking Baru',
+                    'Anda mendapat booking baru. Silakan cek dashboard Anda.',
+                    'tourguide/bookings'
+                );
+                
+                Logger::audit('CREATE_BOOKING', 'bookings', "Created booking ID: {$bookingId}", [], $data);
+                
+                $this->json([
+                    'status' => 'success',
+                    'message' => 'Booking berhasil dibuat. Silakan lanjutkan pembayaran.',
+                    'booking_id' => $bookingId,
+                    'booking_code' => $data['booking_code']
+                ]);
+            } else {
+                $this->json(['status' => 'error', 'message' => 'Gagal membuat booking'], 500);
+            }
+        } catch (Exception $e) {
+            Logger::error('Booking store error', ['error' => $e->getMessage()]);
+            $this->json(['status' => 'error', 'message' => 'Terjadi kesalahan saat membuat booking'], 500);
         }
     }
     

@@ -11,14 +11,16 @@
                         <?php if ($guide['avatar']): ?>
                             <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="rounded-circle me-3" style="width: 80px; height: 80px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/80" class="rounded-circle me-3" style="width: 80px; height: 80px;">
+                            <div class="rounded-circle me-3 bg-secondary d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user text-white" style="font-size: 2rem;"></i>
+                            </div>
                         <?php endif; ?>
                         <div>
                             <h3 class="mb-1"><?= View::e($guide['name']) ?></h3>
                             <div class="text-warning mb-1">
                                 <i class="fas fa-star"></i> <?= number_format($guide['rating_avg'], 1) ?>
                             </div>
-                            <p class="text-muted mb-0"><?= View::e($guide['city']) ?></p>
+                            <p class="text-muted mb-0"><?= View::e($guide['city'] ?? 'Indonesia') ?></p>
                         </div>
                     </div>
                     
@@ -88,14 +90,14 @@
                 </div>
                 <div class="card-body">
                     <h6>Tentang Guide</h6>
-                    <p class="text-muted"><?= View::e($guide['bio']) ?></p>
+                    <p class="text-muted"><?= View::e($guide['bio'] ?? 'Tidak ada bio tersedia') ?></p>
                     
                     <h6>Pengalaman</h6>
-                    <p><?= $guide['experience_years'] ?> tahun</p>
+                    <p><?= $guide['experience_years'] ?? 0 ?> tahun</p>
                     
                     <h6>Harga</h6>
-                    <p><?= View::currency($guide['hourly_rate']) ?>/jam</p>
-                    <p><?= View::currency($guide['daily_rate']) ?>/hari</p>
+                    <p><?= View::currency($guide['hourly_rate'] ?? 0) ?>/jam</p>
+                    <p><?= View::currency($guide['daily_rate'] ?? 0) ?>/hari</p>
                     
                     <h6>Bahasa</h6>
                     <p class="text-muted">Bahasa yang dikuasai akan ditampilkan di sini</p>

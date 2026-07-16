@@ -51,18 +51,20 @@
                         <?php if (!empty($dest['main_image'])): ?>
                             <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>
+                            </div>
                         <?php endif; ?>
                         <div class="card-body">
                             <h5 class="card-title"><?= View::e($dest['name']) ?></h5>
                             <p class="card-text text-muted small">
-                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city']) ?>
+                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city'] ?? 'Indonesia') ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <i class="fas fa-star text-warning"></i> <?= number_format($dest['rating_avg'], 1) ?>
                                 </div>
-                                <span class="badge bg-primary"><?= View::e($dest['category_name']) ?></span>
+                                <span class="badge bg-primary"><?= View::e($dest['category_name'] ?? 'Umum') ?></span>
                             </div>
                             <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary mt-3 w-100">
                                 Lihat Detail
@@ -88,12 +90,14 @@
                         <?php if (!empty($dest['main_image'])): ?>
                             <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>
+                            </div>
                         <?php endif; ?>
                         <div class="card-body">
                             <h5 class="card-title"><?= View::e($dest['name']) ?></h5>
                             <p class="card-text text-muted small">
-                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city']) ?>
+                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city'] ?? 'Indonesia') ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -127,18 +131,20 @@
                             <?php if (!empty($dest['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>
+                            </div>
                             <?php endif; ?>
                             <div class="card-body">
-                                <h5 class="card-title"><?= View::e($dest['name']) ?></h5>
+                                <h5 class="card-title"><?= View::e($dest['name'] ?? 'Destinasi') ?></h5>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city']) ?>
+                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($dest['city'] ?? 'Indonesia') ?>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <i class="fas fa-star text-warning"></i> <?= number_format($dest['rating_avg'], 1) ?>
                                     </div>
-                                    <span class="badge bg-secondary"><?= View::e($dest['category_name']) ?></span>
+                                    <span class="badge bg-secondary"><?= View::e($dest['category_name'] ?? 'Umum') ?></span>
                                 </div>
                                 <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary mt-3 w-100">
                                     Lihat Detail

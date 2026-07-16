@@ -13,7 +13,9 @@
                         <?php if ($guide && $guide['avatar']): ?>
                             <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                            <div class="rounded-circle mb-3 bg-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                                <i class="fas fa-user text-white" style="font-size: 4rem;"></i>
+                            </div>
                         <?php endif; ?>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Upload Avatar</label>

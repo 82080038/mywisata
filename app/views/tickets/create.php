@@ -18,7 +18,7 @@
                         <div>
                             <h3 class="mb-1"><?= View::e($destination['name']) ?></h3>
                             <p class="text-muted mb-0">
-                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($destination['city']) ?>
+                                <i class="fas fa-map-marker-alt me-1"></i><?= View::e($destination['city'] ?? 'Indonesia') ?>
                             </p>
                         </div>
                     </div>
@@ -73,17 +73,17 @@
                 </div>
                 <div class="card-body">
                     <h6>Deskripsi</h6>
-                    <p class="text-muted small"><?= substr(View::e($destination['description']), 0, 200) ?>...</p>
+                    <p class="text-muted small"><?= substr(View::e($destination['description'] ?? 'Tidak ada deskripsi'), 0, 200) ?>...</p>
                     
                     <h6>Jam Buka</h6>
-                    <p><?= View::e($destination['opening_hours']) ?></p>
+                    <p><?= View::e($destination['opening_hours'] ?? 'Tidak tersedia') ?></p>
                     
                     <h6>Kontak</h6>
-                    <p><?= View::e($destination['contact_phone']) ?></p>
+                    <p><?= View::e($destination['contact_phone'] ?? 'Tidak tersedia') ?></p>
                     
                     <h6>Rating</h6>
                     <div class="text-warning">
-                        <i class="fas fa-star"></i> <?= number_format($destination['rating_avg'], 1) ?>
+                        <i class="fas fa-star"></i> <?= number_format($destination['rating_avg'] ?? 0, 1) ?>
                     </div>
                 </div>
             </div>

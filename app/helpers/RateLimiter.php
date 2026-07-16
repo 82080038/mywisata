@@ -22,7 +22,12 @@ class RateLimiter {
         self::$cacheDir = APP_ROOT . '/cache/ratelimit';
         
         if (!is_dir(self::$cacheDir)) {
-            mkdir(self::$cacheDir, 0777, true);
+            try {
+                mkdir(self::$cacheDir, 0777, true);
+            } catch (Exception $e) {
+                // Fall back to session-based rate limiting if file system fails
+                self::$cacheDir = null;
+            }
         }
     }
     
@@ -43,6 +48,11 @@ class RateLimiter {
         
         if ($window === null) {
             $window = self::$defaultWindow;
+        }
+        
+        // Use session-based rate limiting if file system unavailable
+        if (self::$cacheDir === null) {
+            return self::allowSession($identifier, $limit, $window);
         }
         
         $cacheFile = self::$cacheDir . '/' . md5($identifier) . '.ratelimit';
@@ -70,7 +80,51 @@ class RateLimiter {
         
         // Increment count
         $data['count']++;
-        file_put_contents($cacheFile, json_encode($data));
+        try {
+            file_put_contents($cacheFile, json_encode($data));
+        } catch (Exception $e) {
+            // Fall back to session if file write fails
+            return self::allowSession($identifier, $limit, $window);
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Session-based rate limiting fallback
+     * 
+     * @param string $identifier Unique identifier
+     * @param int $limit Request limit
+     * @param int $window Time window in seconds
+     * @return bool
+     */
+    private static function allowSession($identifier, $limit, $window) {
+        $sessionKey = 'ratelimit_' . md5($identifier);
+        
+        $data = [
+            'count' => 0,
+            'reset_time' => time() + $window
+        ];
+        
+        if (isset($_SESSION[$sessionKey])) {
+            $data = $_SESSION[$sessionKey];
+            
+            // Reset if window expired
+            if ($data['reset_time'] < time()) {
+                $data['count'] = 0;
+                $data['reset_time'] = time() + $window;
+            }
+        }
+        
+        // Check if limit exceeded
+        if ($data['count'] >= $limit) {
+            Logger::warning('Rate limit exceeded (session)', ['identifier' => $identifier, 'limit' => $limit]);
+            return false;
+        }
+        
+        // Increment count
+        $data['count']++;
+        $_SESSION[$sessionKey] = $data;
         
         return true;
     }
@@ -117,6 +171,16 @@ class RateLimiter {
      */
     public static function clear($identifier) {
         self::init();
+        
+        // Use session-based if file system unavailable
+        if (self::$cacheDir === null) {
+            $sessionKey = 'ratelimit_' . md5($identifier);
+            if (isset($_SESSION[$sessionKey])) {
+                unset($_SESSION[$sessionKey]);
+                return true;
+            }
+            return false;
+        }
         
         $cacheFile = self::$cacheDir . '/' . md5($identifier) . '.ratelimit';
         

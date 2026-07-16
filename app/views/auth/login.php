@@ -48,6 +48,21 @@
                     
                     <hr class="my-4">
                     
+                    <div class="text-center mb-3">
+                        <p class="text-muted small mb-2">Quick Login (Demo)</p>
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <button type="button" class="btn btn-outline-danger btn-sm quick-login" data-role="admin">
+                                <i class="fas fa-user-shield me-1"></i>Admin
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-login" data-role="wisatawan">
+                                <i class="fas fa-user me-1"></i>Wisatawan
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm quick-login" data-role="tour_guide">
+                                <i class="fas fa-map-signs me-1"></i>Tour Guide
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="text-center">
                         <p class="mb-0">Belum punya akun? 
                             <a href="<?= View::url('auth/register') ?>" class="text-decoration-none fw-bold">Daftar sekarang</a>
@@ -81,6 +96,47 @@ $(document).ready(function() {
             url: '<?= View::url('auth/doLogin') ?>',
             method: 'POST',
             data: formData,
+            success: function(response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: response.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(function() {
+                        window.location.href = response.redirect;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message,
+                        confirmButtonColor: '#0d6efd'
+                    });
+                }
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Quick login buttons
+    $('.quick-login').on('click', function() {
+        var role = $(this).data('role');
+        var btn = $(this);
+        var originalText = btn.html();
+        
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        ajax({
+            url: '<?= View::url('auth/quickLogin') ?>',
+            method: 'POST',
+            data: {
+                role: role,
+                csrf_token: '<?= View::e($csrf_token) ?>'
+            },
             success: function(response) {
                 if (response.status === 'success') {
                     Swal.fire({

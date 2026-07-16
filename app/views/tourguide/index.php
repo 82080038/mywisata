@@ -42,12 +42,14 @@
                             <?php if (!empty($guide['avatar'])): ?>
                                 <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="card-img-top" alt="<?= View::e($guide['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($guide['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-user-tie text-white" style="font-size: 3rem;"></i>
+                                </div>
                             <?php endif; ?>
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($guide['name']) ?></h5>
                                 <p class="card-text text-muted small">
-                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($guide['city']) ?>
+                                    <i class="fas fa-map-marker-alt me-1"></i><?= View::e($guide['city'] ?? 'Indonesia') ?>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
@@ -56,7 +58,7 @@
                                     <span class="badge bg-success">Terverifikasi</span>
                                 </div>
                                 <p class="card-text small text-muted">
-                                    <?= View::e($guide['bio']) ?>
+                                    <?= View::e($guide['bio'] ?? 'Tidak ada bio tersedia') ?>
                                 </p>
                                 <p class="card-text small">
                                     <strong>Tarif:</strong> Rp <?= number_format($guide['hourly_rate'], 0, ',', '.') ?>/jam

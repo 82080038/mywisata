@@ -139,6 +139,37 @@ class AdminController extends Controller {
     /**
      * Update user
      */
+    public function deleteUser() {
+        Middleware::requireAuth();
+        Middleware::requireRole('admin');
+        
+        $id = $this->get('id');
+        $userModel = $this->model('User');
+        
+        $user = $userModel->findById($id);
+        
+        if (!$user) {
+            Session::flash('error', 'User tidak ditemukan');
+            $this->redirect('admin/users');
+        }
+        
+        // Prevent deleting own account
+        if ($user['id'] == Session::get('user_id')) {
+            Session::flash('error', 'Tidak dapat menghapus akun sendiri');
+            $this->redirect('admin/users');
+        }
+        
+        $result = $userModel->delete($id);
+        
+        if ($result) {
+            Session::flash('success', 'User berhasil dihapus');
+        } else {
+            Session::flash('error', 'Gagal menghapus user');
+        }
+        
+        $this->redirect('admin/users');
+    }
+    
     public function updateUser() {
         $id = $this->post('id');
         $name = $this->post('name');

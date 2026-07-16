@@ -15,7 +15,9 @@
                 <?php if (!empty($event['main_image'])): ?>
                     <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['name']) ?>" style="height: 400px; object-fit: cover;">
                 <?php else: ?>
-                    <img src="https://via.placeholder.com/800x400" class="card-img-top" alt="<?= View::e($event['name']) ?>" style="height: 400px; object-fit: cover;">
+                    <div class="card-img-top bg-warning d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <i class="fas fa-calendar-alt text-white" style="font-size: 4rem;"></i>
+                    </div>
                 <?php endif; ?>
                 <div class="card-body">
                     <h1 class="card-title"><?= View::e($event['name']) ?></h1>

@@ -30,8 +30,8 @@
                         <tr>
                             <td><?= $dest['id'] ?></td>
                             <td><?= View::e($dest['name']) ?></td>
-                            <td><?= View::e($dest['category_name']) ?></td>
-                            <td><?= View::e($dest['city']) ?></td>
+                            <td><?= View::e($dest['category_name'] ?? 'Umum') ?></td>
+                            <td><?= View::e($dest['city'] ?? 'Indonesia') ?></td>
                             <td><?= View::currency($dest['entry_fee']) ?></td>
                             <td>
                                 <i class="fas fa-star text-warning"></i> <?= number_format($dest['rating_avg'], 1) ?>
