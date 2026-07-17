@@ -40,7 +40,11 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <?php if (!empty($guide['avatar'])): ?>
-                                <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="card-img-top" alt="<?= View::e($guide['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php if (filter_var($guide['avatar'], FILTER_VALIDATE_URL)): ?>
+                                    <img src="<?= View::e($guide['avatar']) ?>" class="card-img-top avatar-img" alt="<?= View::e($guide['name']) ?>">
+                                <?php else: ?>
+                                    <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="card-img-top avatar-img" alt="<?= View::e($guide['name']) ?>">
+                                <?php endif; ?>
                             <?php else: ?>
                                 <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <i class="fas fa-user-tie text-white" style="font-size: 3rem;"></i>

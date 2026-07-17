@@ -53,6 +53,27 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Avatar Images - Focus on Face */
+.card-img-top.avatar-img {
+    object-fit: cover;
+    object-position: center top;
+    height: 200px;
+}
+
+/* Responsive Avatar Positioning */
+@media (max-width: 992px) {
+    .card-img-top.avatar-img {
+        object-position: center center;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-img-top.avatar-img {
+        object-position: center center;
+        height: 180px;
+    }
+}
+
 /* Buttons */
 .btn {
     border-radius: 5px;

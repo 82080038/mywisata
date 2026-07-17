@@ -85,9 +85,33 @@
                         <h5 class="card-title mb-0">Lokasi</h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label for="city" class="form-label">Kota</label>
-                            <input type="text" class="form-control" id="city" name="city" value="<?= $guide ? View::e($guide['city']) : '' ?>" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="province_id" class="form-label">Provinsi</label>
+                                <select class="form-select" id="province_id" name="province_id" required>
+                                    <option value="">Pilih Provinsi</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="regency_id" class="form-label">Kabupaten/Kota</label>
+                                <select class="form-select" id="regency_id" name="regency_id" required>
+                                    <option value="">Pilih Kabupaten/Kota</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="district_id" class="form-label">Kecamatan</label>
+                                <select class="form-select" id="district_id" name="district_id">
+                                    <option value="">Pilih Kecamatan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="village_id" class="form-label">Kelurahan/Desa</label>
+                                <select class="form-select" id="village_id" name="village_id">
+                                    <option value="">Pilih Kelurahan/Desa</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -122,6 +146,7 @@
     </form>
 </div>
 
+<script src="<?= View::asset('assets/js/address-cascade.js') ?>"></script>
 <script>
 function getLocation() {
     if (navigator.geolocation) {

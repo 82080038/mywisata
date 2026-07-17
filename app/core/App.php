@@ -48,6 +48,14 @@ class App {
             // Handle plural 'events' to singular 'Event' controller
             $this->controller = 'Event';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'address') {
+            // Handle address controller
+            $this->controller = 'Address';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'test') {
+            // Handle test controller
+            $this->controller = 'Test';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

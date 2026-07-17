@@ -77,6 +77,9 @@ class View {
      */
     public static function date($date, $format = null) {
         $format = $format ?: DATE_FORMAT;
+        if (empty($date)) {
+            return date($format);
+        }
         return date($format, strtotime($date));
     }
     

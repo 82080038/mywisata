@@ -75,4 +75,43 @@ test.describe('Restaurants Tests', () => {
       expect(currentUrl).toMatch(/restaurants|detail/);
     }
   });
+
+  test('should display dietary filter checkboxes', async ({ page }) => {
+    await page.goto(`${BASE_URL}/restaurants`);
+
+    // Check for dietary filter checkboxes
+    await expect(page.locator('input[name="is_halal"]')).toBeVisible();
+    await expect(page.locator('input[name="is_kosher"]')).toBeVisible();
+    await expect(page.locator('input[name="is_vegan_friendly"]')).toBeVisible();
+    await expect(page.locator('input[name="is_vegetarian_friendly"]')).toBeVisible();
+    await expect(page.locator('input[name="is_gluten_free_friendly"]')).toBeVisible();
+    await expect(page.locator('input[name="has_prayer_space"]')).toBeVisible();
+    await expect(page.locator('input[name="is_alcohol_free"]')).toBeVisible();
+  });
+
+  test('should display halal badges on restaurant cards', async ({ page }) => {
+    await page.goto(`${BASE_URL}/restaurants`);
+
+    // Wait for page to load
+    await page.waitForLoadState('networkidle');
+
+    // Check for halal badges
+    const halalBadges = page.locator('.badge:has-text("Halal")');
+    const count = await halalBadges.count();
+
+    expect(count).toBeGreaterThan(0);
+  });
+
+  test('should filter restaurants by halal status', async ({ page }) => {
+    await page.goto(`${BASE_URL}/restaurants?is_halal=1`);
+
+    // Wait for page to load
+    await page.waitForLoadState('networkidle');
+
+    // Check that halal badges are present
+    const halalBadges = page.locator('.badge:has-text("Halal")');
+    const count = await halalBadges.count();
+
+    expect(count).toBeGreaterThan(0);
+  });
 });

@@ -10,14 +10,16 @@
  */
 
 class Database {
-    private static $instance = null;
+    private static $instances = [];
     private $pdo;
     private $config;
+    private $connectionName;
     
     /**
      * Private constructor for singleton pattern
      */
-    private function __construct() {
+    private function __construct($connectionName = 'default') {
+        $this->connectionName = $connectionName;
         $this->config = require APP_ROOT . '/app/config/database.php';
         $this->connect();
     }
@@ -25,13 +27,14 @@ class Database {
     /**
      * Get singleton instance
      * 
+     * @param string $connectionName Connection name (default, address)
      * @return Database
      */
-    public static function getInstance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
+    public static function getInstance($connectionName = 'default') {
+        if (!isset(self::$instances[$connectionName])) {
+            self::$instances[$connectionName] = new self($connectionName);
         }
-        return self::$instance;
+        return self::$instances[$connectionName];
     }
     
     /**
@@ -39,18 +42,20 @@ class Database {
      */
     private function connect() {
         try {
+            $config = $this->config[$this->connectionName] ?? $this->config['default'];
+            
             $dsn = sprintf(
                 "mysql:host=%s;port=%d;dbname=%s;charset=%s",
-                $this->config['host'],
-                $this->config['port'],
-                $this->config['database'],
-                $this->config['charset']
+                $config['host'],
+                $config['port'],
+                $config['database'],
+                $config['charset']
             );
             
-            $this->pdo = new PDO($dsn, $this->config['username'], $this->config['password'], $this->config['options']);
+            $this->pdo = new PDO($dsn, $config['username'], $config['password'], $config['options']);
             
             // Set collation
-            $this->pdo->exec("SET NAMES " . $this->config['charset'] . " COLLATE " . $this->config['collation']);
+            $this->pdo->exec("SET NAMES " . $config['charset'] . " COLLATE " . $config['collation']);
             
         } catch (PDOException $e) {
             $this->logError($e->getMessage());

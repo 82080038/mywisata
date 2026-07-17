@@ -71,7 +71,7 @@ class TourGuide extends Model {
         
         $whereClause = implode(' AND ', $where);
         
-        $sql = "SELECT tg.*, u.name, u.email, u.phone 
+        $sql = "SELECT tg.*, u.name, u.email, u.phone, u.avatar 
                 FROM {$this->table} tg 
                 LEFT JOIN users u ON tg.user_id = u.id 
                 WHERE {$whereClause} 
@@ -165,9 +165,8 @@ class TourGuide extends Model {
      * @return array
      */
     public function getLanguages($guideId) {
-        $sql = "SELECT gl.*, l.name as language_name, l.native_name 
+        $sql = "SELECT gl.*, gl.language as language_name, gl.language as native_name 
                 FROM guide_languages gl 
-                LEFT JOIN languages l ON gl.language_id = l.id 
                 WHERE gl.guide_id = :guide_id";
         
         return $this->db->query($sql, ['guide_id' => $guideId])->fetchAll();
@@ -217,9 +216,8 @@ class TourGuide extends Model {
      * @return array
      */
     public function getSpecializations($guideId) {
-        $sql = "SELECT gs.*, s.name as specialization_name 
+        $sql = "SELECT gs.*, gs.specialization as specialization_name 
                 FROM guide_specializations gs 
-                LEFT JOIN specializations s ON gs.specialization_id = s.id 
                 WHERE gs.guide_id = :guide_id";
         
         return $this->db->query($sql, ['guide_id' => $guideId])->fetchAll();

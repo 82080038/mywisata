@@ -31,9 +31,29 @@ class Hotel extends Model {
             $params['city'] = "%{$filters['city']}%";
         }
         
+        if (!empty($filters['type'])) {
+            $where[] = "type = :type";
+            $params['type'] = $filters['type'];
+        }
+        
         if (!empty($filters['is_approved'])) {
             $where[] = "is_approved = :is_approved";
             $params['is_approved'] = $filters['is_approved'];
+        }
+        
+        if (!empty($filters['has_prayer_room'])) {
+            $where[] = "has_prayer_room = :has_prayer_room";
+            $params['has_prayer_room'] = $filters['has_prayer_room'];
+        }
+        
+        if (!empty($filters['is_alcohol_free'])) {
+            $where[] = "is_alcohol_free = :is_alcohol_free";
+            $params['is_alcohol_free'] = $filters['is_alcohol_free'];
+        }
+        
+        if (!empty($filters['has_women_only_facilities'])) {
+            $where[] = "has_women_only_facilities = :has_women_only_facilities";
+            $params['has_women_only_facilities'] = $filters['has_women_only_facilities'];
         }
         
         if (!empty($filters['search'])) {

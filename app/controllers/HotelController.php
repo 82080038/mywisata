@@ -20,6 +20,10 @@ class HotelController extends Controller {
         $filters = [
             'city' => $this->get('city'),
             'search' => $this->get('search'),
+            'type' => $this->get('type'),
+            'has_prayer_room' => $this->get('has_prayer_room'),
+            'is_alcohol_free' => $this->get('is_alcohol_free'),
+            'has_women_only_facilities' => $this->get('has_women_only_facilities'),
             'is_approved' => 1
         ];
         

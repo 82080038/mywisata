@@ -49,7 +49,11 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <?php if (!empty($hotel['main_image'])): ?>
-                                <img src="<?= View::asset('uploads/hotels/' . $hotel['main_image']) ?>" class="card-img-top" alt="<?= View::e($hotel['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php if (filter_var($hotel['main_image'], FILTER_VALIDATE_URL)): ?>
+                                    <img src="<?= View::e($hotel['main_image']) ?>" class="card-img-top" alt="<?= View::e($hotel['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php else: ?>
+                                    <img src="<?= View::asset('uploads/hotels/' . $hotel['main_image']) ?>" class="card-img-top" alt="<?= View::e($hotel['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php endif; ?>
                             <?php else: ?>
                                 <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <i class="fas fa-hotel text-white" style="font-size: 2rem;"></i>
@@ -65,6 +69,23 @@
                                         <i class="fas fa-star text-warning"></i> <?= number_format($hotel['rating_avg'], 1) ?>
                                     </div>
                                     <span class="badge bg-info"><?= View::e($hotel['star_rating'] ?? '0') ?> Bintang</span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    <?php if (!empty($hotel['has_prayer_room'])): ?>
+                                        <span class="badge bg-success"><i class="fas fa-mosque me-1"></i>Prayer Room</span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($hotel['is_alcohol_free'])): ?>
+                                        <span class="badge bg-danger"><i class="fas fa-ban me-1"></i>Alcohol Free</span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($hotel['has_women_only_facilities'])): ?>
+                                        <span class="badge bg-primary"><i class="fas fa-female me-1"></i>Women Only</span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($hotel['qibla_direction'])): ?>
+                                        <span class="badge bg-info"><i class="fas fa-compass me-1"></i><?= View::e($hotel['qibla_direction']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($hotel['distance_to_mosque'])): ?>
+                                        <span class="badge bg-secondary"><i class="fas fa-place-of-worship me-1"></i><?= number_format($hotel['distance_to_mosque'], 1) ?> km</span>
+                                    <?php endif; ?>
                                 </div>
                                 <p class="card-text small text-muted">
                                     <?= View::e($hotel['address'] ?? 'Alamat tidak tersedia') ?>

@@ -74,16 +74,14 @@ class TourGuideController extends Controller {
                                   ['guide_id' => $id])->fetchAll();
             
             // Get guide languages
-            $languages = $db->query("SELECT gl.*, l.name as language_name, l.native_name 
+            $languages = $db->query("SELECT gl.*, gl.language as language_name, gl.language as native_name 
                                      FROM guide_languages gl 
-                                     LEFT JOIN languages l ON gl.language_id = l.id 
                                      WHERE gl.guide_id = :guide_id", 
                                      ['guide_id' => $id])->fetchAll();
             
             // Get guide specializations
-            $specializations = $db->query("SELECT gs.*, s.name as specialization_name 
+            $specializations = $db->query("SELECT gs.*, gs.specialization as specialization_name 
                                           FROM guide_specializations gs 
-                                          LEFT JOIN specializations s ON gs.specialization_id = s.id 
                                           WHERE gs.guide_id = :guide_id", 
                                           ['guide_id' => $id])->fetchAll();
             

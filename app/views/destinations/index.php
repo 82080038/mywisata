@@ -49,7 +49,11 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <?php if (!empty($dest['main_image'])): ?>
-                            <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php if (filter_var($dest['main_image'], FILTER_VALIDATE_URL)): ?>
+                                <img src="<?= View::e($dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php else: ?>
+                                <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
                         <?php else: ?>
                             <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
                                 <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>
@@ -88,7 +92,11 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <?php if (!empty($dest['main_image'])): ?>
-                            <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php if (filter_var($dest['main_image'], FILTER_VALIDATE_URL)): ?>
+                                <img src="<?= View::e($dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php else: ?>
+                                <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
                         <?php else: ?>
                             <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
                                 <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>
@@ -129,7 +137,11 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <?php if (!empty($dest['main_image'])): ?>
-                                <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php if (filter_var($dest['main_image'], FILTER_VALIDATE_URL)): ?>
+                                    <img src="<?= View::e($dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php else: ?>
+                                    <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <?php endif; ?>
                             <?php else: ?>
                                 <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
                                 <i class="fas fa-map-marked-alt text-white" style="font-size: 3rem;"></i>

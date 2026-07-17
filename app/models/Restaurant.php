@@ -31,9 +31,49 @@ class Restaurant extends Model {
             $params['city'] = "%{$filters['city']}%";
         }
         
+        if (!empty($filters['type'])) {
+            $where[] = "type = :type";
+            $params['type'] = $filters['type'];
+        }
+        
         if (!empty($filters['is_approved'])) {
             $where[] = "is_approved = :is_approved";
             $params['is_approved'] = $filters['is_approved'];
+        }
+        
+        if (!empty($filters['is_halal'])) {
+            $where[] = "is_halal = :is_halal";
+            $params['is_halal'] = $filters['is_halal'];
+        }
+        
+        if (!empty($filters['is_kosher'])) {
+            $where[] = "is_kosher = :is_kosher";
+            $params['is_kosher'] = $filters['is_kosher'];
+        }
+        
+        if (!empty($filters['is_vegan_friendly'])) {
+            $where[] = "is_vegan_friendly = :is_vegan_friendly";
+            $params['is_vegan_friendly'] = $filters['is_vegan_friendly'];
+        }
+        
+        if (!empty($filters['is_vegetarian_friendly'])) {
+            $where[] = "is_vegetarian_friendly = :is_vegetarian_friendly";
+            $params['is_vegetarian_friendly'] = $filters['is_vegetarian_friendly'];
+        }
+        
+        if (!empty($filters['is_gluten_free_friendly'])) {
+            $where[] = "is_gluten_free_friendly = :is_gluten_free_friendly";
+            $params['is_gluten_free_friendly'] = $filters['is_gluten_free_friendly'];
+        }
+        
+        if (!empty($filters['has_prayer_space'])) {
+            $where[] = "has_prayer_space = :has_prayer_space";
+            $params['has_prayer_space'] = $filters['has_prayer_space'];
+        }
+        
+        if (!empty($filters['is_alcohol_free'])) {
+            $where[] = "is_alcohol_free = :is_alcohol_free";
+            $params['is_alcohol_free'] = $filters['is_alcohol_free'];
         }
         
         if (!empty($filters['search'])) {

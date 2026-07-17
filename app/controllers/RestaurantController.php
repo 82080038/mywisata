@@ -20,6 +20,14 @@ class RestaurantController extends Controller {
         $filters = [
             'city' => $this->get('city'),
             'search' => $this->get('search'),
+            'type' => $this->get('type'),
+            'is_halal' => $this->get('is_halal'),
+            'is_kosher' => $this->get('is_kosher'),
+            'is_vegan_friendly' => $this->get('is_vegan_friendly'),
+            'is_vegetarian_friendly' => $this->get('is_vegetarian_friendly'),
+            'is_gluten_free_friendly' => $this->get('is_gluten_free_friendly'),
+            'has_prayer_space' => $this->get('has_prayer_space'),
+            'is_alcohol_free' => $this->get('is_alcohol_free'),
             'is_approved' => 1
         ];
         
