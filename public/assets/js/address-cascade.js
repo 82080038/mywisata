@@ -15,7 +15,7 @@ class AddressCascade {
         this.regencySelect = options.regencySelect || '#regency_id';
         this.districtSelect = options.districtSelect || '#district_id';
         this.villageSelect = options.villageSelect || '#village_id';
-        this.baseUrl = options.baseUrl || '/address';
+        this.baseUrl = options.baseUrl || (window.APP_URL || '') + '/address';
         
         this.init();
     }
@@ -57,6 +57,7 @@ class AddressCascade {
     
     async loadProvinces() {
         console.log('Address Cascade: Loading provinces...');
+        this.setLoading(this.provinceSelect, true);
         try {
             const response = await fetch(`${this.baseUrl}/getProvinces`);
             console.log('Address Cascade: Response received', response.status);
@@ -68,54 +69,76 @@ class AddressCascade {
                 console.log('Address Cascade: Provinces loaded successfully');
             } else {
                 console.error('Address Cascade: API returned error', data);
+                this.showError('Gagal memuat data provinsi. Silakan coba lagi.');
             }
         } catch (error) {
             console.error('Address Cascade: Error loading provinces:', error);
+            this.showError('Gagal memuat data provinsi. Periksa koneksi internet Anda.');
+        } finally {
+            this.setLoading(this.provinceSelect, false);
         }
     }
     
     async loadRegencies(provinceId) {
         if (!provinceId) return;
         
+        this.setLoading(this.regencySelect, true);
         try {
             const response = await fetch(`${this.baseUrl}/getRegencies?province_id=${provinceId}`);
             const data = await response.json();
             
             if (data.status === 'success') {
                 this.populateSelect(this.regencySelect, data.data, 'Pilih Kabupaten/Kota');
+            } else {
+                this.showError('Gagal memuat data kabupaten/kota. Silakan coba lagi.');
             }
         } catch (error) {
             console.error('Error loading regencies:', error);
+            this.showError('Gagal memuat data kabupaten/kota. Periksa koneksi internet Anda.');
+        } finally {
+            this.setLoading(this.regencySelect, false);
         }
     }
     
     async loadDistricts(regencyId) {
         if (!regencyId) return;
         
+        this.setLoading(this.districtSelect, true);
         try {
             const response = await fetch(`${this.baseUrl}/getDistricts?regency_id=${regencyId}`);
             const data = await response.json();
             
             if (data.status === 'success') {
                 this.populateSelect(this.districtSelect, data.data, 'Pilih Kecamatan');
+            } else {
+                this.showError('Gagal memuat data kecamatan. Silakan coba lagi.');
             }
         } catch (error) {
             console.error('Error loading districts:', error);
+            this.showError('Gagal memuat data kecamatan. Periksa koneksi internet Anda.');
+        } finally {
+            this.setLoading(this.districtSelect, false);
         }
     }
     
     async loadVillages(districtId) {
         if (!districtId) return;
         
+        this.setLoading(this.villageSelect, true);
         try {
             const response = await fetch(`${this.baseUrl}/getVillages?district_id=${districtId}`);
             const data = await response.json();
             
             if (data.status === 'success') {
                 this.populateSelect(this.villageSelect, data.data, 'Pilih Kelurahan/Desa');
+            } else {
+                this.showError('Gagal memuat data kelurahan/desa. Silakan coba lagi.');
             }
         } catch (error) {
             console.error('Error loading villages:', error);
+            this.showError('Gagal memuat data kelurahan/desa. Periksa koneksi internet Anda.');
+        } finally {
+            this.setLoading(this.villageSelect, false);
         }
     }
     
@@ -137,6 +160,33 @@ class AddressCascade {
         const select = document.querySelector(selector);
         if (select) {
             select.innerHTML = '<option value="">Pilih...</option>';
+        }
+    }
+    
+    setLoading(selector, isLoading) {
+        const select = document.querySelector(selector);
+        if (!select) return;
+        
+        if (isLoading) {
+            select.disabled = true;
+            select.classList.add('loading');
+        } else {
+            select.disabled = false;
+            select.classList.remove('loading');
+        }
+    }
+    
+    showError(message) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                confirmButtonColor: '#0d6efd',
+                timer: 3000
+            });
+        } else {
+            alert(message);
         }
     }
     

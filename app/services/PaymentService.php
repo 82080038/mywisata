@@ -10,7 +10,7 @@ class PaymentService
 
     public function __construct()
     {
-        $config = require __DIR__ . '/../config/payment.php';
+        $config = require __DIR__ . '/../config/external/payment.php';
         $this->serverKey = $config['midtrans']['server_key'];
         $this->clientKey = $config['midtrans']['client_key'];
         $this->isProduction = $config['midtrans']['is_production'];

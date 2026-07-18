@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost/mywisata';
 
 test.describe('Map Tests', () => {
   test('should display map page', async ({ page }) => {

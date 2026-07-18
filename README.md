@@ -6,8 +6,10 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1.svg)](https://mysql.com)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3.svg)](https://getbootstrap.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Development Status](https://img.shields.io/badge/Status-Complete-success.svg)](https://github.com/82080038/mywisata)
-[![Tests](https://img.shields.io/badge/Tests-57%20passed-brightgreen.svg)](https://github.com/82080038/mywisata)
+[![Development Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)](https://github.com/82080038/mywisata)
+[![Tests](https://img.shields.io/badge/Tests-83%20passed-brightgreen.svg)](https://github.com/82080038/mywisata)
+[![Project Structure](https://img.shields.io/badge/Structure-Reorganized-blue.svg)](https://github.com/82080038/mywisata)
+[![Prompting System](https://img.shields.io/badge/Prompting-Ready-orange.svg)](https://github.com/82080038/mywisata)
 
 ---
 
@@ -77,9 +79,10 @@
 
 ```
 mywisata/
-├── docs/                 # 40+ file dokumentasi (.md)
+├── docs/                 # 60+ file dokumentasi (.md)
 ├── app/
-│   ├── config/           # Konfigurasi (config.php, database.php, payment.php, dll)
+│   ├── config/           # Konfigurasi (config.php, database.php)
+│   │   └── external/     # External config (cdn.php, openai.php, payment.php, redis.php)
 │   ├── core/             # Core framework (App, Controller, Model, View, Database)
 │   ├── controllers/      # 35+ Controller — logika bisnis
 │   ├── models/           # 20+ Model — interaksi database (PDO)
@@ -94,13 +97,28 @@ mywisata/
 │   ├── sw.js             # Service worker
 │   └── offline.html      # PWA offline page
 ├── database/
-│   ├── migration.sql     # Skema database (33 tabel)
-│   ├── seed.sql          # Data awal
-│   └── migrations/       # Individual migration files
+│   ├── migrations/       # Semua migration files (30+ files)
+│   ├── seeds/            # Seed files (seed.sql, additional_seed.sql)
+│   └── backup/           # Database backups
+├── prompting/            # Prompting system untuk autonomous development
+│   ├── workflows/        # Workflow files (consolidated)
+│   ├── 01_development/   # Development prompting templates
+│   ├── 02_testing/       # Testing prompting templates
+│   ├── 03_revision/      # Revision prompting templates
+│   ├── 04_improvement/   # Improvement prompting templates
+│   ├── 05_cycle/         # Cycle management prompts
+│   ├── config.json       # Configuration file
+│   ├── state.json        # State tracking file
+│   └── README.md         # Prompting documentation
+├── scripts/              # Semua scripts (terorganisir)
+│   ├── deployment/       # Deployment scripts
+│   ├── maintenance/      # Maintenance scripts (backup, log rotation, security)
+│   ├── testing/          # Testing scripts (load tests, unit tests)
+│   ├── utilities/        # Utility scripts (icon generation)
+│   └── README.md         # Scripts documentation
 ├── tests/
 │   └── e2e/              # Playwright E2E tests (17 test files)
 ├── logs/                 # Log files (error.log, audit.log)
-├── prompting/            # AI prompting system (autonomous development)
 ├── vendor/               # Composer dependencies
 ├── node_modules/         # NPM dependencies
 ├── index.php             # Front controller (entry point)

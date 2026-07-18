@@ -29,6 +29,9 @@ $currentLang = Language::getLanguage();
     <!-- Custom CSS -->
     <link href="<?= View::asset('css/style.css') ?>" rel="stylesheet">
     
+    <!-- Skeleton Loading CSS -->
+    <link href="<?= View::asset('css/skeleton.css') ?>" rel="stylesheet">
+    
     <!-- PWA Scripts -->
     <script src="<?= View::asset('js/sw-registration.js') ?>"></script>
     <script src="<?= View::asset('js/indexeddb-helper.js') ?>"></script>
@@ -40,7 +43,7 @@ $currentLang = Language::getLanguage();
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary navbar-sticky">
         <div class="container">
             <a class="navbar-brand" href="<?= View::url() ?>">
                 <i class="fas fa-map-marked-alt me-2"></i>MyWisata
@@ -67,6 +70,12 @@ $currentLang = Language::getLanguage();
                     </li>
                 </ul>
                 <ul class="navbar-nav">
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item">
+                        <button class="nav-link theme-toggle" aria-label="Toggle dark mode" aria-pressed="false">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
                     <!-- Language Selector -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
@@ -99,6 +108,40 @@ $currentLang = Language::getLanguage();
                     </li>
                 </ul>
             </div>
+        </div>
+    </nav>
+    
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav d-md-none">
+        <div class="nav-item">
+            <a class="nav-link" href="<?= View::url() ?>">
+                <i class="fas fa-home"></i>
+                <span>Beranda</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a class="nav-link" href="<?= View::url('destinations') ?>">
+                <i class="fas fa-landmark"></i>
+                <span>Destinasi</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a class="nav-link" href="<?= View::url('map') ?>">
+                <i class="fas fa-map"></i>
+                <span>Peta</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a class="nav-link" href="<?= View::url('favorites') ?>">
+                <i class="fas fa-heart"></i>
+                <span>Favorit</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a class="nav-link" href="<?= View::url('auth/login') ?>">
+                <i class="fas fa-user"></i>
+                <span>Akun</span>
+            </a>
         </div>
     </nav>
     

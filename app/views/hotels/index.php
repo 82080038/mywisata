@@ -42,7 +42,14 @@
     <div class="row">
         <div class="col-md-12">
             <?php if (empty($hotels)): ?>
-                <p class="text-muted">Tidak ada hotel ditemukan.</p>
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-hotel fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Tidak ada hotel ditemukan</h5>
+                    <p class="text-muted">Coba ubah filter atau kata kunci pencarian</p>
+                    <a href="<?= View::url('hotels') ?>" class="btn btn-primary mt-2">
+                        <i class="fas fa-redo me-2"></i>Reset Filter
+                    </a>
+                </div>
             <?php else: ?>
                 <div class="row">
                     <?php foreach ($hotels as $hotel): ?>

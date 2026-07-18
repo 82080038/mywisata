@@ -20,4 +20,14 @@ class TestController extends Controller {
         ];
         $this->view('test/address', $data);
     }
+
+    /**
+     * Voice input test page
+     */
+    public function voiceInput() {
+        $data = [
+            'title' => 'Voice Input Test - MyWisata'
+        ];
+        $this->view('test/voice-input', $data);
+    }
 }

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost/mywisata';
 
 test.describe('Homepage Tests', () => {
   test('should load homepage successfully', async ({ page }) => {
@@ -17,8 +17,8 @@ test.describe('Homepage Tests', () => {
   test('should display navigation menu', async ({ page }) => {
     await page.goto(BASE_URL);
 
-    // Check for navigation elements
-    const nav = page.locator('nav');
+    // Check for navigation elements (use first() to handle multiple nav elements)
+    const nav = page.locator('nav').first();
     await expect(nav).toBeVisible();
   });
 

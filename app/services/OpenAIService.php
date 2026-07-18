@@ -11,12 +11,15 @@ class OpenAIService
 
     public function __construct()
     {
-        $config = require __DIR__ . '/../config/openai.php';
+        $config = require __DIR__ . '/../config/external/openai.php';
         $this->apiKey = $config['api_key'];
         $this->model = $config['model'];
         $this->temperature = $config['temperature'];
         $this->maxTokens = $config['max_tokens'];
         $this->endpoint = $config['endpoint'];
+        $this->language = $config['language'] ?? 'id';
+        $this->locale = $config['locale'] ?? 'id-ID';
+        $this->systemPrompt = $config['system_prompt'] ?? 'You are a helpful assistant.';
     }
 
     /**
@@ -34,6 +37,21 @@ class OpenAIService
         $temperature = $options['temperature'] ?? $this->temperature;
         $maxTokens = $options['max_tokens'] ?? $this->maxTokens;
         $model = $options['model'] ?? $this->model;
+        $useSystemPrompt = $options['use_system_prompt'] ?? true;
+
+        // Add system prompt if not already present and enabled
+        if ($useSystemPrompt && !empty($this->systemPrompt)) {
+            $hasSystemPrompt = false;
+            foreach ($messages as $msg) {
+                if ($msg['role'] === 'system') {
+                    $hasSystemPrompt = true;
+                    break;
+                }
+            }
+            if (!$hasSystemPrompt) {
+                array_unshift($messages, ['role' => 'system', 'content' => $this->systemPrompt]);
+            }
+        }
 
         $payload = [
             'model' => $model,
@@ -117,12 +135,12 @@ class OpenAIService
      */
     public function recommendTourGuides($requirements, $availableGuides)
     {
-        $systemPrompt = "You are a tour guide matching expert. Match user requirements with available tour guides based on their skills, languages, and specializations.";
+        $systemPrompt = "Anda adalah ahli pencocokan pemandu wisata. Cocokkan kebutuhan pengguna dengan pemandu wisata yang tersedia berdasarkan keahlian, bahasa, dan spesialisasi mereka. Respon dalam Bahasa Indonesia.";
 
-        $userPrompt = "User requirements: " . json_encode($requirements) . 
-                     "\n\nAvailable guides: " . json_encode($availableGuides) .
-                     "\n\nRecommend the best 3 guides for this user. " .
-                     "Format your response as a JSON array with objects containing: guide_id, name, match_score, and reasons.";
+        $userPrompt = "Kebutuhan pengguna: " . json_encode($requirements) . 
+                     "\n\nPemandu tersedia: " . json_encode($availableGuides) .
+                     "\n\nRekomendasikan 3 pemandu terbaik untuk pengguna ini. " .
+                     "Format respon sebagai array JSON dengan objek yang berisi: guide_id, name, match_score, dan reasons.";
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],
@@ -157,14 +175,14 @@ class OpenAIService
      */
     public function generateItinerary($destination, $duration, $interests)
     {
-        $systemPrompt = "You are a professional travel planner. Create detailed day-by-day itineraries for tourists visiting destinations in Indonesia.";
+        $systemPrompt = "Anda adalah perencana perjalanan profesional. Buat rencana perjalanan hari demi hari yang detail untuk wisatawan yang mengunjungi destinasi di Indonesia. Respon dalam Bahasa Indonesia.";
 
-        $userPrompt = "Destination: {$destination}\n" .
-                     "Duration: {$duration} days\n" .
-                     "Interests: " . implode(', ', $interests) . "\n\n" .
-                     "Create a detailed itinerary with morning, afternoon, and evening activities for each day. " .
-                     "Include specific locations, estimated times, and tips. " .
-                     "Format your response as a JSON object with a 'days' array containing day objects with 'day', 'date', and 'activities'.";
+        $userPrompt = "Destinasi: {$destination}\n" .
+                     "Durasi: {$duration} hari\n" .
+                     "Minat: " . implode(', ', $interests) . "\n\n" .
+                     "Buat rencana perjalanan detail dengan aktivitas pagi, siang, dan malam untuk setiap hari. " .
+                     "Sertakan lokasi spesifik, estimasi waktu, dan tips. " .
+                     "Format respon sebagai objek JSON dengan array 'days' yang berisi objek hari dengan 'day', 'date', dan 'activities'.";
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],
@@ -199,12 +217,12 @@ class OpenAIService
      */
     public function generateDescription($destinationName, $keyFeatures)
     {
-        $systemPrompt = "You are a creative travel writer. Write engaging and informative descriptions for tourist destinations.";
+        $systemPrompt = "Anda adalah penulis perjalanan kreatif. Tulis deskripsi yang menarik dan informatif untuk destinasi wisata. Respon dalam Bahasa Indonesia.";
 
-        $userPrompt = "Destination: {$destinationName}\n" .
-                     "Key features: " . implode(', ', $keyFeatures) . "\n\n" .
-                     "Write a compelling 200-300 word description that highlights the unique appeal of this destination. " .
-                     "Make it inviting and informative for potential tourists.";
+        $userPrompt = "Destinasi: {$destinationName}\n" .
+                     "Fitur utama: " . implode(', ', $keyFeatures) . "\n\n" .
+                     "Tulis deskripsi 200-300 kata yang menarik yang menonjolkan daya tarik unik dari destinasi ini. " .
+                     "Buatlah deskripsi yang mengundang dan informatif untuk wisatawan potensial.";
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],
@@ -231,10 +249,10 @@ class OpenAIService
      */
     public function analyzeSentiment($text)
     {
-        $systemPrompt = "You are a sentiment analysis expert. Analyze the sentiment of the given text and provide a rating from -1 (very negative) to 1 (very positive), along with key themes.";
+        $systemPrompt = "Anda adalah ahli analisis sentimen. Analisis sentimen dari teks yang diberikan dan berikan peringkat dari -1 (sangat negatif) hingga 1 (sangat positif), bersama dengan tema utama. Respon dalam Bahasa Indonesia.";
 
-        $userPrompt = "Analyze the sentiment of this review: \"{$text}\"\n\n" .
-                     "Provide your response as a JSON object with 'sentiment_score' (-1 to 1), 'sentiment_label' (positive/negative/neutral), and 'themes' (array of key topics).";
+        $userPrompt = "Analisis sentimen dari ulasan ini: \"{$text}\"\n\n" .
+                     "Berikan respon sebagai objek JSON dengan 'sentiment_score' (-1 hingga 1), 'sentiment_label' (positif/negatif/netral), dan 'themes' (array topik utama).";
 
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],

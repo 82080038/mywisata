@@ -54,7 +54,10 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        // Set APP_URL for testing
+        window.APP_URL = 'http://localhost/mywisata';
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Inline address cascade logic for testing
@@ -64,7 +67,7 @@
                 this.regencySelect = options.regencySelect || '#regency_id';
                 this.districtSelect = options.districtSelect || '#district_id';
                 this.villageSelect = options.villageSelect || '#village_id';
-                this.baseUrl = options.baseUrl || '/address';
+                this.baseUrl = options.baseUrl || (window.APP_URL || '') + '/address';
                 
                 this.init();
             }

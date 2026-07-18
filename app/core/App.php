@@ -56,6 +56,10 @@ class App {
             // Handle test controller
             $this->controller = 'Test';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'speech') {
+            // Handle speech controller
+            $this->controller = 'Speech';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

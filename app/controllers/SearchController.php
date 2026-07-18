@@ -87,6 +87,78 @@ class SearchController extends Controller {
     }
     
     /**
+     * API search endpoint for frontend autocomplete
+     */
+    public function apiSearch() {
+        header('Content-Type: application/json');
+        
+        $query = $this->get('q', '');
+        $limit = $this->get('limit', 8);
+        
+        if (strlen($query) < 2) {
+            echo json_encode([
+                'success' => true,
+                'results' => []
+            ]);
+            exit;
+        }
+        
+        try {
+            $suggestions = $this->searchModel->getSuggestions($query, 'all', $limit);
+            
+            $results = [];
+            foreach ($suggestions as $suggestion) {
+                $results[] = [
+                    'name' => $suggestion['name'],
+                    'highlighted_name' => $this->highlightMatch($suggestion['name'], $query),
+                    'type' => $suggestion['type'] ?? 'Destination',
+                    'url' => $this->getUrlForType($suggestion['type'], $suggestion['id'])
+                ];
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'results' => $results
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+    
+    /**
+     * Highlight matching text in search results
+     */
+    private function highlightMatch($text, $query) {
+        $pattern = preg_quote($query, '/');
+        return preg_replace("/($pattern)/i", '<span class="match">$1</span>', $text);
+    }
+    
+    /**
+     * Get URL based on content type
+     */
+    private function getUrlForType($type, $id) {
+        $baseUrl = BASE_URL;
+        switch (strtolower($type)) {
+            case 'destination':
+                return $baseUrl . 'destinations/detail?id=' . $id;
+            case 'hotel':
+                return $baseUrl . 'hotels/detail?id=' . $id;
+            case 'restaurant':
+                return $baseUrl . 'restaurants/detail?id=' . $id;
+            case 'tour_guide':
+                return $baseUrl . 'tourguides/detail?id=' . $id;
+            case 'event':
+                return $baseUrl . 'events/detail?id=' . $id;
+            default:
+                return $baseUrl . 'destinations/detail?id=' . $id;
+        }
+    }
+    
+    /**
      * Get search history for current user
      */
     public function getHistory() {

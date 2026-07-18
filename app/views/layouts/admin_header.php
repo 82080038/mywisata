@@ -92,6 +92,10 @@
             <nav class="navbar navbar-light bg-white border-bottom px-4">
                 <span class="navbar-brand mb-0 h1"><?= isset($title) ? View::e($title) : 'Admin Panel' ?></span>
                 <div class="d-flex align-items-center">
+                    <!-- Dark Mode Toggle -->
+                    <button class="btn btn-link admin-theme-toggle me-3" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
                     <span class="me-3">
                         <i class="fas fa-user-circle me-1"></i>
                         <?= View::e(Session::get('user_name')) ?>

@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
                             <i class="fas fa-check me-2"></i>Konfirmasi Booking
                         </button>
                     </form>
@@ -116,6 +116,8 @@ var durationInput = document.getElementById('duration_hours');
 var durationDisplay = document.getElementById('durationDisplay');
 var totalDisplay = document.getElementById('totalDisplay');
 var totalAmount = document.getElementById('totalAmount');
+var submitBtn = document.getElementById('submitBtn');
+var bookingForm = document.querySelector('form');
 
 function updateTotal() {
     var duration = parseInt(durationInput.value) || 0;
@@ -132,6 +134,12 @@ function formatCurrency(amount) {
 
 durationInput.addEventListener('change', updateTotal);
 durationInput.addEventListener('input', updateTotal);
+
+// Add loading state to form submission
+bookingForm.addEventListener('submit', function(e) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Memproses...';
+});
 </script>
 
 <?php include APP_ROOT . '/app/views/layouts/footer.php'; ?>

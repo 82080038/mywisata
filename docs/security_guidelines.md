@@ -200,8 +200,8 @@ $stmt->execute();
 ## MONITORING
 
 ### Automated Monitoring
-- **Log Rotation:** Daily (cron/log_rotation.php)
-- **Security Monitoring:** Hourly (cron/security_monitor.php)
+- **Log Rotation:** Daily (scripts/maintenance/log_rotation.php)
+- **Security Monitoring:** Hourly (scripts/maintenance/security_monitor.php)
 - **Alerts:** Email on threshold exceeded
 
 ### Thresholds

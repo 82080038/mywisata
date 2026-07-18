@@ -12,7 +12,7 @@ class RedisService
 
     public function __construct()
     {
-        $this->config = require __DIR__ . '/../config/redis.php';
+        $this->config = require __DIR__ . '/../config/external/redis.php';
         $this->prefix = $this->config['prefix'];
         
         try {

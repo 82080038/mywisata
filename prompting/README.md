@@ -13,6 +13,10 @@ prompting/
 ├── README_SETUP.md                    # Setup guide
 ├── config.json                        # Configuration file
 ├── state.json                         # State tracking file
+├── workflows/                         # Workflow files (consolidated from .devin and .windsurf)
+│   ├── create-new-module.md
+│   ├── deploy-to-production.md
+│   └── setup-local-dev.md
 ├── 01_development/                    # Development prompting templates
 │   ├── 01_MODULE_DEVELOPMENT.md      # Module development prompts
 │   ├── 32_AUDIT_KEAMANAN_CHECKLIST.md # Security audit checklist
@@ -22,7 +26,13 @@ prompting/
 │   ├── 36_PAYMENT_GATEWAY_INTEGRATION.md # Payment gateway integration
 │   ├── 37_REDIS_CACHING.md           # Redis caching
 │   ├── 38_CDN_INTEGRATION.md         # CDN integration
-│   └── 39_AI_ENHANCEMENT_OPENAI.md   # AI enhancement with OpenAI
+│   ├── 39_AI_ENHANCEMENT_OPENAI.md   # AI enhancement with OpenAI
+│   ├── 40_AI_SELF_HOSTED_OLLAMA.md   # AI self-hosted with Ollama
+│   ├── 41_SUSTAINABILITY_CARBON_TRACKING.md # Carbon tracking & sustainability
+│   ├── 42_WHATSAPP_INTEGRATION_SELF_HOSTED.md # WhatsApp integration (OpenWA/WaSphere)
+│   ├── 43_BUSINESS_OPERATIONS_SELF_HOSTED.md # Business operations automation
+│   ├── 44_DOCUMENT_TRIP_MANAGEMENT.md # Document & trip management
+│   └── 45_SOCIAL_FEATURES.md         # Social features
 ├── 02_testing/                        # Testing prompting templates
 │   ├── 01_TEST_GENERATION.md         # Test generation prompts
 │   └── 02_PLAYWRIGHT_TESTING.md      # Playwright testing
@@ -34,7 +44,8 @@ prompting/
     ├── 00_MASTER_PROMPTING_CYCLE.md  # Master cycle documentation
     ├── 01_STATE_TRACKING.md          # State tracking template
     ├── 02_REPROMPTING.md             # Re-prompting template
-    └── 03_ADJUST_PROMPTING.md        # Adjust prompting template
+    ├── 03_ADJUST_PROMPTING.md        # Adjust prompting template
+    └── 04_MASTER_PROMPTING_CYCLE_MODERN_FEATURES.md # Modern features cycle
 ```
 
 ## HOW TO USE
@@ -96,11 +107,24 @@ The following new modules are available for post-production optimization:
 - **CDN Integration:** `01_development/38_CDN_INTEGRATION.md` - Content Delivery Network
 - **AI Enhancement:** `01_development/39_AI_ENHANCEMENT_OPENAI.md` - OpenAI integration
 
-### 4. Re-prompting
+### 4. Modern Features Self-Hosted Modules
+
+The following modules implement modern tourism features using self-hosted, open-source solutions (zero API costs):
+
+- **AI Self-Hosted (Ollama):** `01_development/40_AI_SELF_HOSTED_OLLAMA.md` - Local LLM inference with Ollama
+- **Sustainability (Carbon Tracking):** `01_development/41_SUSTAINABILITY_CARBON_TRACKING.md` - Carbon tracking with GHG Calculator
+- **WhatsApp Integration:** `01_development/42_WHATSAPP_INTEGRATION_SELF_HOSTED.md` - WhatsApp notifications with OpenWA/WaSphere
+- **Business Operations:** `01_development/43_BUSINESS_OPERATIONS_SELF_HOSTED.md` - AI Match Engine, Smart Schedule, Payroll, GPS Clock-in
+- **Document & Trip Management:** `01_development/44_DOCUMENT_TRIP_MANAGEMENT.md` - Digital Wallet, PDF Import, Real-time Updates, Trip Timeline
+- **Social Features:** `01_development/45_SOCIAL_FEATURES.md` - Group Trip Planning, Shared Wishlists, Split Payments, Trip Album
+
+**Master Cycle for Modern Features:** Use `05_cycle/04_MASTER_PROMPTING_CYCLE_MODERN_FEATURES.md`
+
+### 5. Re-prompting
 
 When a prompt fails or needs adjustment, use `05_cycle/02_REPROMPTING.md`.
 
-### 5. Adjust Prompting
+### 6. Adjust Prompting
 
 When the development direction needs adjustment, use `05_cycle/03_ADJUST_PROMPTING.md`.
 
@@ -206,6 +230,8 @@ For issues with the prompting system:
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** 2026-06-30  
-**Status:** Ready for Autonomous Execution
+**Version:** 2.0  
+**Last Updated:** 2026-07-18  
+**Status:** ✅ READY - Modern Features Implementation (Self-Hosted)  
+**Project Structure:** ✅ REORGANIZED  
+**Prompting Templates:** ✅ COMPLETE (6 modules ready)

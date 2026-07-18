@@ -9,29 +9,38 @@
     </div>
     
     <!-- Search & Filter -->
-    <div class="card mb-4">
+    <div class="card mb-4 glass-card">
         <div class="card-body">
             <form method="GET" action="<?= View::url('destinations') ?>">
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <input type="text" class="form-control" name="search" placeholder="Cari destinasi..." value="<?= View::e($filters['search'] ?? '') ?>">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" name="search" id="search" placeholder="Cari destinasi..." value="<?= View::e($filters['search'] ?? '') ?>">
+                            <label for="search">Cari destinasi...</label>
+                        </div>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <select class="form-select" name="category">
-                            <option value="">Semua Kategori</option>
-                            <?php foreach ($categories as $cat): ?>
-                                <option value="<?= $cat['id'] ?>" <?= (isset($filters['category_id']) && $filters['category_id'] == $cat['id']) ? 'selected' : '' ?>>
-                                    <?= View::e($cat['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="form-floating">
+                            <select class="form-select" name="category" id="category">
+                                <option value="">Semua Kategori</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['id'] ?>" <?= (isset($filters['category_id']) && $filters['category_id'] == $cat['id']) ? 'selected' : '' ?>>
+                                        <?= View::e($cat['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="category">Kategori</label>
+                        </div>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <input type="text" class="form-control" name="city" placeholder="Kota..." value="<?= View::e($filters['city'] ?? '') ?>">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" name="city" id="city" placeholder="Kota..." value="<?= View::e($filters['city'] ?? '') ?>">
+                            <label for="city">Kota</label>
+                        </div>
                     </div>
                     <div class="col-md-2 mb-3">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-search me-2"></i>Cari
+                        <button type="submit" class="btn btn-primary btn-modern w-100 h-100">
+                            <i class="fas fa-search"></i>
                         </button>
                     </div>
                 </div>
@@ -43,16 +52,22 @@
     <?php if (!empty($featured)): ?>
     <div class="row mb-4">
         <div class="col-md-12">
-            <h3 class="mb-3">Destinasi Unggulan</h3>
+            <h3 class="mb-3 section-title"><i class="fas fa-star text-warning me-2"></i>Destinasi Unggulan</h3>
             <div class="row">
                 <?php foreach ($featured as $dest): ?>
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100">
+                    <div class="card h-100 hover-shadow">
                         <?php if (!empty($dest['main_image'])): ?>
                             <?php if (filter_var($dest['main_image'], FILTER_VALIDATE_URL)): ?>
-                                <img src="<?= View::e($dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                                     data-src="<?= View::e($dest['main_image']) ?>" 
+                                     class="card-img-top lazyload avatar-img" 
+                                     alt="<?= View::e($dest['name']) ?>">
                             <?php else: ?>
-                                <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                                     data-src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" 
+                                     class="card-img-top lazyload avatar-img" 
+                                     alt="<?= View::e($dest['name']) ?>">
                             <?php endif; ?>
                         <?php else: ?>
                             <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -68,9 +83,9 @@
                                 <div>
                                     <i class="fas fa-star text-warning"></i> <?= number_format($dest['rating_avg'], 1) ?>
                                 </div>
-                                <span class="badge bg-primary"><?= View::e($dest['category_name'] ?? 'Umum') ?></span>
+                                <span class="badge badge-recommendation">Unggulan</span>
                             </div>
-                            <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary mt-3 w-100">
+                            <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary btn-modern mt-3 w-100">
                                 Lihat Detail
                             </a>
                         </div>
@@ -128,19 +143,32 @@
     <!-- All Destinations -->
     <div class="row">
         <div class="col-md-12">
-            <h3 class="mb-3">Semua Destinasi</h3>
+            <h3 class="mb-3 section-title"><i class="fas fa-list me-2"></i>Semua Destinasi</h3>
             <?php if (empty($destinations)): ?>
-                <p class="text-muted">Tidak ada destinasi ditemukan.</p>
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Tidak ada destinasi ditemukan</h5>
+                    <p class="text-muted">Coba ubah filter atau kata kunci pencarian</p>
+                    <a href="<?= View::url('destinations') ?>" class="btn btn-primary mt-2">
+                        <i class="fas fa-redo me-2"></i>Reset Filter
+                    </a>
+                </div>
             <?php else: ?>
-                <div class="row">
+                <div class="masonry-grid">
                     <?php foreach ($destinations as $dest): ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
+                    <div class="masonry-item">
+                        <div class="card h-100 hover-shadow">
                             <?php if (!empty($dest['main_image'])): ?>
                                 <?php if (filter_var($dest['main_image'], FILTER_VALIDATE_URL)): ?>
-                                    <img src="<?= View::e($dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                                         data-src="<?= View::e($dest['main_image']) ?>" 
+                                         class="card-img-top lazyload avatar-img" 
+                                         alt="<?= View::e($dest['name']) ?>">
                                 <?php else: ?>
-                                    <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
+                                         data-src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" 
+                                         class="card-img-top lazyload avatar-img" 
+                                         alt="<?= View::e($dest['name']) ?>">
                                 <?php endif; ?>
                             <?php else: ?>
                                 <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -158,7 +186,7 @@
                                     </div>
                                     <span class="badge bg-secondary"><?= View::e($dest['category_name'] ?? 'Umum') ?></span>
                                 </div>
-                                <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary mt-3 w-100">
+                                <a href="<?= View::url('destinations/detail?id=' . $dest['id']) ?>" class="btn btn-primary btn-modern mt-3 w-100">
                                     Lihat Detail
                                 </a>
                             </div>

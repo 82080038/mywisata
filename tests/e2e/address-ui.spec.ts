@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost/mywisata';
 
 test.describe('Address Cascading Dropdowns UI Interaction', () => {
   test('should display address dropdowns on test page', async ({ page }) => {

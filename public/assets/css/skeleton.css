@@ -1,0 +1,102 @@
+/**
+ * MyWisata Application - Skeleton Loading Screens
+ * 
+ * Provides skeleton loading screens for better UX during image loading
+ * 
+ * @package MyWisata
+ * @version 1.0.0
+ * @since 2026-07-18
+ */
+
+/* Skeleton Base Styles */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Skeleton Image */
+.skeleton-image {
+    width: 100%;
+    height: 200px;
+    display: block;
+}
+
+/* Skeleton Card */
+.skeleton-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-card .skeleton {
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-card .skeleton-title {
+    height: 24px;
+    width: 70%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-card .skeleton-text {
+    height: 16px;
+    width: 100%;
+}
+
+.skeleton-card .skeleton-text-short {
+    height: 16px;
+    width: 60%;
+}
+
+/* Skeleton Avatar */
+.skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+/* Skeleton Button */
+.skeleton-button {
+    height: 40px;
+    width: 100%;
+    border-radius: 4px;
+}
+
+/* Lazy Loading Image with Skeleton */
+.lazyload-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.lazyload-wrapper img {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.lazyload-wrapper img.loaded {
+    opacity: 1;
+}
+
+.lazyload-wrapper .skeleton {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.lazyload-wrapper img {
+    position: relative;
+    z-index: 2;
+}

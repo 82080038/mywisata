@@ -88,7 +88,14 @@
         <div class="col-md-12">
             <h3 class="mb-3">Semua Event</h3>
             <?php if (empty($events)): ?>
-                <p class="text-muted">Tidak ada event ditemukan.</p>
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Tidak ada event ditemukan</h5>
+                    <p class="text-muted">Coba ubah filter atau kata kunci pencarian</p>
+                    <a href="<?= View::url('events') ?>" class="btn btn-primary mt-2">
+                        <i class="fas fa-redo me-2"></i>Reset Filter
+                    </a>
+                </div>
             <?php else: ?>
                 <div class="row">
                     <?php foreach ($events as $event): ?>

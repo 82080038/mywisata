@@ -34,7 +34,7 @@ MIDTRANS_IS_PRODUCTION=false
 ### 3. Run Database Migration
 Execute the migration script to add payment fields:
 ```bash
-mysql -u root -p mywisata < migrations/add_payment_fields.sql
+mysql -u root -p mywisata < database/migrations/add_payment_fields.sql
 ```
 
 ## PAYMENT FLOW

@@ -8,7 +8,7 @@ class ImageService
 
     public function __construct()
     {
-        $config = require __DIR__ . '/../config/cdn.php';
+        $config = require __DIR__ . '/../config/external/cdn.php';
         $this->enabled = $config['enabled'];
         $this->cdnUrl = $config['url'];
     }
