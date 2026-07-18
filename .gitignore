@@ -14,6 +14,9 @@ database/backup/*.sql.gz
 public/uploads/*
 !public/uploads/.gitkeep
 
+# Cache
+cache/*.cache
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -34,5 +37,28 @@ composer.lock
 node_modules/
 package-lock.json
 
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
 # XAMPP temp
 *.tmp
+
+# Test results
+test-results/
+test-results.json
+.phpunit.result.cache
+playwright-report/
+
+# Generated files
+*.tmp
+*.log
