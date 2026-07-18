@@ -56,7 +56,7 @@ class Destination extends Model
                 COUNT(dr.id) as review_count
                 FROM {$this->table} d
                 LEFT JOIN destination_categories c ON d.category_id = c.id
-                LEFT JOIN destination_reviews dr ON d.id = dr.destination_id
+                LEFT JOIN reviews dr ON d.id = dr.reviewable_id AND dr.reviewable_type = 'destination'
                 WHERE {$whereClause}
                 GROUP BY d.id
                 ORDER BY d.name";
@@ -78,7 +78,7 @@ class Destination extends Model
                 COUNT(dr.id) as review_count
                 FROM {$this->table} d
                 LEFT JOIN destination_categories c ON d.category_id = c.id
-                LEFT JOIN destination_reviews dr ON d.id = dr.destination_id
+                LEFT JOIN reviews dr ON d.id = dr.reviewable_id AND dr.reviewable_type = 'destination'
                 WHERE d.id = :id
                 GROUP BY d.id";
 
@@ -109,11 +109,11 @@ class Destination extends Model
      */
     public function getReviews($destinationId, $limit = null)
     {
-        $sql = "SELECT dr.*, u.name as user_name 
-                FROM destination_reviews dr 
-                LEFT JOIN users u ON dr.user_id = u.id 
-                WHERE dr.destination_id = :destination_id 
-                ORDER BY dr.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name, u.avatar as user_avatar
+                FROM reviews r
+                LEFT JOIN users u ON r.user_id = u.id
+                WHERE r.reviewable_type = 'destination' AND r.reviewable_id = :destination_id AND r.is_published = 1
+                ORDER BY r.created_at DESC";
 
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -134,9 +134,9 @@ class Destination extends Model
     public function getNearby($latitude, $longitude, $radius = 10)
     {
         $sql = "SELECT d.*, c.name as category_name,
-                (6371 * ACOS(COS(RADIANS(:latitude)) * COS(RADIANS(d.latitude)) 
-                * COS(RADIANS(d.longitude) - RADIANS(:longitude)) 
-                + SIN(RADIANS(:latitude)) * SIN(RADIANS(d.latitude)))) AS distance
+                (6371 * ACOS(COS(RADIANS(:lat1)) * COS(RADIANS(d.latitude)) 
+                * COS(RADIANS(d.longitude) - RADIANS(:lng)) 
+                + SIN(RADIANS(:lat2)) * SIN(RADIANS(d.latitude)))) AS distance
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1
@@ -144,8 +144,9 @@ class Destination extends Model
                 ORDER BY distance ASC";
 
         return $this->db->query($sql, [
-            'latitude' => $latitude,
-            'longitude' => $longitude,
+            'lat1' => $latitude,
+            'lat2' => $latitude,
+            'lng' => $longitude,
             'radius' => $radius,
         ])->fetchAll();
     }
@@ -160,7 +161,7 @@ class Destination extends Model
     public function getFeatured($limit = 6)
     {
         $sql = "SELECT d.*, c.name as category_name,
-                (SELECT AVG(rating) FROM destination_reviews WHERE destination_id = d.id) as rating_avg
+                (SELECT AVG(rating) FROM reviews WHERE reviewable_type = 'destination' AND reviewable_id = d.id) as rating_avg
                 FROM {$this->table} d 
                 LEFT JOIN destination_categories c ON d.category_id = c.id 
                 WHERE d.is_active = 1 AND d.is_featured = 1
@@ -184,7 +185,7 @@ class Destination extends Model
                 COUNT(dr.id) as review_count
                 FROM {$this->table} d
                 LEFT JOIN destination_categories c ON d.category_id = c.id
-                LEFT JOIN destination_reviews dr ON d.id = dr.destination_id
+                LEFT JOIN reviews dr ON d.id = dr.reviewable_id AND dr.reviewable_type = 'destination'
                 WHERE d.is_active = 1
                 GROUP BY d.id
                 ORDER BY review_count DESC, rating_avg DESC
@@ -202,12 +203,19 @@ class Destination extends Model
      */
     public function addReview($data)
     {
-        $sql = "INSERT INTO destination_reviews 
-                (destination_id, user_id, rating, comment, created_at)
-                VALUES 
-                (:destination_id, :user_id, :rating, :comment, NOW())";
+        $sql = "INSERT INTO reviews
+                (user_id, reviewable_type, reviewable_id, rating, comment, is_published, created_at, updated_at)
+                VALUES
+                (:user_id, 'destination', :destination_id, :rating, :comment, 1, NOW(), NOW())";
 
-        return $this->db->query($sql, $data);
+        $reviewData = [
+            'user_id' => $data['user_id'],
+            'destination_id' => $data['destination_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ];
+
+        return $this->db->query($sql, $reviewData);
     }
 
     /**
@@ -222,11 +230,11 @@ class Destination extends Model
         $sql = "UPDATE {$this->table} 
                 SET rating_avg = (
                     SELECT COALESCE(AVG(rating), 0) 
-                    FROM destination_reviews 
-                    WHERE destination_id = :destination_id
+                    FROM reviews 
+                    WHERE reviewable_type = 'destination' AND reviewable_id = :dest_id
                 )
-                WHERE id = :destination_id";
+                WHERE id = :dest_id_main";
 
-        return $this->db->query($sql, ['destination_id' => $destinationId]);
+        return $this->db->query($sql, ['dest_id' => $destinationId, 'dest_id_main' => $destinationId]);
     }
 }

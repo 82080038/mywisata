@@ -70,7 +70,7 @@ class BookingController extends Controller
         // Verify CSRF
         if (!$this->validateCsrf()) {
             Session::flash('error', 'CSRF token mismatch');
-            $this->redirect('booking/create');
+            $this->redirect('bookings/create?guide_id=' . $this->post('guide_id'));
         }
 
         $userId = Session::get('user_id');
@@ -94,7 +94,15 @@ class BookingController extends Controller
 
         if ($validator->fails()) {
             Session::flash('error', $validator->firstError());
-            $this->redirect('booking/create?guide_id=' . $data['guide_id']);
+            $this->redirect('bookings/create?guide_id=' . $data['guide_id']);
+        }
+
+        // Check guide availability
+        $availModel = new Availability();
+        $availCheck = $availModel->checkGuide($data['guide_id'], $data['booking_date'], $data['booking_time'], $data['duration_hours']);
+        if (!$availCheck['available']) {
+            Session::flash('error', $availCheck['message']);
+            $this->redirect('bookings/create?guide_id=' . $data['guide_id']);
         }
 
         $bookingModel = new Booking();
@@ -117,8 +125,25 @@ class BookingController extends Controller
 
         Logger::audit('CREATE_BOOKING', 'bookings', "Created booking ID: {$bookingId}", [], $data);
 
+        // Send booking confirmation email
+        try {
+            $userModel = new User();
+            $user = $userModel->findById($userId);
+            if ($user) {
+                Email::sendBookingConfirmation($user['email'], [
+                    'booking_code' => $data['booking_code'],
+                    'service_type' => 'Tour Guide Booking',
+                    'start_date' => $data['booking_date'] . ' ' . $data['booking_time'],
+                    'total_amount' => $data['total_amount'],
+                    'status' => 'Pending Payment',
+                ]);
+            }
+        } catch (Exception $e) {
+            Logger::error('Booking email failed', ['error' => $e->getMessage()]);
+        }
+
         Session::flash('success', 'Booking berhasil dibuat. Silakan lanjutkan pembayaran.');
-        $this->redirect('bookings/index');
+        $this->redirect('bookings');
     }
 
     /**

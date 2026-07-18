@@ -53,6 +53,13 @@
                         <?php else: ?>
                             <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php endif; ?>
+                        <?php if (!empty($dest['eco_badge'])): ?>
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-<?= $dest['eco_badge'] === 'Gold' ? 'warning' : ($dest['eco_badge'] === 'Silver' ? 'secondary' : 'success') ?> text-dark">
+                                <i class="fas fa-leaf me-1"></i>Eco <?= View::e($dest['eco_badge']) ?>
+                            </span>
+                        </div>
+                        <?php endif; ?>
                         <div class="card-body">
                             <h5 class="card-title"><?= View::e($dest['name']) ?></h5>
                             <p class="card-text text-muted small">
@@ -89,6 +96,13 @@
                             <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
                             <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                        <?php endif; ?>
+                        <?php if (!empty($dest['eco_badge'])): ?>
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-<?= $dest['eco_badge'] === 'Gold' ? 'warning' : ($dest['eco_badge'] === 'Silver' ? 'secondary' : 'success') ?> text-dark">
+                                <i class="fas fa-leaf me-1"></i>Eco <?= View::e($dest['eco_badge']) ?>
+                            </span>
+                        </div>
                         <?php endif; ?>
                         <div class="card-body">
                             <h5 class="card-title"><?= View::e($dest['name']) ?></h5>
@@ -128,6 +142,13 @@
                                 <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
                                 <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
+                            <?php if (!empty($dest['eco_badge'])): ?>
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-<?= $dest['eco_badge'] === 'Gold' ? 'warning' : ($dest['eco_badge'] === 'Silver' ? 'secondary' : 'success') ?> text-dark">
+                                    <i class="fas fa-leaf me-1"></i>Eco <?= View::e($dest['eco_badge']) ?>
+                                </span>
+                            </div>
                             <?php endif; ?>
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($dest['name']) ?></h5>

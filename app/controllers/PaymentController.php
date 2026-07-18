@@ -125,6 +125,18 @@ class PaymentController extends Controller
                 $bookingModel->updateStatus($transaction['booking_id'], 'confirmed');
             }
 
+            // Send payment success email
+            try {
+                Email::sendPaymentSuccess($user['email'], [
+                    'transaction_id' => $transaction['transaction_code'],
+                    'amount' => $transaction['net_amount'],
+                    'payment_method' => $paymentMethod,
+                    'status' => 'Paid',
+                ]);
+            } catch (Exception $ex) {
+                Logger::error('Payment email failed', ['error' => $ex->getMessage()]);
+            }
+
             Logger::audit('PROCESS_PAYMENT', 'transactions', 
                 "Processed payment for transaction ID: {$transactionId}", [], ['payment_method' => $paymentMethod]);
 
@@ -238,5 +250,84 @@ class PaymentController extends Controller
                 'gateway_status' => null,
             ]);
         }
+    }
+
+    /**
+     * Generate QRIS code for transaction
+     */
+    public function qris()
+    {
+        $transactionId = $this->get('transaction_id');
+        $userId = Session::get('user_id');
+
+        $transactionModel = new Transaction();
+        $transaction = $transactionModel->findById($transactionId);
+
+        if (!$transaction || $transaction['user_id'] != $userId) {
+            Session::flash('error', 'Transaksi tidak ditemukan');
+            $this->redirect('payments');
+        }
+
+        if ($transaction['payment_status'] === 'paid') {
+            Session::flash('info', 'Transaksi sudah dibayar');
+            $this->redirect('payments');
+        }
+
+        // Generate QRIS-style QR code (simulated for demo)
+        $qrData = '00020101021226' . sprintf('%02d', strlen('ID.CO.QRIS.WWW')) . 'ID.CO.QRIS.WWW' .
+                  '011893600914' . $transaction['transaction_code'] .
+                  'CO.QRIS.WWW0215' . $transaction['transaction_code'] .
+                  '0303UMI51440014ID.CO.QRIS.WWW' .
+                  sprintf('%02d', strlen((string)$transaction['net_amount'])) . $transaction['net_amount'] .
+                  '530393605802ID59' . sprintf('%02d', strlen('MyWisata')) . 'MyWisata' .
+                  '60' . sprintf('%02d', strlen('Jakarta')) . 'Jakarta' .
+                  '61051031062270521' . $transaction['transaction_code'] .
+                  '6304';
+
+        // Update payment method
+        $transactionModel->updatePaymentMethod($transactionId, 'qris');
+
+        $data = [
+            'title' => 'QRIS Payment - MyWisata',
+            'transaction' => $transaction,
+            'qr_data' => $qrData,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('payment/qris', $data);
+    }
+
+    /**
+     * Confirm QRIS payment (manual/simulated)
+     */
+    public function confirmQris()
+    {
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
+        $transactionId = $this->post('transaction_id');
+        $userId = Session::get('user_id');
+
+        $transactionModel = new Transaction();
+        $transaction = $transactionModel->findById($transactionId);
+
+        if (!$transaction || $transaction['user_id'] != $userId) {
+            $this->json(['status' => 'error', 'message' => 'Transaksi tidak ditemukan'], 404);
+        }
+
+        // Mark as paid
+        $transactionModel->updatePaymentStatus($transactionId, 'paid');
+        $transactionModel->updatePaymentMethod($transactionId, 'qris');
+
+        // Update related booking
+        if ($transaction['type'] === 'booking_guide' && $transaction['booking_id']) {
+            $bookingModel = new Booking();
+            $bookingModel->updateStatus($transaction['booking_id'], 'confirmed');
+        }
+
+        Logger::audit('QRIS_PAYMENT_CONFIRMED', 'transactions', "QRIS payment confirmed for transaction ID: {$transactionId}");
+
+        $this->json(['status' => 'success', 'message' => 'Pembayaran QRIS berhasil dikonfirmasi']);
     }
 }

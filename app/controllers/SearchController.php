@@ -158,7 +158,7 @@ class SearchController extends Controller
                         'rating' => $dest['rating_avg'],
                         'city' => $dest['city'],
                         'image' => $dest['main_image'],
-                        'url' => BASE_URL . 'destination/detail/' . $dest['id'],
+                        'url' => BASE_URL . 'destinations/detail/' . $dest['id'],
                     ];
                 }
             }
@@ -194,7 +194,7 @@ class SearchController extends Controller
         foreach ($hotels as $hotel) {
             $rooms = $hotelModel->getRooms($hotel['id']);
             if (!empty($rooms)) {
-                $minPrice = min(array_column($rooms, 'price'));
+                $minPrice = min(array_column($rooms, 'price_per_night'));
                 
                 if ($this->matchesPriceFilter($minPrice, $filters)) {
                     if ($this->matchesRatingFilter($hotel['rating_avg'], $filters)) {
@@ -207,7 +207,7 @@ class SearchController extends Controller
                             'rating' => $hotel['rating_avg'],
                             'city' => $hotel['city'],
                             'image' => $hotel['main_image'],
-                            'url' => BASE_URL . 'hotel/detail/' . $hotel['id'],
+                            'url' => BASE_URL . 'hotels/detail/' . $hotel['id'],
                         ];
                     }
                 }
@@ -252,7 +252,7 @@ class SearchController extends Controller
                     'rating' => $restaurant['rating_avg'],
                     'city' => $restaurant['city'],
                     'image' => $restaurant['main_image'],
-                    'url' => BASE_URL . 'restaurant/detail/' . $restaurant['id'],
+                    'url' => BASE_URL . 'restaurants/detail/' . $restaurant['id'],
                 ];
             }
         }
@@ -294,10 +294,10 @@ class SearchController extends Controller
                         'description' => substr($event['description'], 0, 150),
                         'price' => $event['price'],
                         'rating' => $event['rating_avg'],
-                        'city' => $event['city'],
+                        'city' => $event['location_name'] ?? '',
                         'image' => $event['main_image'],
                         'date' => $event['start_date'],
-                        'url' => BASE_URL . 'event/detail/' . $event['id'],
+                        'url' => BASE_URL . 'events/detail/' . $event['id'],
                     ];
                 }
             }

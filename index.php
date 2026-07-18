@@ -70,7 +70,7 @@ date_default_timezone_set('Asia/Jakarta');
 // Set security headers
 if (!headers_sent()) {
     // Content Security Policy
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'; frame-ancestors 'self';");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://libretranslate.com https://translate.googleapis.com https://api.mymemory.translated.net; frame-ancestors 'self';");
 
     // X-Frame-Options
     header("X-Frame-Options: SAMEORIGIN");
@@ -90,7 +90,7 @@ if (!headers_sent()) {
     header("Referrer-Policy: strict-origin-when-cross-origin");
 
     // Permissions-Policy
-    header("Permissions-Policy: geolocation=(self), microphone=(), camera=()");
+    header("Permissions-Policy: geolocation=(self), microphone=(self), camera=()");
 }
 
 // Load core classes
@@ -112,7 +112,20 @@ if (file_exists(APP_ROOT . '/app/core/App.php')) {
     require_once APP_ROOT . '/app/helpers/Email.php';
     require_once APP_ROOT . '/app/helpers/SMS.php';
     require_once APP_ROOT . '/app/helpers/RateLimiter.php';
+    require_once APP_ROOT . '/app/helpers/Cart.php';
+    require_once APP_ROOT . '/app/helpers/PaymentGateway.php';
+    require_once APP_ROOT . '/app/helpers/Cache.php';
+    require_once APP_ROOT . '/app/helpers/AIHelper.php';
+    require_once APP_ROOT . '/app/helpers/CurrencyHelper.php';
     require_once APP_ROOT . '/app/middleware/AccessLogMiddleware.php';
+
+    // Autoload models
+    spl_autoload_register(function ($className) {
+        $modelFile = APP_ROOT . '/app/models/' . $className . '.php';
+        if (file_exists($modelFile)) {
+            require_once $modelFile;
+        }
+    });
 
     // Register exception handler
     ExceptionHandler::register();

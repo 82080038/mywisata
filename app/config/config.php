@@ -37,11 +37,7 @@ date_default_timezone_set('Asia/Jakarta');
 // ============================================
 // SECURITY SETTINGS
 // ============================================
-// CSRF Token (generated per session in actual implementation)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-define('CSRF_TOKEN', bin2hex(random_bytes(32)));
+// CSRF Token is managed via session in Middleware class
 
 // Session settings
 ini_set('session.cookie_httponly', 1);
@@ -85,7 +81,7 @@ if (APP_DEBUG) {
 // ============================================
 // LOGGING
 // ============================================
-define('LOG_PATH', $_ENV['LOG_PATH'] ?? APP_ROOT . '/logs/');
+define('LOG_PATH', rtrim($_ENV['LOG_PATH'] ?? APP_ROOT . '/logs/', '/') . '/');
 define('ERROR_LOG_FILE', LOG_PATH . 'error.log');
 define('AUDIT_LOG_FILE', LOG_PATH . 'audit.log');
 

@@ -25,7 +25,7 @@ class TourGuide extends Model
      */
     public function findByUserId($userId)
     {
-        $sql = "SELECT tg.*, u.name, u.email, u.phone 
+        $sql = "SELECT tg.*, u.email, u.phone as user_phone
                 FROM {$this->table} tg 
                 LEFT JOIN users u ON tg.user_id = u.id 
                 WHERE tg.user_id = :user_id";
@@ -42,7 +42,7 @@ class TourGuide extends Model
      */
     public function findById($id)
     {
-        $sql = "SELECT tg.*, u.name, u.email, u.phone 
+        $sql = "SELECT tg.*, u.email, u.phone as user_phone
                 FROM {$this->table} tg 
                 LEFT JOIN users u ON tg.user_id = u.id 
                 WHERE tg.id = :id";
@@ -79,7 +79,7 @@ class TourGuide extends Model
 
         $whereClause = implode(' AND ', $where);
 
-        $sql = "SELECT tg.*, u.name, u.email, u.phone 
+        $sql = "SELECT tg.*, u.email, u.phone as user_phone
                 FROM {$this->table} tg 
                 LEFT JOIN users u ON tg.user_id = u.id 
                 WHERE {$whereClause} 
@@ -162,16 +162,16 @@ class TourGuide extends Model
                 SET rating_avg = (
                     SELECT COALESCE(AVG(rating), 0) 
                     FROM guide_reviews 
-                    WHERE guide_id = :guide_id
+                    WHERE guide_id = :gid1
                 ),
                 total_tours = (
                     SELECT COUNT(*) 
                     FROM bookings 
-                    WHERE guide_id = :guide_id AND status = 'completed'
+                    WHERE guide_id = :gid2 AND status = 'completed'
                 )
-                WHERE id = :guide_id";
+                WHERE id = :gid3";
 
-        return $this->db->query($sql, ['guide_id' => $guideId]);
+        return $this->db->query($sql, ['gid1' => $guideId, 'gid2' => $guideId, 'gid3' => $guideId]);
     }
 
     /**
@@ -183,7 +183,9 @@ class TourGuide extends Model
      */
     public function getLanguages($guideId)
     {
-        $sql = "SELECT gl.*, l.name as language_name, l.native_name 
+        $sql = "SELECT gl.*, 
+                COALESCE(l.name, gl.language) as language_name, 
+                COALESCE(l.native_name, gl.language) as native_name 
                 FROM guide_languages gl 
                 LEFT JOIN languages l ON gl.language_id = l.id 
                 WHERE gl.guide_id = :guide_id";
@@ -202,13 +204,18 @@ class TourGuide extends Model
      */
     public function addLanguage($guideId, $languageId, $proficiency)
     {
-        $sql = "INSERT INTO guide_languages (guide_id, language_id, proficiency, created_at)
-                VALUES (:guide_id, :language_id, :proficiency, NOW())
-                ON DUPLICATE KEY UPDATE proficiency = :proficiency";
+        // Look up language name from languages table
+        $lang = $this->db->query("SELECT name FROM languages WHERE id = :id", ['id' => $languageId])->fetch();
+        $langName = $lang ? $lang['name'] : '';
+
+        $sql = "INSERT INTO guide_languages (guide_id, language_id, language, proficiency)
+                VALUES (:guide_id, :language_id, :language, :proficiency)
+                ON DUPLICATE KEY UPDATE proficiency = :proficiency, language_id = :language_id, language = :language";
 
         return $this->db->query($sql, [
             'guide_id' => $guideId,
             'language_id' => $languageId,
+            'language' => $langName,
             'proficiency' => $proficiency,
         ]);
     }
@@ -224,7 +231,7 @@ class TourGuide extends Model
     public function removeLanguage($guideId, $languageId)
     {
         $sql = "DELETE FROM guide_languages 
-                WHERE guide_id = :guide_id AND language_id = :language_id";
+                WHERE guide_id = :guide_id AND (language_id = :language_id OR language = :language_id)";
 
         return $this->db->query($sql, [
             'guide_id' => $guideId,
@@ -241,7 +248,8 @@ class TourGuide extends Model
      */
     public function getSpecializations($guideId)
     {
-        $sql = "SELECT gs.*, s.name as specialization_name 
+        $sql = "SELECT gs.*, 
+                COALESCE(s.name, gs.specialization) as specialization_name 
                 FROM guide_specializations gs 
                 LEFT JOIN specializations s ON gs.specialization_id = s.id 
                 WHERE gs.guide_id = :guide_id";
@@ -259,13 +267,18 @@ class TourGuide extends Model
      */
     public function addSpecialization($guideId, $specializationId)
     {
-        $sql = "INSERT INTO guide_specializations (guide_id, specialization_id, created_at)
-                VALUES (:guide_id, :specialization_id, NOW())
-                ON DUPLICATE KEY UPDATE created_at = NOW()";
+        // Look up specialization name
+        $spec = $this->db->query("SELECT name FROM specializations WHERE id = :id", ['id' => $specializationId])->fetch();
+        $specName = $spec ? $spec['name'] : '';
+
+        $sql = "INSERT INTO guide_specializations (guide_id, specialization_id, specialization)
+                VALUES (:guide_id, :specialization_id, :specialization)
+                ON DUPLICATE KEY UPDATE specialization_id = :specialization_id, specialization = :specialization";
 
         return $this->db->query($sql, [
             'guide_id' => $guideId,
             'specialization_id' => $specializationId,
+            'specialization' => $specName,
         ]);
     }
 
@@ -280,7 +293,7 @@ class TourGuide extends Model
     public function removeSpecialization($guideId, $specializationId)
     {
         $sql = "DELETE FROM guide_specializations 
-                WHERE guide_id = :guide_id AND specialization_id = :specialization_id";
+                WHERE guide_id = :guide_id AND (specialization_id = :specialization_id OR specialization = :specialization_id)";
 
         return $this->db->query($sql, [
             'guide_id' => $guideId,

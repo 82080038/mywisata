@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     
-                    <form method="POST" action="<?= View::url('booking/store') ?>">
+                    <form method="POST" action="<?= View::url('bookings/store') ?>">
                         <input type="hidden" name="csrf_token" value="<?= Middleware::csrfToken() ?>">
                         <input type="hidden" name="guide_id" value="<?= $guide['id'] ?>">
                         

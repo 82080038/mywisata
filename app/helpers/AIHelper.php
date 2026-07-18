@@ -128,7 +128,7 @@ class AIHelper
 
         if (empty(self::$apiKey)) {
             return [
-                'response' => 'Maaf, fitur AI tour guide belum dikonfigurasi. Silakan hubungi admin.',
+                'response' => self::getFallbackChatResponse($message),
                 'tokens_used' => 0,
             ];
         }
@@ -346,6 +346,49 @@ class AIHelper
             'description' => 'Informasi tidak tersedia untuk destinasi ini.',
             'source' => 'fallback',
         ];
+    }
+
+    /**
+     * Get fallback chat response (rule-based)
+     *
+     * @param string $message User message
+     * @return string Fallback response
+     */
+    private static function getFallbackChatResponse($message)
+    {
+        $messageLower = strtolower($message);
+
+        if (strpos($messageLower, 'halo') !== false || strpos($messageLower, 'hai') !== false || strpos($messageLower, 'selamat') !== false) {
+            return "Halo! Saya WisataAI, asisten tour guide virtual Anda. Saya bisa membantu memberikan rekomendasi destinasi wisata di Indonesia. Coba tanyakan tentang destinasi seperti 'Borobudur', 'Bali', atau 'Rinjani'. Anda juga bisa meminta rekomendasi berdasarkan kota atau jenis wisata.";
+        }
+
+        if (strpos($messageLower, 'rekomendasi') !== false || strpos($messageLower, 'rekomendasikan') !== false || strpos($messageLower, 'saran') !== false) {
+            $destinationModel = new Destination();
+            $destinations = $destinationModel->getPopular(5);
+            $response = "Berikut beberapa rekomendasi destinasi wisata populer di Indonesia:\n\n";
+            foreach ($destinations as $i => $dest) {
+                $response .= ($i + 1) . ". **" . ($dest['name'] ?? 'Destinasi') . "** - " . ($dest['city'] ?? '') . "\n";
+                $response .= "   " . substr($dest['description'] ?? '', 0, 100) . "...\n";
+            }
+            $response .= "\nUntuk informasi lebih detail, Anda bisa mengunjungi halaman destinasi.";
+            return $response;
+        }
+
+        $destinationModel = new Destination();
+        $destinations = $destinationModel->getAllWithFilters(['search' => $message, 'is_active' => 1]);
+
+        if (!empty($destinations)) {
+            $dest = $destinations[0];
+            $response = "Saya menemukan informasi tentang **" . ($dest['name'] ?? '') . "**:\n\n";
+            $response .= substr($dest['description'] ?? '', 0, 300) . "\n\n";
+            $response .= "Kota: " . ($dest['city'] ?? '-') . "\n";
+            $response .= "Harga tiket: " . ($dest['entry_fee'] ?? 0 > 0 ? 'Rp ' . number_format($dest['entry_fee']) : 'Gratis') . "\n";
+            $response .= "Rating: " . number_format($dest['rating_avg'] ?? 0, 1) . "/5.0\n\n";
+            $response .= "Untuk detail lengkap, kunjungi halaman destinasi ini.";
+            return $response;
+        }
+
+        return "Maaf, saya tidak menemukan informasi spesifik tentang itu. Coba tanyakan:\n- 'Rekomendasi wisata' untuk melihat destinasi populer\n- Nama destinasi seperti 'Borobudur' atau 'Kuta Beach'\n- Nama kota seperti 'Yogyakarta' atau 'Bali'";
     }
 
     /**

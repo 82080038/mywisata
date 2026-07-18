@@ -252,6 +252,174 @@ class AdminController extends Controller
     }
 
     /**
+     * Create destination form
+     */
+    public function createDestination()
+    {
+        $db = Database::getInstance();
+        $categories = $db->query("SELECT * FROM destination_categories ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Tambah Destinasi - MyWisata',
+            'categories' => $categories,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/destinations/create', $data);
+    }
+
+    /**
+     * Store destination
+     */
+    public function storeDestination()
+    {
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('admin/createDestination');
+        }
+
+        $db = Database::getInstance();
+
+        $imageFile = '';
+        if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $imageFile = FileUpload::upload($_FILES['main_image'], APP_ROOT . '/public/uploads/destinations');
+            } catch (Exception $e) {
+                Session::flash('error', $e->getMessage());
+                $this->redirect('admin/createDestination');
+            }
+        }
+
+        $db->query(
+            "INSERT INTO destinations (name, slug, description, short_desc, category_id, city, province, latitude, longitude, entry_fee, main_image, is_active, created_at)
+             VALUES (:name, :slug, :description, :short_desc, :category_id, :city, :province, :latitude, :longitude, :entry_fee, :main_image, 1, NOW())",
+            [
+                'name' => $this->post('name'),
+                'slug' => strtolower(preg_replace('/[^a-z0-9]+/', '-', $this->post('name'))),
+                'description' => $this->post('description', ''),
+                'short_desc' => $this->post('short_desc', ''),
+                'category_id' => $this->post('category_id') ?: null,
+                'city' => $this->post('city', ''),
+                'province' => $this->post('province', ''),
+                'latitude' => $this->post('latitude') ?: null,
+                'longitude' => $this->post('longitude') ?: null,
+                'entry_fee' => $this->post('entry_fee', 0),
+                'main_image' => $imageFile,
+            ]
+        );
+
+        Logger::audit('CREATE_DESTINATION', 'destinations', "Created destination: " . $this->post('name'));
+        Session::flash('success', 'Destinasi berhasil dibuat');
+        $this->redirect('admin/destinations');
+    }
+
+    /**
+     * Edit destination form
+     */
+    public function editDestination()
+    {
+        $id = $this->get('id');
+        $db = Database::getInstance();
+
+        $destination = $db->query("SELECT * FROM destinations WHERE id = :id", ['id' => $id])->fetch();
+        if (!$destination) {
+            Session::flash('error', 'Destinasi tidak ditemukan');
+            $this->redirect('admin/destinations');
+        }
+
+        $categories = $db->query("SELECT * FROM destination_categories ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Edit Destinasi - MyWisata',
+            'destination' => $destination,
+            'categories' => $categories,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/destinations/edit', $data);
+    }
+
+    /**
+     * Update destination
+     */
+    public function updateDestination()
+    {
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('admin/destinations');
+        }
+
+        $id = $this->post('id');
+        $db = Database::getInstance();
+
+        $imageFile = $this->post('existing_image', '');
+        if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $imageFile = FileUpload::upload($_FILES['main_image'], APP_ROOT . '/public/uploads/destinations');
+                if (!empty($this->post('existing_image'))) {
+                    FileUpload::delete('destinations/' . $this->post('existing_image'));
+                }
+            } catch (Exception $e) {
+                Session::flash('error', $e->getMessage());
+                $this->redirect('admin/editDestination?id=' . $id);
+            }
+        }
+
+        $db->query(
+            "UPDATE destinations SET 
+                name = :name, description = :description, short_desc = :short_desc,
+                category_id = :category_id, city = :city, province = :province,
+                latitude = :latitude, longitude = :longitude, entry_fee = :entry_fee,
+                main_image = :main_image, is_active = :is_active, updated_at = NOW()
+             WHERE id = :id",
+            [
+                'id' => $id,
+                'name' => $this->post('name'),
+                'description' => $this->post('description', ''),
+                'short_desc' => $this->post('short_desc', ''),
+                'category_id' => $this->post('category_id') ?: null,
+                'city' => $this->post('city', ''),
+                'province' => $this->post('province', ''),
+                'latitude' => $this->post('latitude') ?: null,
+                'longitude' => $this->post('longitude') ?: null,
+                'entry_fee' => $this->post('entry_fee', 0),
+                'main_image' => $imageFile,
+                'is_active' => $this->post('is_active', 1),
+            ]
+        );
+
+        Logger::audit('UPDATE_DESTINATION', 'destinations', "Updated destination ID: {$id}");
+        Session::flash('success', 'Destinasi berhasil diperbarui');
+        $this->redirect('admin/destinations');
+    }
+
+    /**
+     * Delete destination
+     */
+    public function deleteDestination()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('admin/destinations');
+        }
+
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
+        $id = $this->post('id');
+        $db = Database::getInstance();
+
+        $dest = $db->query("SELECT main_image FROM destinations WHERE id = :id", ['id' => $id])->fetch();
+        if ($dest && !empty($dest['main_image'])) {
+            FileUpload::delete('destinations/' . $dest['main_image']);
+        }
+
+        $db->query("DELETE FROM destinations WHERE id = :id", ['id' => $id]);
+        Logger::audit('DELETE_DESTINATION', 'destinations', "Deleted destination ID: {$id}");
+        $this->json(['status' => 'success', 'message' => 'Destinasi berhasil dihapus']);
+    }
+
+    /**
      * Settings
      */
     public function settings()
@@ -287,5 +455,456 @@ class AdminController extends Controller
         ];
 
         $this->view('admin/settings', $data);
+    }
+
+    /**
+     * Hotels management
+     */
+    public function hotels()
+    {
+        $db = Database::getInstance();
+        $page = $this->get('page', 1);
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+        $hotels = $db->query("SELECT * FROM hotels ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}")->fetchAll();
+        $total = $db->query("SELECT COUNT(*) as count FROM hotels")->fetch()['count'];
+
+        $data = [
+            'title' => 'Manajemen Hotel - MyWisata',
+            'hotels' => $hotels,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+        ];
+
+        $this->view('admin/hotels/index', $data);
+    }
+
+    /**
+     * Approve hotel
+     */
+    public function approveHotel()
+    {
+        $id = $this->post('id');
+        if (!$id) {
+            $this->json(['status' => 'error', 'message' => 'ID tidak valid'], 400);
+        }
+
+        $db = Database::getInstance();
+        $db->query("UPDATE hotels SET is_approved = 1 WHERE id = :id", ['id' => $id]);
+
+        Logger::audit('APPROVE_HOTEL', 'hotels', "Approved hotel ID: {$id}", [], ['id' => $id]);
+        $this->json(['status' => 'success', 'message' => 'Hotel berhasil disetujui']);
+    }
+
+    /**
+     * Restaurants management
+     */
+    public function restaurants()
+    {
+        $db = Database::getInstance();
+        $page = $this->get('page', 1);
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+        $restaurants = $db->query("SELECT * FROM restaurants ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}")->fetchAll();
+        $total = $db->query("SELECT COUNT(*) as count FROM restaurants")->fetch()['count'];
+
+        $data = [
+            'title' => 'Manajemen Restoran - MyWisata',
+            'restaurants' => $restaurants,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+        ];
+
+        $this->view('admin/restaurants/index', $data);
+    }
+
+    /**
+     * Approve restaurant
+     */
+    public function approveRestaurant()
+    {
+        $id = $this->post('id');
+        if (!$id) {
+            $this->json(['status' => 'error', 'message' => 'ID tidak valid'], 400);
+        }
+
+        $db = Database::getInstance();
+        $db->query("UPDATE restaurants SET is_approved = 1 WHERE id = :id", ['id' => $id]);
+
+        Logger::audit('APPROVE_RESTAURANT', 'restaurants', "Approved restaurant ID: {$id}", [], ['id' => $id]);
+        $this->json(['status' => 'success', 'message' => 'Restoran berhasil disetujui']);
+    }
+
+    /**
+     * Events management
+     */
+    public function events()
+    {
+        $db = Database::getInstance();
+        $page = $this->get('page', 1);
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+        $events = $db->query("SELECT * FROM events ORDER BY created_at DESC LIMIT {$limit} OFFSET {$offset}")->fetchAll();
+        $total = $db->query("SELECT COUNT(*) as count FROM events")->fetch()['count'];
+
+        $data = [
+            'title' => 'Manajemen Event - MyWisata',
+            'events' => $events,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+        ];
+
+        $this->view('admin/events/index', $data);
+    }
+
+    /**
+     * Approve event
+     */
+    public function approveEvent()
+    {
+        $id = $this->post('id');
+        if (!$id) {
+            $this->json(['status' => 'error', 'message' => 'ID tidak valid'], 400);
+        }
+
+        $db = Database::getInstance();
+        $db->query("UPDATE events SET is_active = 1 WHERE id = :id", ['id' => $id]);
+
+        Logger::audit('APPROVE_EVENT', 'events', "Approved event ID: {$id}", [], ['id' => $id]);
+        $this->json(['status' => 'success', 'message' => 'Event berhasil disetujui']);
+    }
+
+    /**
+     * Transactions management
+     */
+    public function transactions()
+    {
+        $db = Database::getInstance();
+        $page = $this->get('page', 1);
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+        $transactions = $db->query("SELECT t.*, u.name as user_name FROM transactions t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC LIMIT {$limit} OFFSET {$offset}")->fetchAll();
+        $total = $db->query("SELECT COUNT(*) as count FROM transactions")->fetch()['count'];
+
+        $data = [
+            'title' => 'Manajemen Transaksi - MyWisata',
+            'transactions' => $transactions,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
+        ];
+
+        $this->view('admin/transactions/index', $data);
+    }
+
+    /**
+     * Audio guides management
+     */
+    public function audioGuides()
+    {
+        $db = Database::getInstance();
+
+        $audioGuides = $db->query("SELECT ag.*, d.name as destination_name 
+                                    FROM audio_guides ag 
+                                    LEFT JOIN destinations d ON ag.destination_id = d.id 
+                                    ORDER BY ag.created_at DESC")->fetchAll();
+
+        $destinations = $db->query("SELECT id, name FROM destinations WHERE is_active = 1 ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Manajemen Audio Guide - MyWisata',
+            'audio_guides' => $audioGuides,
+            'destinations' => $destinations,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/audioguides/index', $data);
+    }
+
+    /**
+     * Create audio guide
+     */
+    public function createAudioGuide()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('admin/audioGuides');
+        }
+
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
+        $destinationId = $this->post('destination_id');
+        $title = $this->post('title');
+        $language = $this->post('language', 'Indonesia');
+        $description = $this->post('description', '');
+        $duration = (int) $this->post('duration', 0);
+
+        if (empty($destinationId) || empty($title)) {
+            $this->json(['status' => 'error', 'message' => 'Destinasi dan judul wajib diisi'], 400);
+        }
+
+        $audioFile = '';
+        if (isset($_FILES['audio_file']) && $_FILES['audio_file']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $audioFile = FileUpload::upload(
+                    $_FILES['audio_file'],
+                    APP_ROOT . '/public/uploads/audio',
+                    ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-wav'],
+                    52428800
+                );
+            } catch (Exception $e) {
+                $this->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+            }
+        }
+
+        $db = Database::getInstance();
+        $db->query(
+            "INSERT INTO audio_guides (destination_id, title, description, audio_file, language, duration, is_active, created_at)
+             VALUES (:destination_id, :title, :description, :audio_file, :language, :duration, 1, NOW())",
+            [
+                'destination_id' => $destinationId,
+                'title' => $title,
+                'description' => $description,
+                'audio_file' => $audioFile,
+                'language' => $language,
+                'duration' => $duration,
+            ]
+        );
+
+        Logger::audit('CREATE_AUDIO_GUIDE', 'audio_guides', "Created audio guide: {$title}");
+
+        $this->json(['status' => 'success', 'message' => 'Audio guide berhasil dibuat']);
+    }
+
+    /**
+     * Delete audio guide
+     */
+    public function deleteAudioGuide()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('admin/audioGuides');
+        }
+
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
+        $id = $this->post('id');
+
+        if (empty($id)) {
+            $this->json(['status' => 'error', 'message' => 'ID wajib diisi'], 400);
+        }
+
+        $db = Database::getInstance();
+        $audio = $db->query("SELECT audio_file FROM audio_guides WHERE id = :id", ['id' => $id])->fetch();
+
+        if ($audio && !empty($audio['audio_file'])) {
+            FileUpload::delete('audio/' . $audio['audio_file']);
+        }
+
+        $db->query("DELETE FROM audio_guides WHERE id = :id", ['id' => $id]);
+
+        Logger::audit('DELETE_AUDIO_GUIDE', 'audio_guides', "Deleted audio guide ID: {$id}");
+
+        $this->json(['status' => 'success', 'message' => 'Audio guide berhasil dihapus']);
+    }
+
+    /**
+     * Products management
+     */
+    public function products()
+    {
+        $productModel = new Product();
+        $products = $productModel->getAllWithFilters(['limit' => 50, 'offset' => 0]);
+        $categories = $productModel->getCategories();
+
+        $db = Database::getInstance();
+        $destinations = $db->query("SELECT id, name FROM destinations WHERE is_active = 1 ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Manajemen Produk - MyWisata',
+            'products' => $products,
+            'categories' => $categories,
+            'destinations' => $destinations,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/products/index', $data);
+    }
+
+    /**
+     * Create product form
+     */
+    public function createProduct()
+    {
+        $productModel = new Product();
+        $categories = $productModel->getCategories();
+
+        $db = Database::getInstance();
+        $destinations = $db->query("SELECT id, name FROM destinations WHERE is_active = 1 ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Tambah Produk - MyWisata',
+            'categories' => $categories,
+            'destinations' => $destinations,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/products/create', $data);
+    }
+
+    /**
+     * Store product
+     */
+    public function storeProduct()
+    {
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('admin/createProduct');
+        }
+
+        $imageFile = '';
+        if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $imageFile = FileUpload::upload($_FILES['main_image'], APP_ROOT . '/public/uploads/products');
+            } catch (Exception $e) {
+                Session::flash('error', $e->getMessage());
+                $this->redirect('admin/createProduct');
+            }
+        }
+
+        $name = $this->post('name');
+        $productModel = new Product();
+        $productId = $productModel->create([
+            'name' => $name,
+            'slug' => strtolower(preg_replace('/[^a-z0-9]+/', '-', $name)),
+            'description' => $this->post('description', ''),
+            'short_desc' => $this->post('short_desc', ''),
+            'category_id' => $this->post('category_id') ?: null,
+            'destination_id' => $this->post('destination_id') ?: null,
+            'price' => $this->post('price', 0),
+            'discount_price' => $this->post('discount_price', 0),
+            'stock' => $this->post('stock', 0),
+            'sku' => $this->post('sku', ''),
+            'main_image' => $imageFile,
+            'is_active' => $this->post('is_active', 1),
+            'is_featured' => $this->post('is_featured', 0),
+            'region' => $this->post('region', ''),
+        ]);
+
+        Logger::audit('CREATE_PRODUCT', 'products', "Created product: {$name}");
+        Session::flash('success', 'Produk berhasil dibuat');
+        $this->redirect('admin/products');
+    }
+
+    /**
+     * Edit product form
+     */
+    public function editProduct()
+    {
+        $id = $this->get('id');
+        $productModel = new Product();
+        $product = $productModel->findById($id);
+
+        if (!$product) {
+            Session::flash('error', 'Produk tidak ditemukan');
+            $this->redirect('admin/products');
+        }
+
+        $categories = $productModel->getCategories();
+        $db = Database::getInstance();
+        $destinations = $db->query("SELECT id, name FROM destinations WHERE is_active = 1 ORDER BY name")->fetchAll();
+
+        $data = [
+            'title' => 'Edit Produk - MyWisata',
+            'product' => $product,
+            'categories' => $categories,
+            'destinations' => $destinations,
+            'csrf_token' => Middleware::csrfToken(),
+        ];
+
+        $this->view('admin/products/edit', $data);
+    }
+
+    /**
+     * Update product
+     */
+    public function updateProduct()
+    {
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('admin/products');
+        }
+
+        $id = $this->post('id');
+        $imageFile = $this->post('existing_image', '');
+
+        if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $imageFile = FileUpload::upload($_FILES['main_image'], APP_ROOT . '/public/uploads/products');
+                if (!empty($this->post('existing_image'))) {
+                    FileUpload::delete('products/' . $this->post('existing_image'));
+                }
+            } catch (Exception $e) {
+                Session::flash('error', $e->getMessage());
+                $this->redirect('admin/editProduct?id=' . $id);
+            }
+        }
+
+        $name = $this->post('name');
+        $productModel = new Product();
+        $productModel->update($id, [
+            'name' => $name,
+            'description' => $this->post('description', ''),
+            'short_desc' => $this->post('short_desc', ''),
+            'category_id' => $this->post('category_id') ?: null,
+            'destination_id' => $this->post('destination_id') ?: null,
+            'price' => $this->post('price', 0),
+            'discount_price' => $this->post('discount_price', 0),
+            'stock' => $this->post('stock', 0),
+            'sku' => $this->post('sku', ''),
+            'main_image' => $imageFile,
+            'is_active' => $this->post('is_active', 1),
+            'is_featured' => $this->post('is_featured', 0),
+            'region' => $this->post('region', ''),
+        ]);
+
+        Logger::audit('UPDATE_PRODUCT', 'products', "Updated product ID: {$id}");
+        Session::flash('success', 'Produk berhasil diperbarui');
+        $this->redirect('admin/products');
+    }
+
+    /**
+     * Delete product
+     */
+    public function deleteProduct()
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('admin/products');
+        }
+
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+
+        $id = $this->post('id');
+        $productModel = new Product();
+        $product = $productModel->findById($id);
+
+        if ($product && !empty($product['main_image'])) {
+            FileUpload::delete('products/' . $product['main_image']);
+        }
+
+        $productModel->delete($id);
+        Logger::audit('DELETE_PRODUCT', 'products', "Deleted product ID: {$id}");
+        $this->json(['status' => 'success', 'message' => 'Produk berhasil dihapus']);
     }
 }

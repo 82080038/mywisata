@@ -47,18 +47,10 @@
                     <h5 class="card-title mb-0">Pendapatan Bulanan</h5>
                 </div>
                 <div class="card-body">
-                    <div style="height: 300px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px;">
-                        <?php if (empty($monthly_revenue)): ?>
-                            <p class="text-muted text-center w-100">Belum ada data pendapatan.</p>
-                        <?php else: ?>
-                            <?php foreach (array_reverse($monthly_revenue) as $month): ?>
-                            <div style="text-align: center;">
-                                <div style="height: <?= min($month['revenue'] / 1000000 * 200, 200) ?>px; width: 40px; background-color: #0d6efd; margin: 0 auto;"></div>
-                                <small><?= substr($month['month'], 5) ?></small>
-                            </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+                    <canvas id="revenueChart" height="100"></canvas>
+                    <?php if (empty($monthly_revenue)): ?>
+                        <p class="text-muted text-center w-100 mt-3">Belum ada data pendapatan.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -136,11 +128,11 @@
                     <h5 class="card-title mb-0">Export Laporan</h5>
                 </div>
                 <div class="card-body">
-                    <form>
+                    <form id="exportForm">
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Tipe Laporan</label>
-                                <select class="form-select" name="type">
+                                <select class="form-select" name="type" id="exportType">
                                     <option value="revenue">Pendapatan</option>
                                     <option value="bookings">Booking</option>
                                     <option value="tickets">Tiket</option>
@@ -148,15 +140,17 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" name="start_date">
+                                <input type="date" class="form-control" name="start_date" id="startDate" value="<?= date('Y-m-01') ?>">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Tanggal Akhir</label>
-                                <input type="date" class="form-control" name="end_date">
+                                <input type="date" class="form-control" name="end_date" id="endDate" value="<?= date('Y-m-d') ?>">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary w-100">Export</button>
+                                <button type="button" class="btn btn-primary w-100" onclick="exportReport()">
+                                    <i class="fas fa-download me-2"></i>Export
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -165,5 +159,74 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+var monthlyData = <?= json_encode(array_reverse($monthly_revenue ?? [])) ?>;
+
+if (monthlyData && monthlyData.length > 0) {
+    var ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(function(d) { return d.month; }),
+            datasets: [{
+                label: 'Pendapatan (Rp)',
+                data: monthlyData.map(function(d) { return d.revenue; }),
+                backgroundColor: '#0d6efd',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: function(v) { return 'Rp ' + v.toLocaleString(); } } }
+            }
+        }
+    });
+}
+
+function exportReport() {
+    var type = document.getElementById('exportType').value;
+    var startDate = document.getElementById('startDate').value;
+    var endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Pilih tanggal mulai dan akhir' });
+        return;
+    }
+    
+    fetch(window.APP_URL + 'reports/export?type=' + type + '&start_date=' + startDate + '&end_date=' + endDate)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                var csv = convertToCSV(data.data);
+                downloadCSV(csv, type + '_report_' + startDate + '_' + endDate + '.csv');
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Gagal export' });
+            }
+        });
+}
+
+function convertToCSV(data) {
+    if (!data || data.length === 0) return 'No data';
+    var headers = Object.keys(data[0]);
+    var csv = headers.join(',') + '\n';
+    data.forEach(function(row) {
+        csv += headers.map(function(h) { return '"' + (row[h] || '') + '"'; }).join(',') + '\n';
+    });
+    return csv;
+}
+
+function downloadCSV(csv, filename) {
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+</script>
 
 <?php include APP_ROOT . '/app/views/layouts/admin_footer.php'; ?>

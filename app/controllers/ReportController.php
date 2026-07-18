@@ -44,9 +44,9 @@ class ReportController extends Controller
                                        LIMIT 12")->fetchAll();
 
         // Get top destinations
-        $topDestinations = $db->query("SELECT d.name, COUNT(to.id) as order_count 
+        $topDestinations = $db->query("SELECT d.name, COUNT(tk.id) as order_count 
                                         FROM destinations d 
-                                        LEFT JOIN ticket_orders to ON d.id = to.destination_id 
+                                        LEFT JOIN ticket_orders tk ON d.id = tk.destination_id 
                                         GROUP BY d.id 
                                         ORDER BY order_count DESC 
                                         LIMIT 10")->fetchAll();

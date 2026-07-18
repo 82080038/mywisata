@@ -42,9 +42,11 @@ class RestaurantController extends Controller
     /**
      * Detail - Show restaurant details
      */
-    public function detail()
+    public function detail($id = null)
     {
-        $id = $this->get('id');
+        if (!$id) {
+            $id = $this->get('id');
+        }
         $restaurantModel = new Restaurant();
 
         $restaurant = $restaurantModel->findById($id);
@@ -57,11 +59,30 @@ class RestaurantController extends Controller
         $menuItems = $restaurantModel->getMenuItems($id);
         $reviews = $restaurantModel->getReviews($id, 10);
 
+        $variantModel = new Variant();
+        $menuVariants = [];
+        foreach ($menuItems as $menuItem) {
+            $menuVariants[$menuItem['id']] = $variantModel->getVariants('restaurant_menu', $menuItem['id']);
+        }
+
+        $facilityModel = new Facility();
+        $facilities = $facilityModel->getEntityFacilitiesGrouped('restaurant', $id);
+
+        $videoModel = new VideoGallery();
+        $videos = $videoModel->getVideos('restaurant', $id);
+
         $data = [
             'title' => $restaurant['name'] . ' - MyWisata',
             'restaurant' => $restaurant,
             'menu_items' => $menuItems,
             'reviews' => $reviews,
+            'menu_variants' => $menuVariants,
+            'variantModel' => $variantModel,
+            'facilities' => $facilities,
+            'facilityModel' => $facilityModel,
+            'videos' => $videos,
+            'entityType' => 'restaurant',
+            'entityId' => $id,
         ];
 
         $this->view('restaurants/detail', $data);
@@ -94,10 +115,16 @@ class RestaurantController extends Controller
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
 
-        $restaurantModel = new Restaurant();
-        $restaurantModel->addReview($data);
+        $reviewModel = new Review();
+        $reviewModel->add([
+            'user_id' => $userId,
+            'reviewable_type' => 'restaurant',
+            'reviewable_id' => $data['restaurant_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ]);
 
-        Logger::audit('ADD_RESTAURANT_REVIEW', 'restaurant_reviews', "Added review for restaurant ID: {$data['restaurant_id']}", [], $data);
+        Logger::audit('ADD_REVIEW', 'reviews', "Added review for restaurant ID: {$data['restaurant_id']}", [], $data);
 
         $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
     }

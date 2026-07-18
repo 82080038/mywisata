@@ -51,9 +51,11 @@ class DestinationController extends Controller
     /**
      * Detail - Show destination details
      */
-    public function detail()
+    public function detail($id = null)
     {
-        $id = $this->get('id');
+        if (!$id) {
+            $id = $this->get('id');
+        }
         $destinationModel = new Destination();
 
         $destination = $destinationModel->findById($id);
@@ -66,8 +68,16 @@ class DestinationController extends Controller
         $images = $destinationModel->getImages($id);
         $reviews = $destinationModel->getReviews($id, 10);
 
-        $db = Database::getInstance();
-        $nearby = $destinationModel->getNearby($destination['latitude'], $destination['longitude'], 10);
+        $nearby = [];
+        if (!empty($destination['latitude']) && !empty($destination['longitude'])) {
+            $nearby = $destinationModel->getNearby($destination['latitude'], $destination['longitude'], 10);
+        }
+
+        $facilityModel = new Facility();
+        $facilities = $facilityModel->getEntityFacilitiesGrouped('destination', $id);
+
+        $videoModel = new VideoGallery();
+        $videos = $videoModel->getVideos('destination', $id);
 
         $data = [
             'title' => $destination['name'] . ' - MyWisata',
@@ -75,6 +85,11 @@ class DestinationController extends Controller
             'images' => $images,
             'reviews' => $reviews,
             'nearby' => $nearby,
+            'facilities' => $facilities,
+            'facilityModel' => $facilityModel,
+            'videos' => $videos,
+            'entityType' => 'destination',
+            'entityId' => $id,
         ];
 
         $this->view('destinations/detail', $data);
@@ -107,11 +122,19 @@ class DestinationController extends Controller
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
 
+        $reviewModel = new Review();
+        $reviewModel->add([
+            'user_id' => $userId,
+            'reviewable_type' => 'destination',
+            'reviewable_id' => $data['destination_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ]);
+
         $destinationModel = new Destination();
-        $destinationModel->addReview($data);
         $destinationModel->updateRating($data['destination_id']);
 
-        Logger::audit('ADD_DESTINATION_REVIEW', 'destination_reviews', "Added review for destination ID: {$data['destination_id']}", [], $data);
+        Logger::audit('ADD_REVIEW', 'reviews', "Added review for destination ID: {$data['destination_id']}", [], $data);
 
         $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
     }

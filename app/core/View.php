@@ -36,7 +36,7 @@ class View
      */
     public static function e($string)
     {
-        return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -64,14 +64,21 @@ class View
     }
 
     /**
-     * Format currency
+     * Format currency - supports multi-currency via CurrencyHelper
      *
-     * @param float $amount Amount
+     * @param float $amount Amount in IDR
+     * @param bool $dual Show dual currency (IDR + user's currency)
      *
      * @return string Formatted currency
      */
-    public static function currency($amount)
+    public static function currency($amount, $dual = false)
     {
+        if (class_exists('CurrencyHelper')) {
+            if ($dual) {
+                return CurrencyHelper::formatDual($amount);
+            }
+            return CurrencyHelper::format($amount);
+        }
         return CURRENCY_SYMBOL . number_format($amount, CURRENCY_DECIMALS, ',', '.');
     }
 

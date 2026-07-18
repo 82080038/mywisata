@@ -46,11 +46,12 @@ class Restaurant extends Model
 
         $whereClause = implode(' AND ', $where);
 
-        $sql = "SELECT r.*,
+        $sql = "SELECT r.*, rt.name as type_name, rt.slug as type_slug, rt.icon as type_icon,
                 COALESCE(AVG(restrev.rating), 0) as rating_avg,
                 COUNT(restrev.id) as review_count
                 FROM {$this->table} r
-                LEFT JOIN restaurant_reviews restrev ON r.id = restrev.restaurant_id
+                LEFT JOIN restaurant_types rt ON r.restaurant_type_id = rt.id
+                LEFT JOIN reviews restrev ON r.id = restrev.reviewable_id AND restrev.reviewable_type = 'restaurant'
                 WHERE {$whereClause}
                 GROUP BY r.id
                 ORDER BY r.name";
@@ -67,11 +68,12 @@ class Restaurant extends Model
      */
     public function findById($id)
     {
-        $sql = "SELECT r.*,
+        $sql = "SELECT r.*, rt.name as type_name, rt.slug as type_slug, rt.icon as type_icon,
                 COALESCE(AVG(restrev.rating), 0) as rating_avg,
                 COUNT(restrev.id) as review_count
                 FROM {$this->table} r
-                LEFT JOIN restaurant_reviews restrev ON r.id = restrev.restaurant_id
+                LEFT JOIN restaurant_types rt ON r.restaurant_type_id = rt.id
+                LEFT JOIN reviews restrev ON r.id = restrev.reviewable_id AND restrev.reviewable_type = 'restaurant'
                 WHERE r.id = :id
                 GROUP BY r.id";
 
@@ -87,7 +89,7 @@ class Restaurant extends Model
      */
     public function getMenuItems($restaurantId)
     {
-        $sql = "SELECT * FROM restaurant_menu WHERE restaurant_id = :restaurant_id AND is_available = 1";
+        $sql = "SELECT * FROM menu_items WHERE restaurant_id = :restaurant_id AND is_available = 1";
 
         return $this->db->query($sql, ['restaurant_id' => $restaurantId])->fetchAll();
     }
@@ -102,11 +104,11 @@ class Restaurant extends Model
      */
     public function getReviews($restaurantId, $limit = null)
     {
-        $sql = "SELECT rr.*, u.name as user_name 
-                FROM restaurant_reviews rr 
-                LEFT JOIN users u ON rr.user_id = u.id 
-                WHERE rr.restaurant_id = :restaurant_id 
-                ORDER BY rr.created_at DESC";
+        $sql = "SELECT r.*, u.name as user_name, u.avatar as user_avatar
+                FROM reviews r
+                LEFT JOIN users u ON r.user_id = u.id
+                WHERE r.reviewable_type = 'restaurant' AND r.reviewable_id = :restaurant_id AND r.is_published = 1
+                ORDER BY r.created_at DESC";
 
         if ($limit) {
             $sql .= " LIMIT {$limit}";
@@ -124,11 +126,18 @@ class Restaurant extends Model
      */
     public function addReview($data)
     {
-        $sql = "INSERT INTO restaurant_reviews 
-                (restaurant_id, user_id, rating, comment, created_at)
-                VALUES 
-                (:restaurant_id, :user_id, :rating, :comment, NOW())";
+        $sql = "INSERT INTO reviews
+                (user_id, reviewable_type, reviewable_id, rating, comment, is_published, created_at, updated_at)
+                VALUES
+                (:user_id, 'restaurant', :restaurant_id, :rating, :comment, 1, NOW(), NOW())";
 
-        return $this->db->query($sql, $data);
+        $reviewData = [
+            'user_id' => $data['user_id'],
+            'restaurant_id' => $data['restaurant_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ];
+
+        return $this->db->query($sql, $reviewData);
     }
 }

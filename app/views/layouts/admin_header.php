@@ -32,48 +32,69 @@
                     <i class="fas fa-map-marked-alt me-2"></i>MyWisata Admin
                 </h5>
                 <ul class="nav flex-column">
+                    <?php $currentUri = $_SERVER['REQUEST_URI'] ?? ''; ?>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= $_GET['url'] === 'admin/dashboard' ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/dashboard') ?>">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/dashboard') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/dashboard') ?>">
                             <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= strpos($_GET['url'] ?? '', 'admin/users') === 0 ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/users') ?>">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/users') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/users') ?>">
                             <i class="fas fa-users me-2"></i>Pengguna
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= strpos($_GET['url'] ?? '', 'admin/guides') === 0 ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/guides') ?>">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/guides') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/guides') ?>">
                             <i class="fas fa-user-tie me-2"></i>Tour Guide
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= strpos($_GET['url'] ?? '', 'admin/destinations') === 0 ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/destinations') ?>">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/destinations') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/destinations') ?>">
                             <i class="fas fa-map-marked-alt me-2"></i>Destinasi
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white" href="#">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/hotels') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/hotels') ?>">
                             <i class="fas fa-hotel me-2"></i>Hotel
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white" href="#">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/restaurants') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/restaurants') ?>">
                             <i class="fas fa-utensils me-2"></i>Restoran
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white" href="#">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/events') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/events') ?>">
                             <i class="fas fa-calendar-alt me-2"></i>Event
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white" href="#">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/transactions') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/transactions') ?>">
                             <i class="fas fa-ticket-alt me-2"></i>Transaksi
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-white <?= strpos($_GET['url'] ?? '', 'admin/settings') === 0 ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/settings') ?>">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/audioGuides') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/audioGuides') ?>">
+                            <i class="fas fa-headphones me-2"></i>Audio Guide
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/products') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/products') ?>">
+                            <i class="fas fa-gift me-2"></i>Produk Souvenir
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'reports') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('reports') ?>">
+                            <i class="fas fa-chart-bar me-2"></i>Laporan
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'mastertable') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('mastertable/index') ?>">
+                            <i class="fas fa-database me-2"></i>Master Data
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white <?= strpos($currentUri, 'admin/settings') !== false ? 'active bg-primary' : '' ?>" href="<?= View::url('admin/settings') ?>">
                             <i class="fas fa-cog me-2"></i>Pengaturan
                         </a>
                     </li>

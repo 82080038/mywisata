@@ -26,8 +26,8 @@ class Booking extends Model
     public function create($data)
     {
         $sql = "INSERT INTO {$this->table} 
-                (booking_code, user_id, guide_id, booking_date, booking_time, 
-                 duration_hours, participants, special_requests, status, total_amount, created_at)
+                (booking_code, user_id, guide_id, booking_date, start_time, 
+                 duration_hours, num_participants, notes, status, total_amount, created_at)
                 VALUES 
                 (:booking_code, :user_id, :guide_id, :booking_date, :booking_time,
                  :duration_hours, :participants, :special_requests, 'pending', :total_amount, NOW())";

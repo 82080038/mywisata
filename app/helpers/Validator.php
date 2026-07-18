@@ -51,8 +51,10 @@ class Validator
      */
     public function email($field)
     {
-        if (!empty($this->data[$field]) && !filter_var($this->data[$field], FILTER_VALIDATE_EMAIL)) {
-            $this->errors[$field] = 'Format email tidak valid';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && !filter_var($this->data[$f], FILTER_VALIDATE_EMAIL)) {
+                $this->errors[$f] = 'Format email tidak valid';
+            }
         }
 
         return $this;
@@ -68,8 +70,10 @@ class Validator
      */
     public function min($field, $length)
     {
-        if (!empty($this->data[$field]) && strlen($this->data[$field]) < $length) {
-            $this->errors[$field] = 'Minimal ' . $length . ' karakter';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && strlen($this->data[$f]) < $length) {
+                $this->errors[$f] = 'Minimal ' . $length . ' karakter';
+            }
         }
 
         return $this;
@@ -85,8 +89,10 @@ class Validator
      */
     public function max($field, $length)
     {
-        if (!empty($this->data[$field]) && strlen($this->data[$field]) > $length) {
-            $this->errors[$field] = 'Maksimal ' . $length . ' karakter';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && strlen($this->data[$f]) > $length) {
+                $this->errors[$f] = 'Maksimal ' . $length . ' karakter';
+            }
         }
 
         return $this;
@@ -101,8 +107,10 @@ class Validator
      */
     public function numeric($field)
     {
-        if (!empty($this->data[$field]) && !is_numeric($this->data[$field])) {
-            $this->errors[$field] = 'Harus berupa angka';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && !is_numeric($this->data[$f])) {
+                $this->errors[$f] = 'Harus berupa angka';
+            }
         }
 
         return $this;
@@ -117,8 +125,10 @@ class Validator
      */
     public function integer($field)
     {
-        if (!empty($this->data[$field]) && !filter_var($this->data[$field], FILTER_VALIDATE_INT)) {
-            $this->errors[$field] = 'Harus berupa bilangan bulat';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && !filter_var($this->data[$f], FILTER_VALIDATE_INT)) {
+                $this->errors[$f] = 'Harus berupa bilangan bulat';
+            }
         }
 
         return $this;
@@ -150,8 +160,10 @@ class Validator
      */
     public function phone($field)
     {
-        if (!empty($this->data[$field]) && !preg_match('/^[0-9\+\-\(\)\s]+$/', $this->data[$field])) {
-            $this->errors[$field] = 'Format nomor telepon tidak valid';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && !preg_match('/^[0-9\+\-\(\)\s]+$/', $this->data[$f])) {
+                $this->errors[$f] = 'Format nomor telepon tidak valid';
+            }
         }
 
         return $this;
@@ -166,8 +178,10 @@ class Validator
      */
     public function url($field)
     {
-        if (!empty($this->data[$field]) && !filter_var($this->data[$field], FILTER_VALIDATE_URL)) {
-            $this->errors[$field] = 'Format URL tidak valid';
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f]) && !filter_var($this->data[$f], FILTER_VALIDATE_URL)) {
+                $this->errors[$f] = 'Format URL tidak valid';
+            }
         }
 
         return $this;
@@ -183,11 +197,13 @@ class Validator
      */
     public function date($field, $format = 'Y-m-d')
     {
-        if (!empty($this->data[$field])) {
-            $date = DateTime::createFromFormat($format, $this->data[$field]);
+        foreach ((array) $field as $f) {
+            if (!empty($this->data[$f])) {
+                $date = DateTime::createFromFormat($format, $this->data[$f]);
 
-            if (!$date || $date->format($format) !== $this->data[$field]) {
-                $this->errors[$field] = 'Format tanggal tidak valid (gunakan: ' . $format . ')';
+                if (!$date || $date->format($format) !== $this->data[$f]) {
+                    $this->errors[$f] = 'Format tanggal tidak valid (gunakan: ' . $format . ')';
+                }
             }
         }
 

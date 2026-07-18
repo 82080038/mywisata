@@ -91,6 +91,25 @@ class Cart
     }
 
     /**
+     * Remove item from cart by key
+     *
+     * @param string $itemKey Cart item key
+     * @return bool
+     */
+    public static function removeByKey($itemKey)
+    {
+        $cart = self::get();
+
+        if (isset($cart[$itemKey])) {
+            unset($cart[$itemKey]);
+            self::save($cart);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Update item quantity
      *
      * @param string $type Item type

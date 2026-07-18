@@ -149,4 +149,39 @@ class ApiController extends Controller
 
         $this->json(['status' => 'success', 'data' => $results]);
     }
+
+    public function destinations()
+    {
+        $this->getDestinations();
+    }
+
+    public function destination()
+    {
+        $this->getDestination();
+    }
+
+    public function guides()
+    {
+        $this->getTourGuides();
+    }
+
+    public function guide()
+    {
+        $this->getTourGuide();
+    }
+
+    public function hotels()
+    {
+        $this->getHotels();
+    }
+
+    public function restaurants()
+    {
+        $this->getRestaurants();
+    }
+
+    public function events()
+    {
+        $this->getEvents();
+    }
 }

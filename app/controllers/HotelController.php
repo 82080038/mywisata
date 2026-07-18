@@ -25,15 +25,25 @@ class HotelController extends Controller
         $filters = [
             'city' => $this->get('city'),
             'search' => $this->get('search'),
+            'type' => $this->get('type'),
+            'min_price' => $this->get('min_price'),
+            'max_price' => $this->get('max_price'),
+            'star_rating' => $this->get('star_rating'),
+            'facility' => $this->get('facility'),
+            'sort' => $this->get('sort', 'newest'),
             'is_approved' => 1,
         ];
 
         $hotels = $hotelModel->getAllWithFilters($filters);
+        $types = $hotelModel->getAccommodationTypes();
+        $allFacilities = $hotelModel->getAllFacilities();
 
         $data = [
-            'title' => 'Hotel & Homestay - MyWisata',
+            'title' => 'Penginapan - MyWisata',
             'hotels' => $hotels,
             'filters' => $filters,
+            'types' => $types,
+            'allFacilities' => $allFacilities,
         ];
 
         $this->view('hotels/index', $data);
@@ -42,9 +52,11 @@ class HotelController extends Controller
     /**
      * Detail - Show hotel details
      */
-    public function detail()
+    public function detail($id = null)
     {
-        $id = $this->get('id');
+        if (!$id) {
+            $id = $this->get('id');
+        }
         $hotelModel = new Hotel();
 
         $hotel = $hotelModel->findById($id);
@@ -56,12 +68,25 @@ class HotelController extends Controller
 
         $rooms = $hotelModel->getRooms($id);
         $reviews = $hotelModel->getReviews($id, 10);
+        $images = $hotelModel->getImages($id);
+
+        $facilityModel = new Facility();
+        $facilities = $facilityModel->getEntityFacilitiesGrouped('hotel', $id);
+
+        $videoModel = new VideoGallery();
+        $videos = $videoModel->getVideos('hotel', $id);
 
         $data = [
             'title' => $hotel['name'] . ' - MyWisata',
             'hotel' => $hotel,
             'rooms' => $rooms,
             'reviews' => $reviews,
+            'images' => $images,
+            'facilities' => $facilities,
+            'facilityModel' => $facilityModel,
+            'videos' => $videos,
+            'entityType' => 'hotel',
+            'entityId' => $id,
         ];
 
         $this->view('hotels/detail', $data);
@@ -94,10 +119,16 @@ class HotelController extends Controller
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
 
-        $hotelModel = new Hotel();
-        $hotelModel->addReview($data);
+        $reviewModel = new Review();
+        $reviewModel->add([
+            'user_id' => $userId,
+            'reviewable_type' => 'hotel',
+            'reviewable_id' => $data['hotel_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ]);
 
-        Logger::audit('ADD_HOTEL_REVIEW', 'hotel_reviews', "Added review for hotel ID: {$data['hotel_id']}", [], $data);
+        Logger::audit('ADD_REVIEW', 'reviews', "Added review for hotel ID: {$data['hotel_id']}", [], $data);
 
         $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
     }

@@ -25,6 +25,7 @@ class EventController extends Controller
         $filters = [
             'city' => $this->get('city'),
             'search' => $this->get('search'),
+            'registration_type' => $this->get('registration_type'),
             'is_active' => 1,
             'upcoming' => true,
         ];
@@ -45,9 +46,11 @@ class EventController extends Controller
     /**
      * Detail - Show event details
      */
-    public function detail()
+    public function detail($id = null)
     {
-        $id = $this->get('id');
+        if (!$id) {
+            $id = $this->get('id');
+        }
         $eventModel = new Event();
 
         $event = $eventModel->findById($id);
@@ -59,13 +62,59 @@ class EventController extends Controller
 
         $reviews = $eventModel->getReviews($id, 10);
 
+        $variantModel = new Variant();
+        $variants = $variantModel->getVariants('event', $id);
+
+        $facilityModel = new Facility();
+        $facilities = $facilityModel->getEntityFacilitiesGrouped('event', $id);
+
+        $videoModel = new VideoGallery();
+        $videos = $videoModel->getVideos('event', $id);
+
         $data = [
-            'title' => $event['name'] . ' - MyWisata',
+            'title' => $event['title'] . ' - MyWisata',
             'event' => $event,
             'reviews' => $reviews,
+            'variants' => $variants,
+            'variantModel' => $variantModel,
+            'facilities' => $facilities,
+            'facilityModel' => $facilityModel,
+            'videos' => $videos,
+            'entityType' => 'event',
+            'entityId' => $id,
         ];
 
         $this->view('events/detail', $data);
+    }
+
+    /**
+     * Calendar - Show events in calendar view
+     */
+    public function calendar()
+    {
+        $eventModel = new Event();
+
+        $month = (int)($this->get('month') ?? date('n'));
+        $year = (int)($this->get('year') ?? date('Y'));
+        $city = $this->get('city');
+
+        if ($month < 1) { $month = 1; }
+        if ($month > 12) { $month = 12; }
+
+        $events = $eventModel->getEventsForCalendar($month, $year, $city);
+
+        $cities = $this->db->query("SELECT DISTINCT location_name FROM events WHERE is_active = 1 AND location_name IS NOT NULL AND location_name != '' ORDER BY location_name")->fetchAll();
+
+        $data = [
+            'title' => 'Kalender Event - MyWisata',
+            'events' => $events,
+            'month' => $month,
+            'year' => $year,
+            'cities' => $cities,
+            'cityFilter' => $city,
+        ];
+
+        $this->view('events/calendar', $data);
     }
 
     /**
@@ -95,10 +144,16 @@ class EventController extends Controller
             $this->json(['status' => 'error', 'message' => $validator->firstError()], 400);
         }
 
-        $eventModel = new Event();
-        $eventModel->addReview($data);
+        $reviewModel = new Review();
+        $reviewModel->add([
+            'user_id' => $userId,
+            'reviewable_type' => 'event',
+            'reviewable_id' => $data['event_id'],
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+        ]);
 
-        Logger::audit('ADD_EVENT_REVIEW', 'event_reviews', "Added review for event ID: {$data['event_id']}", [], $data);
+        Logger::audit('ADD_REVIEW', 'reviews', "Added review for event ID: {$data['event_id']}", [], $data);
 
         $this->json(['status' => 'success', 'message' => 'Review berhasil ditambahkan']);
     }

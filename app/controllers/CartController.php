@@ -61,6 +61,13 @@ class CartController extends Controller
             $this->json(['status' => 'error', 'message' => 'Type and item_id are required'], 400);
         }
 
+        // Check availability before adding to cart
+        $availModel = new Availability();
+        $availCheck = $this->checkAvailability($availModel, $type, $itemId, $quantity, $data);
+        if (!$availCheck['available']) {
+            $this->json(['status' => 'error', 'message' => $availCheck['message']], 400);
+        }
+
         // Get item details based on type
         $itemData = $this->getItemDetails($type, $itemId, $data);
         
@@ -90,30 +97,41 @@ class CartController extends Controller
      */
     public function remove()
     {
-        if (!$this->isAjax()) {
+        // Verify CSRF
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
             $this->redirect('cart');
         }
 
-        // Verify CSRF
-        if (!$this->validateCsrf()) {
-            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
-        }
-
+        $itemKey = $this->post('item_key');
         $type = $this->post('type');
         $itemId = $this->post('item_id');
         $data = $this->post('data', []);
 
-        $success = Cart::remove($type, $itemId, $data);
-
-        if ($success) {
-            $this->json([
-                'status' => 'success',
-                'message' => 'Item removed from cart',
-                'cart_count' => Cart::count(),
-                'cart_total' => Cart::total(),
-            ]);
+        if ($itemKey) {
+            $success = Cart::removeByKey($itemKey);
         } else {
-            $this->json(['status' => 'error', 'message' => 'Item not found in cart'], 404);
+            $success = Cart::remove($type, $itemId, $data);
+        }
+
+        if ($this->isAjax()) {
+            if ($success) {
+                $this->json([
+                    'status' => 'success',
+                    'message' => 'Item removed from cart',
+                    'cart_count' => Cart::count(),
+                    'cart_total' => Cart::total(),
+                ]);
+            } else {
+                $this->json(['status' => 'error', 'message' => 'Item not found in cart'], 404);
+            }
+        } else {
+            if ($success) {
+                Session::flash('success', 'Item dihapus dari keranjang');
+            } else {
+                Session::flash('error', 'Item tidak ditemukan');
+            }
+            $this->redirect('cart');
         }
     }
 
@@ -155,23 +173,25 @@ class CartController extends Controller
      */
     public function clear()
     {
-        if (!$this->isAjax()) {
-            $this->redirect('cart');
-        }
-
         // Verify CSRF
         if (!$this->validateCsrf()) {
-            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('cart');
         }
 
         Cart::clear();
 
-        $this->json([
-            'status' => 'success',
-            'message' => 'Cart cleared',
-            'cart_count' => 0,
-            'cart_total' => 0,
-        ]);
+        if ($this->isAjax()) {
+            $this->json([
+                'status' => 'success',
+                'message' => 'Cart cleared',
+                'cart_count' => 0,
+                'cart_total' => 0,
+            ]);
+        } else {
+            Session::flash('success', 'Keranjang dikosongkan');
+            $this->redirect('cart');
+        }
     }
 
     /**
@@ -225,7 +245,7 @@ class CartController extends Controller
             ]);
 
         // Redirect to payment
-        $this->redirect('payment/index?transaction_id=' . $transactionId);
+        $this->redirect('payments?transaction_id=' . $transactionId);
     }
 
     /**
@@ -297,6 +317,19 @@ class CartController extends Controller
                     ];
                 }
                 break;
+
+            case 'product':
+                $model = new Product();
+                $item = $model->findById($itemId);
+                if ($item) {
+                    $price = $item['discount_price'] > 0 ? $item['discount_price'] : $item['price'];
+                    return [
+                        'name' => $item['name'],
+                        'price' => $price,
+                        'image' => $item['main_image'] ?? '',
+                    ];
+                }
+                break;
         }
 
         return null;
@@ -345,5 +378,49 @@ class CartController extends Controller
             'count' => Cart::count(),
             'total' => Cart::total(),
         ]);
+    }
+
+    /**
+     * Check availability based on item type
+     *
+     * @param Availability $model
+     * @param string $type
+     * @param int $itemId
+     * @param int $quantity
+     * @param array $data
+     * @return array
+     */
+    private function checkAvailability($model, $type, $itemId, $quantity, $data = [])
+    {
+        switch ($type) {
+            case 'hotel':
+                $checkIn = $data['check_in'] ?? date('Y-m-d');
+                $checkOut = $data['check_out'] ?? date('Y-m-d', strtotime('+1 day'));
+                return $model->checkRoom($itemId, $checkIn, $checkOut, $quantity);
+
+            case 'destination':
+                $visitDate = $data['visit_date'] ?? date('Y-m-d');
+                return $model->checkDestinationTicket($itemId, $visitDate, $quantity);
+
+            case 'event':
+                return $model->checkEventTicket($itemId, $quantity);
+
+            case 'product':
+                return $model->checkProduct($itemId, $quantity);
+
+            case 'tour_guide':
+                $bookingDate = $data['booking_date'] ?? date('Y-m-d');
+                $startTime = $data['start_time'] ?? '09:00';
+                $duration = $data['duration_hours'] ?? 4;
+                return $model->checkGuide($itemId, $bookingDate, $startTime, $duration);
+
+            case 'restaurant':
+                $date = $data['date'] ?? date('Y-m-d');
+                $time = $data['time'] ?? '12:00';
+                return $model->checkTable($itemId, $date, $time, $quantity);
+
+            default:
+                return ['available' => true];
+        }
     }
 }

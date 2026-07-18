@@ -144,7 +144,7 @@ class Controller
     {
         $token = $this->post('csrf_token');
 
-        return $token === CSRF_TOKEN;
+        return Middleware::verifyCsrf($token);
     }
 
     /**

@@ -16,9 +16,17 @@ class App
     private $params = [];
 
     /**
-     * Constructor - Parse URL and route request
+     * Constructor
      */
     public function __construct()
+    {
+        // Constructor is now empty; routing is done in route()
+    }
+
+    /**
+     * Parse URL and route request
+     */
+    public function route()
     {
         $url = $this->parseUrl();
 
@@ -30,25 +38,86 @@ class App
             // API routes
             $this->controller = 'Api';
             unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'destinations') {
-            // Handle plural 'destinations' to singular 'Destination' controller
+        } elseif (!empty($url) && ($url[0] === 'destinations' || $url[0] === 'destination')) {
             $this->controller = 'Destination';
             unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'tourguides') {
-            // Handle plural 'tourguides' to singular 'TourGuide' controller
+        } elseif (!empty($url) && ($url[0] === 'tourguides' || $url[0] === 'tourguide')) {
             $this->controller = 'TourGuide';
             unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'hotels') {
-            // Handle plural 'hotels' to singular 'Hotel' controller
+        } elseif (!empty($url) && ($url[0] === 'hotels' || $url[0] === 'hotel')) {
             $this->controller = 'Hotel';
             unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'restaurants') {
-            // Handle plural 'restaurants' to singular 'Restaurant' controller
+        } elseif (!empty($url) && ($url[0] === 'restaurants' || $url[0] === 'restaurant')) {
             $this->controller = 'Restaurant';
             unset($url[0]);
-        } elseif (!empty($url) && $url[0] === 'events') {
-            // Handle plural 'events' to singular 'Event' controller
+        } elseif (!empty($url) && ($url[0] === 'events' || $url[0] === 'event')) {
             $this->controller = 'Event';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'bookings' || $url[0] === 'booking')) {
+            $this->controller = 'Booking';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'tickets' || $url[0] === 'ticket')) {
+            $this->controller = 'Ticket';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'notifications' || $url[0] === 'notification')) {
+            $this->controller = 'Notification';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'payments' || $url[0] === 'payment')) {
+            $this->controller = 'Payment';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'favorites' || $url[0] === 'favorite')) {
+            $this->controller = 'Favorite';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'search') {
+            $this->controller = 'Search';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'cart') {
+            $this->controller = 'Cart';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'dashboard') {
+            $this->controller = 'Dashboard';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'map') {
+            $this->controller = 'Map';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'report' || $url[0] === 'reports')) {
+            $this->controller = 'Report';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'aitourguide') {
+            $this->controller = 'AITourGuide';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'audioguide') {
+            $this->controller = 'AudioGuide';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'currency') {
+            $this->controller = 'Currency';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'itinerary' || $url[0] === 'itineraries')) {
+            $this->controller = 'Itinerary';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'desawisata' || $url[0] === 'village')) {
+            $this->controller = 'DesaWisata';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'package' || $url[0] === 'packages')) {
+            $this->controller = 'Package';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'mastertable') {
+            $this->controller = 'MasterTable';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'translation' || $url[0] === 'translate')) {
+            $this->controller = 'Translation';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'products' || $url[0] === 'product')) {
+            $this->controller = 'Product';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'merchant') {
+            $this->controller = 'Merchant';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'messages' || $url[0] === 'message')) {
+            $this->controller = 'Message';
+            unset($url[0]);
+        } elseif (!empty($url) && ($url[0] === 'video' || $url[0] === 'videos')) {
+            $this->controller = 'Video';
             unset($url[0]);
         } elseif (!empty($url)) {
             // Non-existent route - return 404
@@ -110,7 +179,7 @@ class App
         try {
             // Wrap with access logging middleware
             AccessLogMiddleware::handle(function () {
-                $this->__construct();
+                $this->route();
             });
         } catch (Exception $e) {
             $this->handleError($e);

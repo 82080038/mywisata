@@ -67,6 +67,11 @@ class TicketController extends Controller
      */
     public function store()
     {
+        if (!$this->validateCsrf()) {
+            Session::flash('error', 'CSRF token mismatch');
+            $this->redirect('ticket/create?destination_id=' . $this->post('destination_id'));
+        }
+
         $userId = Session::get('user_id');
 
         $destinationModel = new Destination();
@@ -92,6 +97,14 @@ class TicketController extends Controller
 
         if ($validator->fails()) {
             Session::flash('error', $validator->firstError());
+            $this->redirect('ticket/create?destination_id=' . $data['destination_id']);
+        }
+
+        // Check ticket availability
+        $availModel = new Availability();
+        $availCheck = $availModel->checkDestinationTicket($data['destination_id'], $data['visit_date'], $quantity);
+        if (!$availCheck['available']) {
+            Session::flash('error', $availCheck['message']);
             $this->redirect('ticket/create?destination_id=' . $data['destination_id']);
         }
 

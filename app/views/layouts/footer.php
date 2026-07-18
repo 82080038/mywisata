@@ -40,5 +40,58 @@
     
     <!-- Custom JS -->
     <script src="<?= View::asset('js/main.js') ?>"></script>
+    
+    <script>
+    $(document).ready(function() {
+        $('.currency-switch').on('click', function(e) {
+            e.preventDefault();
+            var currency = $(this).data('currency');
+            $.post(window.APP_URL + 'currency/switch', { currency: currency }, function(data) {
+                if (data.status === 'success') {
+                    $('#navCurrencyCode').text(currency);
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message, timer: 1000, showConfirmButton: false })
+                        .then(function() { location.reload(); });
+                }
+            });
+        });
+    });
+    </script>
+    <?php if (Session::get('user_id')): ?>
+    <script>
+    function updateUnreadBadge() {
+        fetch(window.APP_URL + 'messages/unread', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                var badge = document.getElementById('navUnreadBadge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 9 ? '9+' : data.count;
+                        badge.style.display = 'inline';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        })
+        .catch(function() {});
+    }
+    updateUnreadBadge();
+    setInterval(updateUnreadBadge, 30000);
+    </script>
+    <?php endif; ?>
+    
+    <!-- PWA Service Worker -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('<?= BASE_URL ?>public/sw.js').catch(function(err) {
+                console.log('SW registration failed:', err);
+            });
+        });
+    }
+    </script>
 </body>
 </html>

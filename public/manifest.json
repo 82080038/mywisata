@@ -1,0 +1,44 @@
+{
+    "name": "MyWisata - Tourism Marketplace",
+    "short_name": "MyWisata",
+    "description": "Platform marketplace untuk layanan pariwisata di Indonesia",
+    "start_url": "/mywisata/",
+    "scope": "/mywisata/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0d6efd",
+    "theme_color": "#0d6efd",
+    "lang": "id-ID",
+    "categories": ["travel", "tourism", "shopping"],
+    "icons": [
+        {
+            "src": "/mywisata/public/assets/img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/mywisata/public/assets/img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Destinasi",
+            "url": "/mywisata/destinations",
+            "icons": [{"src": "/mywisata/public/assets/img/icon-192.png", "sizes": "192x192"}]
+        },
+        {
+            "name": "Penginapan",
+            "url": "/mywisata/hotels",
+            "icons": [{"src": "/mywisata/public/assets/img/icon-192.png", "sizes": "192x192"}]
+        },
+        {
+            "name": "AI Itinerary",
+            "url": "/mywisata/itinerary/builder",
+            "icons": [{"src": "/mywisata/public/assets/img/icon-192.png", "sizes": "192x192"}]
+        }
+    ]
+}

@@ -9,7 +9,9 @@
             <li class="breadcrumb-item active" aria-current="page"><?= View::e($destination['name']) ?></li>
         </ol>
     </nav>
-    
+
+    <?php include APP_ROOT . '/app/views/partials/translate_widget.php'; ?>
+
     <div class="row">
         <div class="col-md-8">
             <!-- Main Image -->
@@ -24,6 +26,12 @@
                     <p class="card-text text-muted">
                         <i class="fas fa-map-marker-alt me-1"></i><?= View::e($destination['address']) ?>, <?= View::e($destination['city']) ?>
                     </p>
+                    <?php
+                    $shareUrl = View::url('destinations/detail/' . $destination['id']);
+                    $shareTitle = $destination['name'] . ' - MyWisata';
+                    $shareText = 'Kunjungi ' . $destination['name'] . ' di ' . ($destination['city'] ?? 'Indonesia');
+                    include APP_ROOT . '/app/views/partials/social_share.php';
+                    ?>
                     <div class="d-flex align-items-center mb-3">
                         <div class="me-3">
                             <i class="fas fa-star text-warning"></i> <?= number_format($destination['rating_avg'], 1) ?>
@@ -37,18 +45,25 @@
                         <div class="col-md-6">
                             <h6>Informasi Tiket</h6>
                             <p class="card-text">Harga Tiket: <?= View::currency($destination['entry_fee']) ?></p>
-                            <p class="card-text">Jam Buka: <?= View::e($destination['opening_hours']) ?></p>
+                            <p class="card-text">Jam Buka: <?= View::e($destination['opening_hours'] ?? '-') ?></p>
                         </div>
                         <div class="col-md-6">
                             <h6>Kontak</h6>
-                            <p class="card-text">Telepon: <?= View::e($destination['contact_phone']) ?></p>
-                            <p class="card-text">Website: <?= View::e($destination['website']) ?></p>
+                            <p class="card-text">Telepon: <?= View::e($destination['contact_phone'] ?? '-') ?></p>
+                            <p class="card-text">Website: <?= View::e($destination['website'] ?? '-') ?></p>
                         </div>
                     </div>
                     
-                    <a href="#" class="btn btn-primary btn-lg mt-3">
-                        <i class="fas fa-ticket-alt me-2"></i>Beli Tiket
-                    </a>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="#" class="btn btn-primary btn-lg">
+                            <i class="fas fa-ticket-alt me-2"></i>Beli Tiket
+                        </a>
+                        <?php if (Session::get('user_id')): ?>
+                        <button class="btn btn-outline-danger btn-lg" id="favBtn" onclick="toggleFavorite('destination', <?= $destination['id'] ?>)">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
             
@@ -61,9 +76,9 @@
                 <div class="card-body">
                     <div class="row">
                         <?php foreach ($images as $img): ?>
-                            <?php if ($img['image_path'] !== $destination['main_image']): ?>
+                            <?php if ($img['file_path'] !== $destination['main_image']): ?>
                             <div class="col-md-4 mb-3">
-                                <img src="<?= View::asset('uploads/destinations/' . $img['image_path']) ?>" class="img-fluid rounded" alt="Gallery">
+                                <img src="<?= View::asset('uploads/destinations/' . $img['file_path']) ?>" class="img-fluid rounded" alt="<?= View::e($img['caption'] ?? 'Gallery') ?>">
                             </div>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -71,7 +86,44 @@
                 </div>
             </div>
             <?php endif; ?>
-            
+
+            <!-- Facilities -->
+            <?php if (!empty($facilities)): ?>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-list-check me-2 text-primary"></i>Fasilitas Destinasi</h5>
+                </div>
+                <div class="card-body">
+                    <?php foreach ($facilities as $category => $items): ?>
+                    <div class="mb-3">
+                        <h6 class="text-muted small fw-bold mb-2">
+                            <i class="fas <?= Facility::categoryIcon($category) ?> me-1"></i>
+                            <?= Facility::categoryLabel($category) ?>
+                        </h6>
+                        <div class="row">
+                            <?php foreach ($items as $f): ?>
+                            <div class="col-md-4 mb-2 d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" style="width:32px;height:32px;min-width:32px;">
+                                    <i class="fas <?= View::e($f['icon']) ?> text-success" style="font-size:14px;"></i>
+                                </div>
+                                <div>
+                                    <span><?= View::e($f['name']) ?></span>
+                                    <?php if (!empty($f['notes'])): ?>
+                                    <small class="text-muted d-block" style="font-size:11px;"><?= View::e($f['notes']) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Video Gallery -->
+            <?php include APP_ROOT . '/app/views/partials/video_gallery.php'; ?>
+
             <!-- Reviews -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -130,6 +182,32 @@
         </div>
         
         <div class="col-md-4">
+            <!-- Weather Widget -->
+            <?php
+            $latitude = $destination['latitude'] ?? null;
+            $longitude = $destination['longitude'] ?? null;
+            $cityName = $destination['city'] ?? $destination['name'];
+            include APP_ROOT . '/app/views/partials/weather_widget.php';
+            ?>
+            
+            <!-- Eco Score Card -->
+            <?php if (!empty($destination['eco_score']) && $destination['eco_score'] > 0): ?>
+            <div class="card mb-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-leaf me-2"></i>Eco Score</h5>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="text-success mb-0"><?= $destination['eco_score'] ?><small class="text-muted">/100</small></h2>
+                    <?php if (!empty($destination['eco_badge'])): ?>
+                    <span class="badge bg-<?= $destination['eco_badge'] === 'Gold' ? 'warning' : ($destination['eco_badge'] === 'Silver' ? 'secondary' : 'success') ?> text-dark fs-5 mt-2">
+                        <?= View::e($destination['eco_badge']) ?> Badge
+                    </span>
+                    <?php endif; ?>
+                    <p class="small text-muted mt-2 mb-0">Destinasi ini menerapkan praktik pariwisata berkelanjutan</p>
+                </div>
+            </div>
+            <?php endif; ?>
+            
             <!-- Map -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -146,6 +224,49 @@
                 </div>
             </div>
             
+            <!-- Ticket Availability -->
+            <?php if (!empty($destination['daily_quota'])): ?>
+            <?php
+            $remaining = $destination['daily_quota'] - ($destination['daily_quota_used'] ?? 0);
+            $percent = round(($destination['daily_quota_used'] ?? 0) / $destination['daily_quota'] * 100);
+            $isLow = $remaining <= $destination['daily_quota'] * 0.2;
+            $isSoldOut = $remaining <= 0;
+            ?>
+            <div class="card mb-4 <?= $isSoldOut ? 'border-danger' : ($isLow ? 'border-warning' : '') ?>">
+                <div class="card-header <?= $isSoldOut ? 'bg-danger bg-opacity-10' : ($isLow ? 'bg-warning bg-opacity-10' : 'bg-light') ?>">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-ticket-alt me-2 <?= $isSoldOut ? 'text-danger' : ($isLow ? 'text-warning' : 'text-success') ?>"></i>
+                        Ketersediaan Tiket Hari Ini
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <?php if ($isSoldOut): ?>
+                    <div class="text-center py-2">
+                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Tiket Habis</span>
+                        <p class="text-muted small mt-2 mb-0">Tiket untuk hari ini sudah terjual habis. Coba tanggal lain.</p>
+                    </div>
+                    <?php else: ?>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tersedia:</span>
+                        <span class="fw-bold <?= $isLow ? 'text-warning' : 'text-success' ?>"><?= number_format($remaining) ?> tiket</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Terjual:</span>
+                        <span><?= number_format($destination['daily_quota_used'] ?? 0) ?> / <?= number_format($destination['daily_quota']) ?></span>
+                    </div>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar <?= $isLow ? 'bg-warning' : 'bg-success' ?>" style="width: <?= $percent ?>%"></div>
+                    </div>
+                    <?php if ($isLow): ?>
+                    <div class="alert alert-warning py-2 mb-0">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Tiket tersisa <?= $remaining ?>! Segera pesan.
+                    </div>
+                    <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Nearby Destinations -->
             <?php if (!empty($nearby)): ?>
             <div class="card mb-4">
@@ -219,6 +340,36 @@ document.getElementById('reviewForm').addEventListener('submit', function(e) {
         });
     });
 });
+</script>
+
+<script>
+function toggleFavorite(type, id) {
+    var formData = new FormData();
+    formData.append('item_type', type);
+    formData.append('item_id', id);
+    
+    fetch(window.APP_URL + 'favorites/toggle', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            var btn = document.getElementById('favBtn');
+            var icon = btn.querySelector('i');
+            if (data.action === 'added') {
+                icon.className = 'fas fa-heart';
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-danger');
+            } else {
+                icon.className = 'far fa-heart';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-danger');
+            }
+            Swal.fire({ icon: 'success', title: data.action === 'added' ? 'Ditambahkan' : 'Dihapus', text: data.message, timer: 1000, showConfirmButton: false });
+        }
+    });
+}
 </script>
 
 <?php include APP_ROOT . '/app/views/layouts/footer.php'; ?>

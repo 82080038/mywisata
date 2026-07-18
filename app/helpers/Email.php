@@ -81,6 +81,46 @@ class Email
     }
 
     /**
+     * Send payment success email
+     *
+     * @param string $to Recipient email
+     * @param array $paymentData Payment data
+     *
+     * @return bool
+     */
+    public static function sendPaymentSuccess($to, $paymentData)
+    {
+        $subject = 'Pembayaran Berhasil - MyWisata';
+        $body = self::renderTemplate('payment_success', $paymentData);
+
+        return self::send($to, $subject, $body);
+    }
+
+    /**
+     * Send welcome email to new user
+     *
+     * @param string $to Recipient email
+     * @param string $name User name
+     *
+     * @return bool
+     */
+    public static function sendWelcome($to, $name)
+    {
+        $subject = 'Selamat Datang di MyWisata';
+        $body = '<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f8f9fa;padding:20px;">';
+        $body .= '<div style="max-width:600px;margin:0 auto;background:#fff;padding:30px;border-radius:8px;">';
+        $body .= '<h2 style="color:#0d6efd;text-align:center;">Selamat Datang!</h2>';
+        $body .= '<p>Halo ' . htmlspecialchars($name) . ',</p>';
+        $body .= '<p>Selamat datang di MyWisata! Akun Anda telah berhasil dibuat.</p>';
+        $body .= '<p>Sekarang Anda dapat:</p>';
+        $body .= '<ul><li>Membooking destinasi wisata</li><li>Menyewa tour guide</li><li>Membeli tiket</li><li>Memberikan review</li></ul>';
+        $body .= '<p>Terima kasih,<br>Tim MyWisata</p>';
+        $body .= '</div></body></html>';
+
+        return self::send($to, $subject, $body);
+    }
+
+    /**
      * Render email template
      *
      * @param string $template Template name

@@ -46,11 +46,11 @@ class Ticket extends Model
      */
     public function findById($id)
     {
-        $sql = "SELECT to.*, u.name as user_name, d.name as destination_name, d.main_image
-                FROM {$this->table} to 
-                LEFT JOIN users u ON to.user_id = u.id 
-                LEFT JOIN destinations d ON to.destination_id = d.id 
-                WHERE to.id = :id";
+        $sql = "SELECT tk.*, u.name as user_name, d.name as destination_name, d.main_image
+                FROM {$this->table} tk 
+                LEFT JOIN users u ON tk.user_id = u.id 
+                LEFT JOIN destinations d ON tk.destination_id = d.id 
+                WHERE tk.id = :id";
 
         return $this->db->query($sql, ['id' => $id])->fetch();
     }
@@ -65,19 +65,19 @@ class Ticket extends Model
      */
     public function getByUserId($userId, $status = null)
     {
-        $where = "to.user_id = :user_id";
+        $where = "tk.user_id = :user_id";
         $params = ['user_id' => $userId];
 
         if ($status) {
-            $where .= " AND to.status = :status";
+            $where .= " AND tk.status = :status";
             $params['status'] = $status;
         }
 
-        $sql = "SELECT to.*, d.name as destination_name, d.main_image, d.city
-                FROM {$this->table} to 
-                LEFT JOIN destinations d ON to.destination_id = d.id 
+        $sql = "SELECT tk.*, d.name as destination_name, d.main_image, d.city
+                FROM {$this->table} tk 
+                LEFT JOIN destinations d ON tk.destination_id = d.id 
                 WHERE {$where} 
-                ORDER BY to.created_at DESC";
+                ORDER BY tk.created_at DESC";
 
         return $this->db->query($sql, $params)->fetchAll();
     }

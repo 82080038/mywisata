@@ -26,7 +26,7 @@ class Transaction extends Model
     public function create($data)
     {
         $sql = "INSERT INTO {$this->table} 
-                (transaction_code, user_id, booking_id, type, gross_amount, discount_amount, 
+                (transaction_code, user_id, booking_id, type, gross_amount, discount, 
                  tax_amount, net_amount, payment_method, payment_status, created_at)
                 VALUES 
                 (:transaction_code, :user_id, :booking_id, :type, :gross_amount, :discount_amount,

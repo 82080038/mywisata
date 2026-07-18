@@ -20,10 +20,13 @@
                 <div class="row">
                     <?php foreach ($favorites as $favorite): ?>
                     <div class="col-md-4 mb-4">
-                        <div class="card">
+                        <div class="card h-100">
                             <div class="card-body">
-                                <h6 class="card-title"><?= View::e(ucfirst($favorite['item_type'])) ?></h6>
-                                <p class="card-text small text-muted">ID: <?= $favorite['item_id'] ?></p>
+                                <span class="badge bg-secondary mb-2"><?= View::e(ucfirst($favorite['item_type'])) ?></span>
+                                <h6 class="card-title"><?= View::e($favorite['item_name'] ?? 'Item #' . $favorite['item_id']) ?></h6>
+                                <?php if (!empty($favorite['item_city'])): ?>
+                                <p class="card-text small text-muted"><i class="fas fa-map-marker-alt"></i> <?= View::e($favorite['item_city']) ?></p>
+                                <?php endif; ?>
                                 <p class="card-text small text-muted">Ditambahkan: <?= View::date($favorite['created_at']) ?></p>
                                 <button class="btn btn-sm btn-danger" onclick="removeFavorite('<?= $favorite['item_type'] ?>', <?= $favorite['item_id'] ?>)">
                                     <i class="fas fa-trash"></i> Hapus
@@ -45,7 +48,7 @@ function removeFavorite(itemType, itemId) {
     formData.append('item_id', itemId);
     formData.append('csrf_token', '<?= Middleware::csrfToken() ?>');
     
-    fetch(window.APP_URL + 'favorite/remove', {
+    fetch(window.APP_URL + 'favorites/remove', {
         method: 'POST',
         body: formData
     })

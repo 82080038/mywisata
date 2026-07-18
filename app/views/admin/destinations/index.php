@@ -3,7 +3,7 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Manajemen Destinasi</h2>
-        <a href="#" class="btn btn-primary">
+        <a href="<?= View::url('admin/createDestination') ?>" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Tambah Destinasi
         </a>
     </div>
@@ -44,13 +44,13 @@
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-info">
+                                <a href="<?= View::url('destinations/detail/' . $dest['id']) ?>" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="#" class="btn btn-sm btn-warning">
+                                <a href="<?= View::url('admin/editDestination?id=' . $dest['id']) ?>" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button class="btn btn-sm btn-danger">
+                                <button class="btn btn-sm btn-danger" onclick="deleteDestination(<?= $dest['id'] ?>)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -64,5 +64,35 @@
         </div>
     </div>
 </div>
+
+<script>
+function deleteDestination(id) {
+    Swal.fire({
+        title: 'Hapus Destinasi?',
+        text: 'Tindakan ini tidak dapat dibatalkan',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Hapus'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var formData = new FormData();
+            formData.append('csrf_token', '<?= Middleware::csrfToken() ?>');
+            formData.append('id', id);
+            fetch(window.APP_URL + 'admin/deleteDestination', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Berhasil', text: data.message, timer: 1500, showConfirmButton: false })
+                        .then(() => location.reload());
+                }
+            });
+        }
+    });
+}
+</script>
 
 <?php include APP_ROOT . '/app/views/layouts/admin_footer.php'; ?>

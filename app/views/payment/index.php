@@ -25,7 +25,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Diskon:</span>
-                        <span><?= View::currency($transaction['discount_amount']) ?></span>
+                        <span><?= View::currency($transaction['discount'] ?? 0) ?></span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Pajak:</span>
@@ -107,6 +107,14 @@ document.getElementById('paymentForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     var formData = new FormData(this);
+    var paymentMethod = formData.get('payment_method');
+    
+    // QRIS: redirect to QRIS page
+    if (paymentMethod === 'qris') {
+        var txnId = formData.get('transaction_id');
+        window.location.href = window.APP_URL + 'payment/qris?transaction_id=' + txnId;
+        return;
+    }
     
     Swal.fire({
         title: 'Konfirmasi Pembayaran',
@@ -119,7 +127,7 @@ document.getElementById('paymentForm').addEventListener('submit', function(e) {
         cancelButtonText: 'Batal'
     }).then(function(result) {
         if (result.isConfirmed) {
-            fetch(window.APP_URL + 'payment/process', {
+            fetch(window.APP_URL + 'payments/process', {
                 method: 'POST',
                 body: formData
             })

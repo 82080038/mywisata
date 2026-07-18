@@ -44,6 +44,32 @@ class FavoriteController extends Controller
     }
 
     /**
+     * Toggle favorite (add/remove)
+     */
+    public function toggle()
+    {
+        $userId = Session::get('user_id');
+        $itemType = $this->post('item_type');
+        $itemId = $this->post('item_id');
+
+        if (empty($itemType) || empty($itemId)) {
+            $this->json(['status' => 'error', 'message' => 'Parameter tidak valid'], 400);
+        }
+
+        $favoriteModel = new Favorite();
+
+        if ($favoriteModel->isFavorited($userId, $itemType, $itemId)) {
+            $favoriteModel->remove($userId, $itemType, $itemId);
+            Logger::audit('REMOVE_FAVORITE', 'user_favorites', "Removed favorite: {$itemType} ID: {$itemId}");
+            $this->json(['status' => 'success', 'message' => 'Dihapus dari favorit', 'action' => 'removed']);
+        } else {
+            $favoriteModel->add($userId, $itemType, $itemId);
+            Logger::audit('ADD_FAVORITE', 'user_favorites', "Added favorite: {$itemType} ID: {$itemId}");
+            $this->json(['status' => 'success', 'message' => 'Ditambahkan ke favorit', 'action' => 'added']);
+        }
+    }
+
+    /**
      * Add to favorites
      */
     public function add()
@@ -51,6 +77,10 @@ class FavoriteController extends Controller
         $userId = Session::get('user_id');
         $itemType = $this->post('item_type');
         $itemId = $this->post('item_id');
+
+        if (empty($itemType) || empty($itemId)) {
+            $this->json(['status' => 'error', 'message' => 'Parameter tidak valid'], 400);
+        }
 
         $favoriteModel = new Favorite();
         $favoriteModel->add($userId, $itemType, $itemId);

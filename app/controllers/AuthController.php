@@ -350,8 +350,24 @@ class AuthController extends Controller
         ]);
 
         if ($userId) {
+            // Save food preferences if provided
+            $allergies = $this->post('allergies', []);
+            $dietaryPrefs = $this->post('dietary_prefs', []);
+            if (!empty($allergies) || !empty($dietaryPrefs)) {
+                if (!is_array($allergies)) $allergies = [];
+                if (!is_array($dietaryPrefs)) $dietaryPrefs = [];
+                $this->userModel->updateFoodPreferences($userId, $allergies, $dietaryPrefs, '');
+            }
+
             // Clear rate limit on successful registration
             RateLimiter::clear('register:' . $ip);
+
+            // Send welcome email
+            try {
+                Email::sendWelcome($email, $name);
+            } catch (Exception $e) {
+                Logger::error('Welcome email failed', ['error' => $e->getMessage(), 'email' => $email]);
+            }
 
             $this->json([
                 'status' => 'success',

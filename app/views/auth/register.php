@@ -18,6 +18,9 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="tourguide-tab" data-bs-toggle="tab" data-bs-target="#tourguide" type="button" role="tab">Tour Guide</button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="merchant-tab" data-bs-toggle="tab" data-bs-target="#merchant" type="button" role="tab">Penjual Souvenir</button>
+                        </li>
                     </ul>
                     
                     <form id="registerForm">
@@ -61,6 +64,28 @@
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                 <input type="password" class="form-control" id="password_confirm" name="password_confirm" required minlength="6">
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="foodPrefsSection">
+                            <label class="form-label"><i class="fas fa-utensils text-warning me-1"></i>Alergi Makanan (Opsional)</label>
+                            <p class="text-muted small">Pilih jika Anda memiliki alergi makanan tertentu. Ini membantu kami merekomendasikan restoran & menu yang aman.</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php foreach (['peanut','seafood','shellfish','milk','lactose','gluten','egg','soy'] as $a): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="allergies[]" value="<?= $a ?>" id="reg_<?= $a ?>">
+                                    <label class="form-check-label small" for="reg_<?= $a ?>"><?= User::allergyLabel($a) ?></label>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <label class="form-label mt-2"><i class="fas fa-leaf text-success me-1"></i>Preferensi Diet (Opsional)</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php foreach (['halal','vegetarian','vegan','no_spicy','no_pork'] as $p): ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="dietary_prefs[]" value="<?= $p ?>" id="reg_<?= $p ?>">
+                                    <label class="form-check-label small" for="reg_<?= $p ?>"><?= User::preferenceLabel($p) ?></label>
+                                </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                         
