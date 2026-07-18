@@ -66,6 +66,7 @@ class ItineraryController extends Controller {
         }
         
         $userId = Session::get('user_id');
+        $templateId = $this->post('template_id');
         
         $data = [
             'user_id' => $userId,
@@ -75,7 +76,9 @@ class ItineraryController extends Controller {
             'end_date' => $this->post('end_date'),
             'budget' => $this->post('budget'),
             'participants' => $this->post('participants', 1),
-            'is_public' => $this->post('is_public', 0)
+            'is_public' => $this->post('is_public', 0),
+            'timeline_view_mode' => $this->post('timeline_view_mode', 'timeline'),
+            'template_id' => $templateId
         ];
         
         // Validate input
@@ -86,6 +89,11 @@ class ItineraryController extends Controller {
         $itineraryId = $this->itineraryModel->create($data);
         
         if ($itineraryId) {
+            // If template is provided, copy template events
+            if ($templateId) {
+                $this->copyTemplateEvents($templateId, $itineraryId);
+            }
+            
             Logger::audit('CREATE_ITINERARY', 'itineraries', "Created itinerary ID: {$itineraryId}", [], $data);
             
             $this->json([
@@ -99,13 +107,39 @@ class ItineraryController extends Controller {
     }
     
     /**
-     * Show - View itinerary details
+     * Copy template events to itinerary
+     */
+    private function copyTemplateEvents($templateId, $itineraryId) {
+        $templateEventModel = $this->model('ItineraryTemplateEvent');
+        $templateEvents = $templateEventModel->getByTemplateId($templateId);
+        
+        $timelineEventModel = $this->model('ItineraryTimelineEvent');
+        
+        foreach ($templateEvents as $templateEvent) {
+            $timelineEventModel->create([
+                'itinerary_id' => $itineraryId,
+                'day_number' => $templateEvent['day_number'],
+                'event_order' => $templateEvent['event_order'],
+                'event_type' => $templateEvent['event_type'],
+                'event_title' => $templateEvent['event_title'],
+                'event_description' => $templateEvent['event_description'],
+                'start_time' => $templateEvent['start_time'],
+                'end_time' => $templateEvent['end_time'],
+                'duration_minutes' => $templateEvent['duration_minutes'],
+                'is_mandatory' => !$templateEvent['is_optional']
+            ]);
+        }
+    }
+    
+    /**
+     * Show - View itinerary details with visual timeline
      */
     public function show() {
         Middleware::requireAuth();
         
         $itineraryId = $this->get('id');
         $userId = Session::get('user_id');
+        $viewMode = $this->get('view_mode', 'timeline'); // timeline, map, list, calendar
         
         $itinerary = $this->itineraryModel->findById($itineraryId);
         
@@ -116,10 +150,24 @@ class ItineraryController extends Controller {
         
         $items = $this->itineraryModel->getItems($itineraryId);
         
+        // Get timeline events if view mode is timeline
+        $timelineEvents = [];
+        if ($viewMode === 'timeline') {
+            $timelineEventModel = $this->model('ItineraryTimelineEvent');
+            $timelineEvents = $timelineEventModel->getByItineraryId($itineraryId);
+            
+            // Get day summaries
+            $daySummaryModel = $this->model('ItineraryDaySummary');
+            $daySummaries = $daySummaryModel->getByItineraryId($itineraryId);
+        }
+        
         $data = [
             'title' => 'Detail Itinerary - MyWisata',
             'itinerary' => $itinerary,
             'items' => $items,
+            'view_mode' => $viewMode,
+            'timeline_events' => $timelineEvents ?? [],
+            'day_summaries' => $daySummaries ?? [],
             'csrf_token' => Middleware::csrfToken()
         ];
         
@@ -305,7 +353,7 @@ class ItineraryController extends Controller {
     }
     
     /**
-     * Share itinerary
+     * Share itinerary with advanced options
      */
     public function share() {
         Middleware::requireAuth();
@@ -321,6 +369,11 @@ class ItineraryController extends Controller {
         
         $userId = Session::get('user_id');
         $itineraryId = $this->post('itinerary_id');
+        $shareType = $this->post('share_type', 'link'); // public, private, link, email
+        $sharedWithUserId = $this->post('shared_with_user_id');
+        $canEdit = $this->post('can_edit', false);
+        $canComment = $this->post('can_comment', true);
+        $expiresAt = $this->post('expires_at');
         
         // Check ownership
         $itinerary = $this->itineraryModel->findById($itineraryId);
@@ -331,9 +384,26 @@ class ItineraryController extends Controller {
         $shareToken = $this->itineraryModel->generateShareToken($itineraryId);
         
         if ($shareToken) {
+            // Create sharing record
+            $itinerarySharingModel = $this->model('ItinerarySharing');
+            $itinerarySharingModel->create([
+                'itinerary_id' => $itineraryId,
+                'shared_by_user_id' => $userId,
+                'shared_with_user_id' => $sharedWithUserId,
+                'share_type' => $shareType,
+                'share_token' => $shareToken,
+                'share_link' => BASE_URL . 'itinerary/shared/' . $shareToken,
+                'can_edit' => $canEdit,
+                'can_comment' => $canComment,
+                'expires_at' => $expiresAt
+            ]);
+            
             $shareUrl = BASE_URL . 'itinerary/shared/' . $shareToken;
             
-            Logger::audit('SHARE_ITINERARY', 'itineraries', "Generated share token for itinerary ID: {$itineraryId}", [], []);
+            Logger::audit('SHARE_ITINERARY', 'itinerary_sharing', "Shared itinerary ID: {$itineraryId}", [], [
+                'share_type' => $shareType,
+                'can_edit' => $canEdit
+            ]);
             
             $this->json([
                 'status' => 'success',
@@ -345,6 +415,69 @@ class ItineraryController extends Controller {
         } else {
             $this->json(['status' => 'error', 'message' => 'Gagal membuat share link'], 500);
         }
+    }
+    
+    /**
+     * Add comment to itinerary
+     */
+    public function addComment() {
+        Middleware::requireAuth();
+        
+        if (!$this->isAjax()) {
+            $this->redirect('home');
+        }
+        
+        if (!$this->validateCsrf()) {
+            $this->json(['status' => 'error', 'message' => 'CSRF token mismatch'], 419);
+        }
+        
+        $userId = Session::get('user_id');
+        $itineraryId = $this->post('itinerary_id');
+        $commentText = $this->post('comment_text');
+        $parentCommentId = $this->post('parent_comment_id');
+        
+        $itinerary = $this->itineraryModel->findById($itineraryId);
+        if (!$itinerary) {
+            $this->json(['status' => 'error', 'message' => 'Itinerary tidak ditemukan'], 404);
+        }
+        
+        $commentModel = $this->model('ItineraryComment');
+        $commentId = $commentModel->create([
+            'itinerary_id' => $itineraryId,
+            'user_id' => $userId,
+            'comment_text' => $commentText,
+            'parent_comment_id' => $parentCommentId
+        ]);
+        
+        if ($commentId) {
+            $this->json([
+                'status' => 'success',
+                'message' => 'Komentar berhasil ditambahkan',
+                'comment_id' => $commentId
+            ]);
+        } else {
+            $this->json(['status' => 'error', 'message' => 'Gagal menambahkan komentar'], 500);
+        }
+    }
+    
+    /**
+     * Get itinerary templates
+     */
+    public function templates() {
+        Middleware::requireAuth();
+        
+        $page = $this->get('page', 1);
+        $limit = $this->get('limit', 12);
+        $destinationId = $this->get('destination_id');
+        $durationDays = $this->get('duration_days');
+        
+        $templateModel = $this->model('ItineraryTemplate');
+        $templates = $templateModel->getActive($page, $limit, $destinationId, $durationDays);
+        
+        $this->json([
+            'status' => 'success',
+            'data' => $templates
+        ]);
     }
     
     /**

@@ -11,6 +11,9 @@
 
 class PaymentController extends Controller {
     
+    private $paymentGatewayController;
+    private $currencyController;
+    
     /**
      * Constructor - Require login
      */
@@ -19,6 +22,8 @@ class PaymentController extends Controller {
         if (!Session::get('user_id')) {
             $this->redirect('auth/login');
         }
+        $this->paymentGatewayController = new PaymentGatewayController();
+        $this->currencyController = new CurrencyController();
     }
     
     /**
@@ -44,11 +49,12 @@ class PaymentController extends Controller {
     }
     
     /**
-     * Create payment token with Midtrans
+     * Create payment token with intelligent gateway routing
      */
     public function createToken() {
         $transactionId = $this->post('transaction_id');
         $userId = Session::get('user_id');
+        $preferredGateway = $this->post('gateway', 'auto'); // auto, midtrans, stripe, paypal
         
         $transactionModel = $this->model('Transaction');
         $transaction = $transactionModel->findById($transactionId);
@@ -69,26 +75,91 @@ class PaymentController extends Controller {
         $transactionItemModel = $this->model('TransactionItem');
         $items = $transactionItemModel->getByTransactionId($transactionId);
         
-        // Format items for Midtrans
-        $midtransItems = [];
+        // Determine currency
+        $currency = $transaction['currency'] ?? 'IDR';
+        $amount = $transaction['net_amount'];
+        
+        // Route to appropriate gateway
+        $gatewayRouting = $this->paymentGatewayController->routeTransaction($currency, $amount, $preferredGateway, $user['country'] ?? 'ID');
+        
+        if (!$gatewayRouting['success']) {
+            $this->json(['status' => 'error', 'message' => $gatewayRouting['message']], 400);
+        }
+        
+        $gateway = $gatewayRouting['gateway'];
+        
+        // Format items for gateway
+        $gatewayItems = [];
         foreach ($items as $item) {
-            $midtransItems[] = [
+            $gatewayItems[] = [
                 'id' => $item['item_id'],
-                'price' => (int) $item['unit_price'],
+                'price' => (float) $item['unit_price'],
                 'quantity' => (int) $item['quantity'],
                 'name' => $item['item_type'],
                 'category' => $item['item_type']
             ];
         }
         
-        // Create Midtrans transaction
+        // Create payment intent based on gateway
+        $paymentIntent = null;
+        switch ($gateway) {
+            case 'midtrans':
+                $paymentIntent = $this->createMidtransIntent($transaction, $user, $gatewayItems);
+                break;
+            case 'stripe':
+                $paymentIntent = $this->paymentGatewayController->createStripeIntent($transaction['transaction_code'], $amount, $currency, $user);
+                break;
+            case 'paypal':
+                $paymentIntent = $this->paymentGatewayController->createPayPalOrder($transaction['transaction_code'], $amount, $currency, $user);
+                break;
+            default:
+                $paymentIntent = $this->createMidtransIntent($transaction, $user, $gatewayItems);
+        }
+        
+        if ($paymentIntent && $paymentIntent['success']) {
+            // Update transaction with gateway info
+            $transactionModel->updateGatewayInfo($transactionId, $gateway, $paymentIntent['gateway_payment_id'], $paymentIntent['client_secret'] ?? null);
+            
+            Logger::info('Payment token created', [
+                'transaction_id' => $transactionId,
+                'order_id' => $transaction['transaction_code'],
+                'gateway' => $gateway
+            ]);
+            
+            $this->json([
+                'status' => 'success',
+                'message' => 'Token pembayaran berhasil dibuat',
+                'data' => [
+                    'gateway' => $gateway,
+                    'token' => $paymentIntent['token'] ?? $paymentIntent['client_secret'],
+                    'redirect_url' => $paymentIntent['redirect_url'] ?? null,
+                    'payment_intent_id' => $paymentIntent['payment_intent_id'] ?? null
+                ]
+            ]);
+        } else {
+            Logger::error('Failed to create payment token', [
+                'transaction_id' => $transactionId,
+                'gateway' => $gateway
+            ]);
+            
+            $this->json([
+                'status' => 'error',
+                'message' => 'Gagal membuat token pembayaran. Silakan coba lagi.'
+            ], 500);
+        }
+    }
+    
+    /**
+     * Create Midtrans payment intent (legacy fallback)
+     */
+    private function createMidtransIntent($transaction, $user, $items) {
         $midtransData = [
             'order_id' => $transaction['transaction_code'],
             'amount' => (int) $transaction['net_amount'],
             'customer_name' => $user['name'],
             'customer_email' => $user['email'],
             'customer_phone' => $user['phone'] ?? '',
-            'items' => $midtransItems,
+            'items' => $items,
             'type' => $transaction['type'],
             'reference_id' => $transaction['reference_id'],
             'expiry' => PAYMENT_TIMEOUT_HOURS
@@ -97,32 +168,15 @@ class PaymentController extends Controller {
         $midtransResponse = Midtrans::createTransaction($midtransData);
         
         if ($midtransResponse && isset($midtransResponse['token'])) {
-            // Update transaction with Midtrans token
-            $transactionModel->updateMidtransToken($transactionId, $midtransResponse['token'], $midtransResponse['redirect_url'] ?? null);
-            
-            Logger::info('Payment token created', [
-                'transaction_id' => $transactionId,
-                'order_id' => $transaction['transaction_code']
-            ]);
-            
-            $this->json([
-                'status' => 'success',
-                'message' => 'Token pembayaran berhasil dibuat',
-                'data' => [
-                    'token' => $midtransResponse['token'],
-                    'redirect_url' => $midtransResponse['redirect_url'] ?? null
-                ]
-            ]);
-        } else {
-            Logger::error('Failed to create Midtrans token', [
-                'transaction_id' => $transactionId
-            ]);
-            
-            $this->json([
-                'status' => 'error',
-                'message' => 'Gagal membuat token pembayaran. Silakan coba lagi.'
-            ], 500);
+            return [
+                'success' => true,
+                'token' => $midtransResponse['token'],
+                'redirect_url' => $midtransResponse['redirect_url'] ?? null,
+                'gateway_payment_id' => $midtransResponse['token']
+            ];
         }
+        
+        return ['success' => false, 'message' => 'Midtrans failed'];
     }
     
     /**
@@ -177,7 +231,7 @@ class PaymentController extends Controller {
     }
     
     /**
-     * Handle Midtrans notification webhook
+     * Handle payment notification webhook (multi-gateway)
      */
     public function notification() {
         // Get raw POST data
@@ -190,6 +244,56 @@ class PaymentController extends Controller {
             exit;
         }
         
+        // Detect gateway from notification
+        $gateway = $this->detectGatewayFromNotification($notification);
+        
+        // Route to appropriate handler
+        $result = false;
+        switch ($gateway) {
+            case 'midtrans':
+                $result = $this->handleMidtransNotification($notification);
+                break;
+            case 'stripe':
+                $result = $this->paymentGatewayController->handleStripeWebhook($notification);
+                break;
+            case 'paypal':
+                $result = $this->paymentGatewayController->handlePayPalWebhook($notification);
+                break;
+            default:
+                // Default to Midtrans for backward compatibility
+                $result = $this->handleMidtransNotification($notification);
+        }
+        
+        if ($result) {
+            http_response_code(200);
+            echo 'OK';
+        } else {
+            http_response_code(500);
+            echo 'Failed to process notification';
+        }
+        exit;
+    }
+    
+    /**
+     * Detect gateway from notification payload
+     */
+    private function detectGatewayFromNotification($notification) {
+        if (isset($notification['order_id']) && isset($notification['signature_key'])) {
+            return 'midtrans';
+        }
+        if (isset($notification['type']) && isset($notification['data']['object'])) {
+            return 'stripe';
+        }
+        if (isset($notification['event_type']) || isset($notification['resource_type'])) {
+            return 'paypal';
+        }
+        return 'midtrans'; // Default
+    }
+    
+    /**
+     * Handle Midtrans notification (legacy)
+     */
+    private function handleMidtransNotification($notification) {
         $orderId = $notification['order_id'];
         $statusCode = $notification['status_code'];
         $grossAmount = $notification['gross_amount'];
@@ -199,16 +303,14 @@ class PaymentController extends Controller {
         if (!Midtrans::verifySignature($orderId, $statusCode, $grossAmount, $signatureKey)) {
             http_response_code(403);
             echo 'Invalid signature';
-            exit;
+            return false;
         }
         
         // Get transaction status from Midtrans
         $transactionStatus = Midtrans::getTransactionStatus($orderId);
         
         if (!$transactionStatus) {
-            http_response_code(500);
-            echo 'Failed to get transaction status';
-            exit;
+            return false;
         }
         
         // Map Midtrans status to application status
@@ -226,15 +328,14 @@ class PaymentController extends Controller {
                 $this->updateRelatedStatus($transaction);
             }
             
-            Logger::info('Payment notification processed', [
+            Logger::info('Midtrans notification processed', [
                 'order_id' => $orderId,
                 'status' => $appStatus
             ]);
+            return true;
         }
         
-        http_response_code(200);
-        echo 'OK';
-        exit;
+        return false;
     }
     
     /**

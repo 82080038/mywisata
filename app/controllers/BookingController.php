@@ -12,6 +12,7 @@
 class BookingController extends Controller {
     
     private $bookingModel;
+    private $currencyController;
     
     /**
      * Constructor - Require wisatawan role
@@ -20,6 +21,7 @@ class BookingController extends Controller {
         parent::__construct();
         Middleware::requireRole('wisatawan');
         $this->bookingModel = $this->model('Booking');
+        $this->currencyController = new CurrencyController();
     }
     
     /**
@@ -86,6 +88,14 @@ class BookingController extends Controller {
             
             $userId = Session::get('user_id');
             
+            // Get user's preferred currency
+            $currency = $this->currencyController->getUserCurrency($userId);
+            $totalAmount = $this->post('total_amount');
+            
+            // Convert to base currency (IDR) if needed
+            $baseAmount = $currency === 'IDR' ? $totalAmount : $this->currencyController->convert($totalAmount, $currency, 'IDR');
+            $exchangeRate = $currency === 'IDR' ? 1.0 : $this->currencyController->getExchangeRate($currency, 'IDR');
+            
             $data = [
                 'booking_code' => 'BK' . date('YmdHis') . rand(1000, 9999),
                 'user_id' => $userId,
@@ -95,7 +105,12 @@ class BookingController extends Controller {
                 'duration_hours' => $this->post('duration_hours'),
                 'participants' => $this->post('participants'),
                 'special_requests' => $this->post('special_requests'),
-                'total_amount' => $this->post('total_amount')
+                'total_amount' => $totalAmount,
+                'currency' => $currency,
+                'original_amount' => $totalAmount,
+                'base_amount' => $baseAmount,
+                'exchange_rate' => $exchangeRate,
+                'exchange_rate_date' => date('Y-m-d H:i:s')
             ];
             
             $validator = new Validator($_POST);
@@ -137,6 +152,11 @@ class BookingController extends Controller {
                     'discount_amount' => 0,
                     'tax_amount' => 0,
                     'net_amount' => $data['total_amount'],
+                    'currency' => $currency,
+                    'original_amount' => $data['total_amount'],
+                    'base_amount' => $baseAmount,
+                    'exchange_rate' => $exchangeRate,
+                    'exchange_rate_date' => date('Y-m-d H:i:s'),
                     'payment_method' => 'pending'
                 ];
                 $transactionModel->create($transactionData);

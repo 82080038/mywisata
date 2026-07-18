@@ -80,6 +80,73 @@ class App {
             // Handle social features controller
             $this->controller = 'SocialFeatures';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'halal-tourism') {
+            // Handle halal tourism controller
+            $this->controller = 'HalalTourism';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'culinary-tourism') {
+            // Handle culinary tourism controller
+            $this->controller = 'CulinaryTourism';
+            unset($url[0]);
+            // Map URL segments to controller methods
+            if (!empty($url) && isset($url[1])) {
+                if ($url[1] === 'food-tours') {
+                    $this->method = 'foodTours';
+                    unset($url[1]);
+                } elseif ($url[1] === 'cooking-classes') {
+                    $this->method = 'cookingClasses';
+                    unset($url[1]);
+                }
+            }
+        } elseif (!empty($url) && $url[0] === 'religious-tourism') {
+            // Handle religious tourism controller
+            $this->controller = 'ReligiousTourism';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'green-credits') {
+            // Handle green credits controller
+            $this->controller = 'GreenCredits';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'walk-in-booking') {
+            // Handle walk-in booking controller
+            $this->controller = 'WalkInBooking';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'whatsapp-booking') {
+            // Handle whatsapp booking controller
+            $this->controller = 'WhatsAppBooking';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'adventure-tourism') {
+            // Handle adventure tourism controller
+            $this->controller = 'AdventureTourism';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'agritourism') {
+            // Handle agritourism controller
+            $this->controller = 'Agritourism';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'split-payment') {
+            // Handle split payment controller
+            $this->controller = 'SplitPayment';
+            unset($url[0]);
+            // Map URL segments to controller methods
+            if (!empty($url) && isset($url[1])) {
+                if ($url[1] === 'join-group') {
+                    $this->method = 'joinGroup';
+                    unset($url[1]);
+                } elseif ($url[1] === 'group-status') {
+                    $this->method = 'groupStatus';
+                    unset($url[1]);
+                }
+            }
+        } elseif (!empty($url) && $url[0] === 'location') {
+            // Handle location discovery controller
+            $this->controller = 'LocationDiscovery';
+            unset($url[0]);
+            // Map URL segments to controller methods
+            if (!empty($url) && isset($url[1])) {
+                if ($url[1] === 'nearby') {
+                    $this->method = 'nearby';
+                    unset($url[1]);
+                }
+            }
         } else {
             // Default to Home controller
             $this->controller = 'Home';

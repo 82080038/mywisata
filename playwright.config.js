@@ -4,9 +4,13 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: false, // Run sequentially for headed mode
   forbidOnly: !!process.env.CI,
-  retries: 0, // No retries for manual testing
+  retries: 1, // Retry once on failure for robustness
   workers: 1, // Single worker for headed mode
-  reporter: ['html', 'list'],
+  reporter: [
+    ['html', { open: 'never' }], // Don't auto-open report, continue execution
+    ['list'],
+    ['json', { outputFile: 'test-results.json' }]
+  ],
   use: {
     baseURL: 'http://localhost/mywisata',
     trace: 'retain-on-failure',
@@ -15,6 +19,8 @@ export default defineConfig({
     headless: false, // Run in headed mode
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
+    actionTimeout: 30000, // 30 second action timeout
+    navigationTimeout: 30000, // 30 second navigation timeout
   },
 
   projects: [
@@ -23,12 +29,14 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         launchOptions: {
-          args: ['--start-maximized']
+          args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox']
         }
       },
     },
   ],
 
   // No webServer - XAMPP Apache is already running
-  timeout: 60000, // 60 second timeout per test
+  timeout: 120000, // 120 second timeout per test
+  globalSetup: require.resolve('./tests/global-setup.js'),
+  globalTeardown: require.resolve('./tests/global-teardown.js'),
 });

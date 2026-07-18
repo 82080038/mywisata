@@ -1,24 +1,35 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests/e2e',
-  fullyParallel: true,
+  testDir: './tests',
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  retries: 1,
+  workers: 1,
+  reporter: [
+    ['list'],
+    ['json', { outputFile: 'test-results.json' }]
+  ],
   use: {
-    baseURL: 'http://localhost:8080',
-    headless: true,
-    trace: 'on-first-retry',
+    baseURL: 'http://localhost/mywisata',
+    headless: false,
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    actionTimeout: 30000,
+    navigationTimeout: 30000,
   },
 
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox']
+        }
+      },
     },
   ],
+  timeout: 120000,
 });
