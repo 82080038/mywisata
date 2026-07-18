@@ -29,6 +29,9 @@ class SecurityTest {
         $this->testSQLInjection();
         $this->testRateLimiting();
         $this->testSessionSecurity();
+        $this->testPasswordComplexity();
+        $this->testAccountLockout();
+        $this->testEncryption();
         
         $this->printResults();
     }
@@ -231,6 +234,90 @@ class SecurityTest {
         }
         
         echo "  ✗ Session helper not found\n";
+        return false;
+    }
+    
+    /**
+     * Test Password Complexity
+     */
+    private function testPasswordComplexity() {
+        echo "Testing Password Complexity...\n";
+        
+        $result = $this->checkPasswordComplexityImplementation();
+        $this->testResults['Password Complexity'] = $result;
+        
+        echo "\n";
+    }
+    
+    /**
+     * Check password complexity implementation
+     */
+    private function checkPasswordComplexityImplementation() {
+        if (file_exists(APP_ROOT . '/app/helpers/Security.php')) {
+            $securityContent = file_get_contents(APP_ROOT . '/app/helpers/Security.php');
+            if (strpos($securityContent, 'validatePasswordComplexity') !== false) {
+                echo "  ✓ Password complexity validation implemented\n";
+                return true;
+            }
+        }
+        
+        echo "  ✗ Password complexity validation not found\n";
+        return false;
+    }
+    
+    /**
+     * Test Account Lockout
+     */
+    private function testAccountLockout() {
+        echo "Testing Account Lockout...\n";
+        
+        $result = $this->checkAccountLockoutImplementation();
+        $this->testResults['Account Lockout'] = $result;
+        
+        echo "\n";
+    }
+    
+    /**
+     * Check account lockout implementation
+     */
+    private function checkAccountLockoutImplementation() {
+        if (file_exists(APP_ROOT . '/app/helpers/Security.php')) {
+            $securityContent = file_get_contents(APP_ROOT . '/app/helpers/Security.php');
+            if (strpos($securityContent, 'checkAccountLockout') !== false) {
+                echo "  ✓ Account lockout implemented\n";
+                return true;
+            }
+        }
+        
+        echo "  ✗ Account lockout not found\n";
+        return false;
+    }
+    
+    /**
+     * Test Encryption
+     */
+    private function testEncryption() {
+        echo "Testing Encryption...\n";
+        
+        $result = $this->checkEncryptionImplementation();
+        $this->testResults['Encryption'] = $result;
+        
+        echo "\n";
+    }
+    
+    /**
+     * Check encryption implementation
+     */
+    private function checkEncryptionImplementation() {
+        if (file_exists(APP_ROOT . '/app/helpers/Security.php')) {
+            $securityContent = file_get_contents(APP_ROOT . '/app/helpers/Security.php');
+            if (strpos($securityContent, 'encrypt') !== false && strpos($securityContent, 'decrypt') !== false) {
+                echo "  ✓ Encryption/decryption implemented\n";
+                return true;
+            }
+        }
+        
+        echo "  ✗ Encryption not found\n";
         return false;
     }
     

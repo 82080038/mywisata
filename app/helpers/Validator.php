@@ -220,4 +220,47 @@ class Validator {
     public function getError($field) {
         return $this->errors[$field] ?? null;
     }
+    
+    /**
+     * Validate password complexity
+     * 
+     * @param string $field Field name
+     * @return self
+     */
+    public function passwordComplexity($field) {
+        if (!empty($this->data[$field])) {
+            $password = $this->data[$field];
+            $errors = [];
+            
+            // Minimum length
+            if (strlen($password) < PASSWORD_MIN_LENGTH) {
+                $errors[] = 'Minimal ' . PASSWORD_MIN_LENGTH . ' karakter';
+            }
+            
+            // Uppercase
+            if (PASSWORD_REQUIRE_UPPERCASE && !preg_match('/[A-Z]/', $password)) {
+                $errors[] = 'Harus mengandung huruf kapital';
+            }
+            
+            // Lowercase
+            if (PASSWORD_REQUIRE_LOWERCASE && !preg_match('/[a-z]/', $password)) {
+                $errors[] = 'Harus mengandung huruf kecil';
+            }
+            
+            // Number
+            if (PASSWORD_REQUIRE_NUMBER && !preg_match('/[0-9]/', $password)) {
+                $errors[] = 'Harus mengandung angka';
+            }
+            
+            // Special character
+            if (PASSWORD_REQUIRE_SPECIAL && !preg_match('/[^A-Za-z0-9]/', $password)) {
+                $errors[] = 'Harus mengandung karakter spesial';
+            }
+            
+            if (!empty($errors)) {
+                $this->errors[$field] = implode(', ', $errors);
+            }
+        }
+        return $this;
+    }
 }

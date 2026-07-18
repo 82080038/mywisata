@@ -50,6 +50,20 @@ if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.gc_maxlifetime', 1800); // 30 minutes
 }
 
+// Encryption key for sensitive data (CHANGE IN PRODUCTION)
+define('ENCRYPTION_KEY', 'change-this-encryption-key-in-production-use-32-characters');
+
+// Account lockout settings
+define('MAX_LOGIN_ATTEMPTS', 5);
+define('LOCKOUT_DURATION', 900); // 15 minutes in seconds
+
+// Password complexity settings
+define('PASSWORD_MIN_LENGTH', 8);
+define('PASSWORD_REQUIRE_UPPERCASE', true);
+define('PASSWORD_REQUIRE_LOWERCASE', true);
+define('PASSWORD_REQUIRE_NUMBER', true);
+define('PASSWORD_REQUIRE_SPECIAL', true);
+
 // ============================================
 // FILE UPLOAD SETTINGS
 // ============================================

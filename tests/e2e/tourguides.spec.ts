@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost/mywisata';
+const BASE_URL = 'http://localhost:8080';
 
 test.describe('Tour Guides Tests', () => {
   test('should display tour guides page for guests', async ({ page }) => {

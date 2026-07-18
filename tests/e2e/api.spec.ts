@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost/mywisata';
+const BASE_URL = 'http://localhost:8080';
 
 test.describe('API Tests', () => {
   test('should get destinations API', async ({ request }) => {

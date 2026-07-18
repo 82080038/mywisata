@@ -10,6 +10,16 @@ $currentLang = Language::getLanguage();
     <meta name="description" content="<?= Language::trans('home.subtitle') ?>">
     <title><?= isset($title) ? $title : Language::trans('home.welcome') ?></title>
     
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="<?= BASE_URL ?>manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyWisata">
+    <link rel="apple-touch-icon" href="<?= View::asset('icons/icon-152x152.png') ?>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?= View::asset('icons/icon-192x192.png') ?>">
+    <link rel="icon" type="image/png" sizes="512x512" href="<?= View::asset('icons/icon-512x512.png') ?>">
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -18,6 +28,11 @@ $currentLang = Language::getLanguage();
     
     <!-- Custom CSS -->
     <link href="<?= View::asset('css/style.css') ?>" rel="stylesheet">
+    
+    <!-- PWA Scripts -->
+    <script src="<?= View::asset('js/sw-registration.js') ?>"></script>
+    <script src="<?= View::asset('js/indexeddb-helper.js') ?>"></script>
+    <script src="<?= View::asset('js/push-notification.js') ?>"></script>
     
     <script>
         window.APP_URL = '<?= BASE_URL ?>';

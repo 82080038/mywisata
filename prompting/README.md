@@ -10,10 +10,22 @@ This prompting system enables autonomous, proactive development of the Tour Guid
 ```
 prompting/
 ├── README.md                          # This file
+├── README_SETUP.md                    # Setup guide
+├── config.json                        # Configuration file
+├── state.json                         # State tracking file
 ├── 01_development/                    # Development prompting templates
-│   └── 01_MODULE_DEVELOPMENT.md       # Module development prompts
+│   ├── 01_MODULE_DEVELOPMENT.md      # Module development prompts
+│   ├── 32_AUDIT_KEAMANAN_CHECKLIST.md # Security audit checklist
+│   ├── 33_AUTOMATION_TESTING_GUIDE.md # Automation testing guide
+│   ├── 34_LOAD_TESTING_SCENARIOS.md  # Load testing scenarios
+│   ├── 35_PWA_IMPLEMENTATION.md      # PWA implementation
+│   ├── 36_PAYMENT_GATEWAY_INTEGRATION.md # Payment gateway integration
+│   ├── 37_REDIS_CACHING.md           # Redis caching
+│   ├── 38_CDN_INTEGRATION.md         # CDN integration
+│   └── 39_AI_ENHANCEMENT_OPENAI.md   # AI enhancement with OpenAI
 ├── 02_testing/                        # Testing prompting templates
-│   └── 01_TEST_GENERATION.md          # Test generation prompts
+│   ├── 01_TEST_GENERATION.md         # Test generation prompts
+│   └── 02_PLAYWRIGHT_TESTING.md      # Playwright testing
 ├── 03_revision/                       # Revision prompting templates
 │   └── 01_CODE_REVIEW.md             # Code review prompts
 ├── 04_improvement/                    # Improvement prompting templates
@@ -71,11 +83,24 @@ Use specific prompting templates:
 - **Revision:** `03_revision/01_CODE_REVIEW.md`
 - **Improvement:** `04_improvement/01_CODE_OPTIMIZATION.md`
 
-### 3. Re-prompting
+### 3. Post-Production Optimization Modules
+
+The following new modules are available for post-production optimization:
+
+- **Security Audit:** `01_development/32_AUDIT_KEAMANAN_CHECKLIST.md` - Comprehensive security audit
+- **Automation Testing:** `01_development/33_AUTOMATION_TESTING_GUIDE.md` - Complete automation testing
+- **Load Testing:** `01_development/34_LOAD_TESTING_SCENARIOS.md` - Performance load testing
+- **PWA Implementation:** `01_development/35_PWA_IMPLEMENTATION.md` - Progressive Web App
+- **Payment Gateway:** `01_development/36_PAYMENT_GATEWAY_INTEGRATION.md` - Payment integration
+- **Redis Caching:** `01_development/37_REDIS_CACHING.md` - Redis caching implementation
+- **CDN Integration:** `01_development/38_CDN_INTEGRATION.md` - Content Delivery Network
+- **AI Enhancement:** `01_development/39_AI_ENHANCEMENT_OPENAI.md` - OpenAI integration
+
+### 4. Re-prompting
 
 When a prompt fails or needs adjustment, use `05_cycle/02_REPROMPTING.md`.
 
-### 4. Adjust Prompting
+### 5. Adjust Prompting
 
 When the development direction needs adjustment, use `05_cycle/03_ADJUST_PROMPTING.md`.
 

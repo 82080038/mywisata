@@ -1,0 +1,12 @@
+parameters:
+    level: 8
+    paths:
+        - app
+    excludePaths:
+        - app/views
+        - app/config
+    ignoreErrors:
+        - '#Access to undefined constant#'
+        - '#Undefined variable#'
+    bootstrapFiles:
+        - app/config/config.php

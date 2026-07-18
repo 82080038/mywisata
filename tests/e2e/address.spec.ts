@@ -4,7 +4,7 @@ const BASE_URL = 'http://localhost:8080';
 
 test.describe('Address Cascading Dropdowns UI', () => {
   test('should load provinces API endpoint', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getProvinces`);
+    await page.goto(`${BASE_URL}/?url=address/getProvinces`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -18,7 +18,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should load regencies by province ID', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getRegencies?province_id=3`);
+    await page.goto(`${BASE_URL}/?url=address/getRegencies&province_id=3`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -30,7 +30,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should load districts by regency ID', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getDistricts?regency_id=31`);
+    await page.goto(`${BASE_URL}/?url=address/getDistricts&regency_id=31`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -42,7 +42,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should load villages by district ID', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getVillages?district_id=402`);
+    await page.goto(`${BASE_URL}/?url=address/getVillages&district_id=402`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -54,7 +54,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should handle missing parameters gracefully', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getRegencies`);
+    await page.goto(`${BASE_URL}/?url=address/getRegencies`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -65,7 +65,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should return correct province data structure', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getProvinces`);
+    await page.goto(`${BASE_URL}/?url=address/getProvinces`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -78,7 +78,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should return correct regency data structure', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getRegencies?province_id=3`);
+    await page.goto(`${BASE_URL}/?url=address/getRegencies&province_id=3`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -92,7 +92,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should return correct district data structure', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getDistricts?regency_id=31`);
+    await page.goto(`${BASE_URL}/?url=address/getDistricts&regency_id=31`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -105,7 +105,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should return correct village data structure', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getVillages?district_id=402`);
+    await page.goto(`${BASE_URL}/?url=address/getVillages&district_id=402`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
@@ -119,7 +119,7 @@ test.describe('Address Cascading Dropdowns UI', () => {
   });
 
   test('should include count in response', async ({ page }) => {
-    await page.goto(`${BASE_URL}/address/getProvinces`);
+    await page.goto(`${BASE_URL}/?url=address/getProvinces`);
     
     const response = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);

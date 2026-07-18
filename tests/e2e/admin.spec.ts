@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost/mywisata';
+const BASE_URL = 'http://localhost:8080';
 
 test.describe('Admin Dashboard Tests', () => {
   test('should redirect to login when accessing admin without auth', async ({ page }) => {
