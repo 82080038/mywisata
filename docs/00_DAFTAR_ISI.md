@@ -1,9 +1,9 @@
 # DAFTAR ISI — Tour Guide Application Documentation
 
 > **Aplikasi:** Tour Guide Application  
-> **Versi Dokumen:** 1.0  
-> **Tanggal:** 2026-06-30  
-> **Total Dokumen:** 42 modul
+> **Versi Dokumen:** 2.0  
+> **Tanggal:** 2026-07-18  
+> **Total Dokumen:** 50+ modul
 
 ---
 
@@ -67,7 +67,7 @@ mulai dari konsep, analisis, desain, implementasi modul, hingga deployment.
 | No | Dokumen | Deskripsi |
 |----|---------|-----------|
 | 20 | `20_SECURITY_SYSTEM.md` | Autentikasi, RBAC, CSRF, SQL injection, XSS, input validation, audit log, rate limiting, security headers |
-| 21 | `21_API_DESIGN_AJAX_JSON.md` | Format response standar, HTTP status codes, daftar endpoint lengkap, JS API helper, pagination |
+| 21 | `API_GUIDE.md` | API documentation lengkap: request/response format, authentication, endpoints, error handling, rate limiting, OpenAPI specification |
 | 22 | `22_USER_ROLE_PERMISSION.md` | Role definition, permission matrix per modul, implementation, flow registrasi |
 
 ### Bagian VII — Operasional & Deployment
@@ -75,15 +75,15 @@ mulai dari konsep, analisis, desain, implementasi modul, hingga deployment.
 | No | Dokumen | Deskripsi |
 |----|---------|-----------|
 | 23 | `23_DATABASE_BACKUP_RECOVERY.md` | Strategi backup, script otomatis, recovery, backup via PHP admin panel |
-| 24 | `24_TESTING_SYSTEM.md` | Jenis testing, test cases per modul, API test, security test, UI test, performance test |
-| 25 | `25_DEPLOYMENT_SERVER.md` | Spesifikasi server, instalasi LAMP, deploy aplikasi, Apache/Nginx config, SSL, cron jobs, optimisasi |
+| 24 | `TESTING_GUIDE.md` | Panduan testing lengkap: Playwright E2E, manual testing, load testing, security testing, performance testing |
+| 25 | `DEPLOYMENT_GUIDE.md` | Panduan deployment lengkap: server setup, LAMP/LNMP, Apache/Nginx config, SSL, cron jobs, optimization, security hardening |
 | 26 | `26_ROADMAP_PENGEMBANGAN.md` | Timeline 4 fase (22 minggu), post-launch roadmap, metrik kesuksesan, risiko, referensi aplikasi |
 
 ### Bagian VIII — Panduan Tambahan
 
 | No | Dokumen | Deskripsi |
 |----|---------|-----------|
-| 27 | `27_PANDUAN_INSTALASI_LOKAL.md` | Setup lingkungan development lokal (XAMPP/LAMPP), konfigurasi, import database, troubleshooting, multi-environment config |
+| 27 | `SETUP_GUIDE.md` | Panduan instalasi lengkap: prerequisites, installation steps, configuration, database setup, running application, troubleshooting |
 | 28 | `28_STANDAR_KODE_KONTRIBUSI.md` | Standar penulisan kode PHP/JS/CSS, Git workflow, kontribusi tim, code review checklist |
 | 29 | `29_CHECKLIST_PENGEMBANGAN.md` | Checklist per fase pengembangan, acceptance criteria per modul, definisi selesai (Definition of Done) |
 
@@ -107,41 +107,60 @@ mulai dari konsep, analisis, desain, implementasi modul, hingga deployment.
 
 | No | Dokumen | Deskripsi |
 |----|---------|-----------|
-| 33 | `33_API_DOCUMENTATION_SWAGGER.md` | API documentation lengkap dalam format OpenAPI/Swagger untuk semua endpoint |
-| 34 | `34_USER_MANUAL.md` | Panduan penggunaan aplikasi untuk wisatawan (end-user) |
-| 35 | `35_ADMIN_MANUAL.md` | Panduan lengkap untuk admin panel dan manajemen sistem |
-| 36 | `36_TROUBLESHOOTING_GUIDE.md` | Panduan troubleshooting untuk masalah umum dan solusinya |
-| 37 | `37_PERFORMANCE_TUNING_GUIDE.md` | Panduan optimasi performance PHP, MySQL, web server, caching, dan scaling |
-| 38 | `38_TESTING_GUIDE.md` | Test cases lengkap per modul dengan expected results |
-| 39 | `39_AUTOMATION_TESTING_GUIDE.md` | Panduan automation testing dengan Selenium dan Puppeteer |
-| 40 | `40_LOAD_TESTING_SCENARIOS.md` | Scenarios load testing dengan JMeter dan k6 |
-| 41 | `41_VISUAL_DIAGRAMS.md` | Kumpulan diagram visual (architecture, ERD, flow, sequence) dalam format Mermaid |
-| 42 | `42_THIRD_PARTY_API_INTEGRATION.md` | Integrasi dengan platform pihak ketiga (Traveloka, Booking.com, Agoda) untuk menerima pesanan hotel/homestay dan pembayaran via webhook |
+| 33 | `DEVELOPER_GUIDE.md` | **Panduan developer lengkap** - Architecture, project structure, coding standards, configuration, database, API, testing, deployment, troubleshooting |
+| 34 | `PROJECT_STRUCTURE.md` | Struktur project detail - Directory overview, file naming conventions, database structure, routing pattern, dependency flow |
+| 35 | `34_USER_MANUAL.md` | Panduan penggunaan aplikasi untuk wisatawan (end-user) |
+| 36 | `35_ADMIN_MANUAL.md` | Panduan lengkap untuk admin panel dan manajemen sistem |
+| 37 | `41_VISUAL_DIAGRAMS.md` | Kumpulan diagram visual (architecture, ERD, flow, sequence) dalam format Mermaid |
+| 38 | `42_THIRD_PARTY_API_INTEGRATION.md` | Integrasi dengan platform pihak ketiga (Traveloka, Booking.com, Agoda) untuk menerima pesanan hotel/homestay dan pembayaran via webhook |
+| 39 | `43_GAP_ANALYSIS_COMPARISON.md` | Analisis gap dan perbandingan dengan aplikasi sejenis |
+
+### Bagian XI — Panduan Fitur Advanced
+
+| No | Dokumen | Deskripsi |
+|----|---------|-----------|
+| 40 | `ai_integration_guide.md` | Panduan integrasi OpenAI untuk AI Tour Guide features |
+| 41 | `openai_setup_guide.md` | Setup OpenAI API key dan konfigurasi |
+| 42 | `payment_gateway_guide.md` | Panduan integrasi Midtrans payment gateway |
+| 43 | `cdn_integration_guide.md` | Panduan integrasi Cloudflare CDN |
+| 44 | `cloudflare_setup_guide.md` | Setup Cloudflare account dan konfigurasi |
+| 45 | `load_testing_guide.md` | Panduan load testing dengan Apache Bench dan JMeter |
+| 46 | `pwa_guide.md` | Panduan PWA implementation dengan service worker |
+
+### Bagian XII — Laporan & Status
+
+| No | Dokumen | Deskripsi |
+|----|---------|-----------|
+| 47 | `PLAYWRIGHT_COMPREHENSIVE_TEST_REPORT.md` | Laporan lengkap Playwright E2E testing: test results, coverage, issues, recommendations |
 
 ---
 
 ## CARA MEMBACA DOKUMENTASI
 
 ```
-Bagian I (01-02)   → Pahami KEBUTUHAN & SCOPE
+Bagian I (01-02)      → Pahami KEBUTUHAN & SCOPE
         ↓
-Bagian II (03-04)  → Pahami ARSITEKTUR & STRUKTUR
+Bagian II (03-04)     → Pahami ARSITEKTUR & STRUKTUR
         ↓
-Bagian III (05-06) → Pahami DATABASE & DATA MODEL
+Bagian III (05-06)    → Pahami DATABASE & DATA MODEL
         ↓
-Bagian IV (07-09)  → Pahami MODUL PER ROLE
+Bagian IV (07-09)     → Pahami MODUL PER ROLE
         ↓
-Bagian V (10-19)   → Pahami MODUL PER FITUR
+Bagian V (10-19)      → Pahami MODUL PER FITUR
         ↓
-Bagian VI (20-22)  → Pahami SECURITY & API
+Bagian VI (20-22)     → Pahami SECURITY & API
         ↓
-Bagian VII (23-26) → Pahami OPERASIONAL & DEPLOYMENT
+Bagian VII (23-26)    → Pahami OPERASIONAL & DEPLOYMENT
         ↓
-Bagian VIII (27-29)→ Pahami PANDUAN DEVELOPMENT
+Bagian VIII (27-29)   → Pahami PANDUAN DEVELOPMENT
         ↓
-Bagian IX (30-32) → Pahami DIAGRAM, GLOSARIUM & AUDIT
+Bagian IX (30-32)     → Pahami DIAGRAM, GLOSARIUM & AUDIT
         ↓
-Bagian X (33-41)  → Pahami PANDUAN TAMBAHAN (100% COMPLETION)
+Bagian X (33-39)      → Pahami PANDUAN TAMBAHAN (100% COMPLETION)
+        ↓
+Bagian XI (40-46)     → Pahami FITUR ADVANCED
+        ↓
+Bagian XII (47)       → Pahami LAPORAN & STATUS
 ```
 
 ---
@@ -153,6 +172,7 @@ Bagian X (33-41)  → Pahami PANDUAN TAMBAHAN (100% COMPLETION)
 | 1.0 | 2026-06-30 | Dokumen awal 01-26 |
 | 1.1 | 2026-06-30 | Penambahan modul 27-29, update doc 05/06 (tabel `rate_limits`), update doc 03/04/21 |
 | 1.2 | 2026-06-30 | Penambahan modul 30-32: diagram alur bisnis, kamus istilah, audit keamanan |
+| 2.0 | 2026-07-18 | Reorganisasi dokumentasi: merge deployment (6→1), testing (4→1), API (2→1). Tambah DEVELOPER_GUIDE, PROJECT_STRUCTURE, SETUP_GUIDE. Hapus file duplikat/obsolete. Update struktur dokumentasi menjadi 12 bagian. |
 
 ---
 
