@@ -60,6 +60,26 @@ class App {
             // Handle speech controller
             $this->controller = 'Speech';
             unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'sustainability') {
+            // Handle sustainability controller
+            $this->controller = 'Sustainability';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'whatsapp') {
+            // Handle whatsapp controller
+            $this->controller = 'WhatsApp';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'business-operations') {
+            // Handle business operations controller
+            $this->controller = 'BusinessOperations';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'document-trip') {
+            // Handle document trip controller
+            $this->controller = 'DocumentTrip';
+            unset($url[0]);
+        } elseif (!empty($url) && $url[0] === 'social-features') {
+            // Handle social features controller
+            $this->controller = 'SocialFeatures';
+            unset($url[0]);
         } else {
             // Default to Home controller
             $this->controller = 'Home';

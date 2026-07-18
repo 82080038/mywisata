@@ -17,11 +17,18 @@ class SustainabilityController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
         $stats = $this->sustainabilityService->getUserStatistics($userId);
-        return $this->json(['success' => true, 'data' => $stats]);
+        $data = [
+            'eco_score' => $stats['eco_score'],
+            'total_co2_saved' => $stats['total_co2_saved'],
+            'total_points' => $stats['total_points'],
+            'emissions_by_type' => $stats['emissions_by_type'],
+            'recent_actions' => $stats['recent_actions']
+        ];
+        $this->view('sustainability/index', $data);
     }
     
     /**
@@ -31,20 +38,30 @@ class SustainabilityController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
-        $data = [
-            'user_id' => $userId,
-            'emission_type' => $_POST['emission_type'] ?? '',
-            'co2_kg' => $_POST['co2_kg'] ?? 0,
-            'transport_mode' => $_POST['transport_mode'] ?? null,
-            'distance_km' => $_POST['distance_km'] ?? null,
-            'booking_id' => $_POST['booking_id'] ?? null
-        ];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'user_id' => $userId,
+                'emission_type' => $_POST['emission_type'] ?? '',
+                'co2_kg' => $_POST['co2_kg'] ?? 0,
+                'transport_mode' => $_POST['transport_mode'] ?? null,
+                'distance_km' => $_POST['distance_km'] ?? null,
+                'booking_id' => $_POST['booking_id'] ?? null
+            ];
+            
+            $result = $this->sustainabilityService->recordEmission($data);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Carbon emission recorded successfully');
+                return $this->redirect('sustainability');
+            } else {
+                Session::flash('error', $result['error']);
+            }
+        }
         
-        $result = $this->sustainabilityService->recordEmission($data);
-        return $this->json($result);
+        $this->view('sustainability/record_emission');
     }
     
     /**
@@ -54,17 +71,27 @@ class SustainabilityController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
-        $data = [
-            'user_id' => $userId,
-            'action_type' => $_POST['action_type'] ?? '',
-            'description' => $_POST['description'] ?? ''
-        ];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'user_id' => $userId,
+                'action_type' => $_POST['action_type'] ?? '',
+                'description' => $_POST['description'] ?? ''
+            ];
+            
+            $result = $this->sustainabilityService->recordEcoAction($data);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Eco action recorded! You earned ' . $result['points_earned'] . ' points');
+                return $this->redirect('sustainability');
+            } else {
+                Session::flash('error', $result['error']);
+            }
+        }
         
-        $result = $this->sustainabilityService->recordEcoAction($data);
-        return $this->json($result);
+        $this->view('sustainability/record_action');
     }
     
     /**

@@ -102,4 +102,21 @@ class BusinessOperationsController extends Controller {
         $stats = $this->businessOpsService->getGuideStatistics($guideId);
         return $this->json(['success' => true, 'data' => $stats]);
     }
+    
+    /**
+     * Index page
+     */
+    public function index() {
+        $userId = $_SESSION['user_id'] ?? null;
+        
+        if (!$userId) {
+            return $this->redirect('auth/login');
+        }
+        
+        $data = [
+            'recent_matches' => [], // Would fetch from model
+            'recent_clock_ins' => [] // Would fetch from model
+        ];
+        $this->view('business_operations/index', $data);
+    }
 }

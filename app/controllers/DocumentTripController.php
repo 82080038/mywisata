@@ -17,11 +17,17 @@ class DocumentTripController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
         $wallet = $this->documentTripService->getWallet($userId);
-        return $this->json(['success' => true, 'data' => $wallet]);
+        $transactions = $this->documentTripService->getTransactions($userId, 20);
+        
+        $data = [
+            'wallet' => $wallet,
+            'transactions' => $transactions
+        ];
+        $this->view('document_trip/wallet', $data);
     }
     
     /**
@@ -31,14 +37,24 @@ class DocumentTripController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
-        $amount = $_POST['amount'] ?? 0;
-        $description = $_POST['description'] ?? null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $amount = $_POST['amount'] ?? 0;
+            $description = $_POST['description'] ?? null;
+            
+            $result = $this->documentTripService->addFunds($userId, $amount, $description);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Funds added successfully');
+                return $this->redirect('document-trip/wallet');
+            } else {
+                Session::flash('error', $result['error']);
+            }
+        }
         
-        $result = $this->documentTripService->addFunds($userId, $amount, $description);
-        return $this->json($result);
+        return $this->redirect('document-trip/wallet');
     }
     
     /**
@@ -48,7 +64,7 @@ class DocumentTripController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
         }
         
         $limit = $_GET['limit'] ?? 50;

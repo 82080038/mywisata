@@ -17,23 +17,54 @@ class SocialFeaturesController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'trip_name' => $_POST['trip_name'] ?? '',
+                'created_by' => $userId,
+                'destination_id' => $_POST['destination_id'] ?? null,
+                'start_date' => $_POST['start_date'] ?? null,
+                'end_date' => $_POST['end_date'] ?? null,
+                'max_participants' => $_POST['max_participants'] ?? null,
+                'is_public' => $_POST['is_public'] ?? 0,
+                'description' => $_POST['description'] ?? null,
+                'status' => 'planning'
+            ];
+            
+            $result = $this->socialFeaturesService->createGroupTrip($data);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Group trip created successfully');
+                return $this->redirect('social-features/group-trips');
+            } else {
+                Session::flash('error', $result['error']);
+            }
         }
         
         $data = [
-            'trip_name' => $_POST['trip_name'] ?? '',
-            'created_by' => $userId,
-            'destination_id' => $_POST['destination_id'] ?? null,
-            'start_date' => $_POST['start_date'] ?? null,
-            'end_date' => $_POST['end_date'] ?? null,
-            'max_participants' => $_POST['max_participants'] ?? null,
-            'is_public' => $_POST['is_public'] ?? 0,
-            'description' => $_POST['description'] ?? null,
-            'status' => 'planning'
+            'trips' => [], // Would fetch from model
+            'destinations' => [] // Would fetch from model
         ];
+        $this->view('social_features/group_trips', $data);
+    }
+    
+    /**
+     * Group trips index
+     */
+    public function groupTrips() {
+        $userId = $_SESSION['user_id'] ?? null;
         
-        $result = $this->socialFeaturesService->createGroupTrip($data);
-        return $this->json($result);
+        if (!$userId) {
+            return $this->redirect('auth/login');
+        }
+        
+        $data = [
+            'trips' => [], // Would fetch from model
+            'destinations' => [] // Would fetch from model
+        ];
+        $this->view('social_features/group_trips', $data);
     }
     
     /**
@@ -79,18 +110,47 @@ class SocialFeaturesController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'wishlist_name' => $_POST['wishlist_name'] ?? '',
+                'created_by' => $userId,
+                'is_public' => $_POST['is_public'] ?? 0,
+                'description' => $_POST['description'] ?? null
+            ];
+            
+            $result = $this->socialFeaturesService->createSharedWishlist($data);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Wishlist created successfully');
+                return $this->redirect('social-features/wishlists');
+            } else {
+                Session::flash('error', $result['error']);
+            }
         }
         
         $data = [
-            'wishlist_name' => $_POST['wishlist_name'] ?? '',
-            'created_by' => $userId,
-            'is_public' => $_POST['is_public'] ?? 0,
-            'description' => $_POST['description'] ?? null
+            'wishlists' => [] // Would fetch from model
         ];
+        $this->view('social_features/wishlists', $data);
+    }
+    
+    /**
+     * Wishlists index
+     */
+    public function wishlists() {
+        $userId = $_SESSION['user_id'] ?? null;
         
-        $result = $this->socialFeaturesService->createSharedWishlist($data);
-        return $this->json($result);
+        if (!$userId) {
+            return $this->redirect('auth/login');
+        }
+        
+        $data = [
+            'wishlists' => [] // Would fetch from model
+        ];
+        $this->view('social_features/wishlists', $data);
     }
     
     /**
@@ -203,19 +263,50 @@ class SocialFeaturesController extends Controller {
         $userId = $_SESSION['user_id'] ?? null;
         
         if (!$userId) {
-            return $this->json(['success' => false, 'error' => 'Not logged in']);
+            return $this->redirect('auth/login');
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'group_trip_id' => $_POST['group_trip_id'] ?? null,
+                'album_name' => $_POST['album_name'] ?? '',
+                'created_by' => $userId,
+                'description' => $_POST['description'] ?? null,
+                'is_public' => $_POST['is_public'] ?? 0
+            ];
+            
+            $result = $this->socialFeaturesService->createTripAlbum($data);
+            
+            if ($result['success']) {
+                Session::flash('success', 'Album created successfully');
+                return $this->redirect('social-features/albums');
+            } else {
+                Session::flash('error', $result['error']);
+            }
         }
         
         $data = [
-            'group_trip_id' => $_POST['group_trip_id'] ?? null,
-            'album_name' => $_POST['album_name'] ?? '',
-            'created_by' => $userId,
-            'description' => $_POST['description'] ?? null,
-            'is_public' => $_POST['is_public'] ?? 0
+            'albums' => [], // Would fetch from model
+            'group_trips' => [] // Would fetch from model
         ];
+        $this->view('social_features/albums', $data);
+    }
+    
+    /**
+     * Albums index
+     */
+    public function albums() {
+        $userId = $_SESSION['user_id'] ?? null;
         
-        $result = $this->socialFeaturesService->createTripAlbum($data);
-        return $this->json($result);
+        if (!$userId) {
+            return $this->redirect('auth/login');
+        }
+        
+        $data = [
+            'albums' => [], // Would fetch from model
+            'group_trips' => [] // Would fetch from model
+        ];
+        $this->view('social_features/albums', $data);
     }
     
     /**
