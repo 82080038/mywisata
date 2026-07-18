@@ -10,6 +10,7 @@
 [![Tests](https://img.shields.io/badge/Tests-83%20passed-brightgreen.svg)](https://github.com/82080038/mywisata)
 [![Project Structure](https://img.shields.io/badge/Structure-Reorganized-blue.svg)](https://github.com/82080038/mywisata)
 [![Prompting System](https://img.shields.io/badge/Prompting-Ready-orange.svg)](https://github.com/82080038/mywisata)
+[![Modern Features](https://img.shields.io/badge/Modern%20Features-In%20Progress-yellow.svg)](https://github.com/82080038/mywisata)
 
 ---
 
