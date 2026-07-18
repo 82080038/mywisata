@@ -5,10 +5,10 @@
 
 -- Group trips
 CREATE TABLE IF NOT EXISTS `group_trips` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `trip_name` varchar(255) NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `destination_id` int(11) DEFAULT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
+  `destination_id` bigint(20) unsigned DEFAULT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
   `max_participants` int(11) DEFAULT NULL,
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS `group_trips` (
 
 -- Group trip participants
 CREATE TABLE IF NOT EXISTS `group_trip_participants` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_trip_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `group_trip_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `role` enum('organizer','participant','viewer') DEFAULT 'participant',
   `status` enum('invited','accepted','declined','left') DEFAULT 'invited',
   `joined_at` timestamp NULL DEFAULT NULL,
@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS `group_trip_participants` (
 
 -- Shared wishlists
 CREATE TABLE IF NOT EXISTS `shared_wishlists` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `wishlist_name` varchar(255) NOT NULL,
-  `created_by` int(11) NOT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
   `is_public` tinyint(1) DEFAULT 0,
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -58,10 +58,10 @@ CREATE TABLE IF NOT EXISTS `shared_wishlists` (
 
 -- Shared wishlist items
 CREATE TABLE IF NOT EXISTS `shared_wishlist_items` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `wishlist_id` int(11) NOT NULL,
-  `destination_id` int(11) NOT NULL,
-  `added_by` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `wishlist_id` bigint(20) unsigned NOT NULL,
+  `destination_id` bigint(20) unsigned NOT NULL,
+  `added_by` bigint(20) unsigned NOT NULL,
   `notes` text DEFAULT NULL,
   `priority` enum('low','medium','high') DEFAULT 'medium',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -76,11 +76,11 @@ CREATE TABLE IF NOT EXISTS `shared_wishlist_items` (
 
 -- Shared wishlist collaborators
 CREATE TABLE IF NOT EXISTS `shared_wishlist_collaborators` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `wishlist_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `wishlist_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `permission` enum('view','edit','admin') DEFAULT 'view',
-  `invited_by` int(11) NOT NULL,
+  `invited_by` bigint(20) unsigned NOT NULL,
   `status` enum('invited','accepted','declined') DEFAULT 'invited',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -94,10 +94,10 @@ CREATE TABLE IF NOT EXISTS `shared_wishlist_collaborators` (
 
 -- Split payment groups
 CREATE TABLE IF NOT EXISTS `split_payment_groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(255) NOT NULL,
-  `created_by` int(11) NOT NULL,
-  `booking_id` int(11) DEFAULT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
+  `booking_id` bigint(20) unsigned DEFAULT NULL,
   `total_amount` decimal(10,2) NOT NULL,
   `currency` varchar(3) DEFAULT 'IDR',
   `status` enum('active','settled','cancelled') DEFAULT 'active',
@@ -114,9 +114,9 @@ CREATE TABLE IF NOT EXISTS `split_payment_groups` (
 
 -- Split payment members
 CREATE TABLE IF NOT EXISTS `split_payment_members` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `payment_group_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `payment_group_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `share_amount` decimal(10,2) NOT NULL,
   `paid_amount` decimal(10,2) DEFAULT 0,
   `status` enum('pending','partial','settled') DEFAULT 'pending',
@@ -132,10 +132,10 @@ CREATE TABLE IF NOT EXISTS `split_payment_members` (
 
 -- Trip albums
 CREATE TABLE IF NOT EXISTS `trip_albums` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_trip_id` int(11) DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `group_trip_id` bigint(20) unsigned DEFAULT NULL,
   `album_name` varchar(255) NOT NULL,
-  `created_by` int(11) NOT NULL,
+  `created_by` bigint(20) unsigned NOT NULL,
   `description` text DEFAULT NULL,
   `is_public` tinyint(1) DEFAULT 0,
   `cover_photo` varchar(500) DEFAULT NULL,
@@ -150,9 +150,9 @@ CREATE TABLE IF NOT EXISTS `trip_albums` (
 
 -- Trip album photos
 CREATE TABLE IF NOT EXISTS `trip_album_photos` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `album_id` int(11) NOT NULL,
-  `uploaded_by` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `album_id` bigint(20) unsigned NOT NULL,
+  `uploaded_by` bigint(20) unsigned NOT NULL,
   `file_path` varchar(500) NOT NULL,
   `caption` varchar(500) DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
@@ -170,9 +170,9 @@ CREATE TABLE IF NOT EXISTS `trip_album_photos` (
 
 -- Trip album comments
 CREATE TABLE IF NOT EXISTS `trip_album_comments` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `photo_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `photo_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
   `comment` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),

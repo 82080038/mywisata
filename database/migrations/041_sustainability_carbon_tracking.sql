@@ -5,9 +5,9 @@
 
 -- Carbon emissions table
 CREATE TABLE IF NOT EXISTS `carbon_emissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `booking_id` int(11) DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `booking_id` bigint(20) unsigned DEFAULT NULL,
   `emission_type` enum('transport','accommodation','food','activity') NOT NULL,
   `transport_mode` varchar(50) DEFAULT NULL COMMENT 'car, bus, train, flight, etc.',
   `distance_km` decimal(10,2) DEFAULT NULL,
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS `carbon_emissions` (
 
 -- Eco scores table
 CREATE TABLE IF NOT EXISTS `eco_scores` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `destination_id` int(11) DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `destination_id` bigint(20) unsigned DEFAULT NULL,
   `score` int(11) NOT NULL COMMENT '0-100 eco score',
   `level` enum('bronze','silver','gold','platinum') NOT NULL,
   `total_co2_saved` decimal(10,2) DEFAULT 0 COMMENT 'Total CO2 saved in kg',
@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS `eco_scores` (
 
 -- Eco actions table
 CREATE TABLE IF NOT EXISTS `eco_actions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
   `action_type` enum('public_transport','eco_accommodation','local_food','carbon_offset','waste_reduction') NOT NULL,
   `description` varchar(255) NOT NULL,
   `co2_saved_kg` decimal(10,2) DEFAULT 0,
@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS `eco_actions` (
 
 -- Low-carbon routes table
 CREATE TABLE IF NOT EXISTS `low_carbon_routes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `origin_id` int(11) NOT NULL COMMENT 'Destination ID',
-  `destination_id` int(11) NOT NULL COMMENT 'Destination ID',
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `origin_id` bigint(20) unsigned NOT NULL COMMENT 'Destination ID',
+  `destination_id` bigint(20) unsigned NOT NULL COMMENT 'Destination ID',
   `transport_mode` varchar(50) NOT NULL,
   `duration_hours` decimal(5,2) NOT NULL,
   `co2_kg` decimal(10,2) NOT NULL,

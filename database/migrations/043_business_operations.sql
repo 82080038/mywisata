@@ -5,10 +5,10 @@
 
 -- AI match engine results
 CREATE TABLE IF NOT EXISTS `guide_match_results` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `booking_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `matched_guide_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `booking_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `matched_guide_id` bigint(20) unsigned NOT NULL,
   `match_score` decimal(5,2) NOT NULL COMMENT '0-100 match score',
   `match_reasons` text DEFAULT NULL COMMENT 'JSON array of match reasons',
   `is_accepted` tinyint(1) DEFAULT NULL,
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS `guide_match_results` (
 
 -- Smart schedule entries
 CREATE TABLE IF NOT EXISTS `smart_schedule_entries` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `guide_id` int(11) NOT NULL,
-  `booking_id` int(11) DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `guide_id` bigint(20) unsigned NOT NULL,
+  `booking_id` bigint(20) unsigned DEFAULT NULL,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `start_datetime` datetime NOT NULL,
@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS `smart_schedule_entries` (
 
 -- Payroll records
 CREATE TABLE IF NOT EXISTS `payroll_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `guide_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `guide_id` bigint(20) unsigned NOT NULL,
   `period_start` date NOT NULL,
   `period_end` date NOT NULL,
   `total_bookings` int(11) DEFAULT 0,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `payroll_records` (
   `deductions` decimal(10,2) DEFAULT 0,
   `net_salary` decimal(10,2) DEFAULT 0,
   `status` enum('draft','pending','approved','paid') DEFAULT 'draft',
-  `approved_by` int(11) DEFAULT NULL,
+  `approved_by` bigint(20) unsigned DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
   `paid_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS `payroll_records` (
 
 -- GPS clock-in records
 CREATE TABLE IF NOT EXISTS `gps_clock_in_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `guide_id` int(11) NOT NULL,
-  `booking_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `guide_id` bigint(20) unsigned NOT NULL,
+  `booking_id` bigint(20) unsigned NOT NULL,
   `clock_in_time` datetime NOT NULL,
   `clock_out_time` datetime DEFAULT NULL,
   `clock_in_latitude` decimal(10,8) DEFAULT NULL,
@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS `gps_clock_in_records` (
 
 -- Express book (walk-in) records
 CREATE TABLE IF NOT EXISTS `express_book_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `guide_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `guide_id` bigint(20) unsigned NOT NULL,
   `customer_name` varchar(255) NOT NULL,
   `customer_phone` varchar(20) NOT NULL,
   `customer_email` varchar(255) DEFAULT NULL,

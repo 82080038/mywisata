@@ -5,8 +5,8 @@
 
 -- WhatsApp contacts table
 CREATE TABLE IF NOT EXISTS `whatsapp_contacts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
   `phone_number` varchar(20) NOT NULL,
   `whatsapp_id` varchar(100) DEFAULT NULL COMMENT 'WhatsApp business ID',
   `is_verified` tinyint(1) DEFAULT 0,
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS `whatsapp_contacts` (
 
 -- WhatsApp messages table
 CREATE TABLE IF NOT EXISTS `whatsapp_messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `contact_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `contact_id` bigint(20) unsigned NOT NULL,
   `message_type` enum('booking_confirmation','payment_reminder','review_request','promotion','customer_service','custom') NOT NULL,
   `direction` enum('outbound','inbound') NOT NULL,
   `content` text NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `whatsapp_messages` (
 
 -- WhatsApp message templates
 CREATE TABLE IF NOT EXISTS `whatsapp_templates` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `template_name` varchar(100) NOT NULL,
   `template_type` enum('booking_confirmation','payment_reminder','review_request','promotion','customer_service','custom') NOT NULL,
   `content` text NOT NULL,
@@ -61,9 +61,9 @@ CREATE TABLE IF NOT EXISTS `whatsapp_templates` (
 
 -- WhatsApp campaign table
 CREATE TABLE IF NOT EXISTS `whatsapp_campaigns` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `campaign_name` varchar(255) NOT NULL,
-  `template_id` int(11) NOT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
   `target_audience` text DEFAULT NULL COMMENT 'JSON array of user IDs or criteria',
   `scheduled_at` timestamp NULL DEFAULT NULL,
   `sent_at` timestamp NULL DEFAULT NULL,

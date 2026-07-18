@@ -5,8 +5,8 @@
 
 -- Digital wallet
 CREATE TABLE IF NOT EXISTS `digital_wallet` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
   `balance` decimal(10,2) DEFAULT 0,
   `currency` varchar(3) DEFAULT 'IDR',
   `is_active` tinyint(1) DEFAULT 1,
@@ -19,12 +19,12 @@ CREATE TABLE IF NOT EXISTS `digital_wallet` (
 
 -- Wallet transactions
 CREATE TABLE IF NOT EXISTS `wallet_transactions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `wallet_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `wallet_id` bigint(20) unsigned NOT NULL,
   `transaction_type` enum('credit','debit','refund','bonus') NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
-  `reference_id` int(11) DEFAULT NULL COMMENT 'Booking ID or other reference',
+  `reference_id` bigint(20) unsigned DEFAULT NULL COMMENT 'Booking ID or other reference',
   `reference_type` varchar(50) DEFAULT NULL,
   `balance_after` decimal(10,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS `wallet_transactions` (
 
 -- Imported itineraries
 CREATE TABLE IF NOT EXISTS `imported_itineraries` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
   `original_filename` varchar(255) NOT NULL,
   `file_path` varchar(500) NOT NULL,
   `import_status` enum('pending','processing','completed','failed') DEFAULT 'pending',
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS `imported_itineraries` (
 
 -- Trip timeline entries
 CREATE TABLE IF NOT EXISTS `trip_timeline_entries` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `itinerary_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `itinerary_id` bigint(20) unsigned NOT NULL,
   `day_number` int(11) NOT NULL,
   `time` time NOT NULL,
   `activity_type` enum('transport','sightseeing','meal','rest','activity','other') NOT NULL,
@@ -76,8 +76,8 @@ CREATE TABLE IF NOT EXISTS `trip_timeline_entries` (
 
 -- PDF itineraries
 CREATE TABLE IF NOT EXISTS `pdf_itineraries` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `itinerary_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `itinerary_id` bigint(20) unsigned NOT NULL,
   `file_path` varchar(500) NOT NULL,
   `file_name` varchar(255) NOT NULL,
   `file_size` int(11) DEFAULT NULL,
@@ -92,11 +92,11 @@ CREATE TABLE IF NOT EXISTS `pdf_itineraries` (
 
 -- Real-time updates (WebSocket subscriptions)
 CREATE TABLE IF NOT EXISTS `websocket_subscriptions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned NOT NULL,
   `channel` varchar(100) NOT NULL,
   `subscription_type` enum('booking','itinerary','message','notification') NOT NULL,
-  `reference_id` int(11) DEFAULT NULL,
+  `reference_id` bigint(20) unsigned DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `last_activity` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
