@@ -2,14 +2,27 @@
 namespace App\Controllers;
 
 use App\Services\OpenAIService;
+use App\Services\OllamaService;
 
 class AIController extends Controller
 {
     private $openai;
+    private $ollama;
+    private $useSelfHosted;
 
     public function __construct()
     {
         $this->openai = new OpenAIService();
+        $this->ollama = new OllamaService();
+        $this->useSelfHosted = getenv('USE_SELF_HOSTED_AI') === 'true';
+    }
+
+    /**
+     * Get AI service (OpenAI or Ollama based on config)
+     */
+    private function getAIService()
+    {
+        return $this->useSelfHosted ? $this->ollama : $this->openai;
     }
 
     /**
@@ -25,7 +38,17 @@ class AIController extends Controller
             'language' => $_POST['language'] ?? 'english'
         ];
 
-        $result = $this->openai->recommendDestinations($preferences);
+        $aiService = $this->getAIService();
+        
+        if ($this->useSelfHosted) {
+            // Use Ollama for recommendations
+            $result = $this->ollama->aiSearch(
+                implode(', ', $preferences['interests']),
+                $this->getDestinations()
+            );
+        } else {
+            $result = $this->openai->recommendDestinations($preferences);
+        }
 
         return $this->json($result);
     }
@@ -106,9 +129,23 @@ class AIController extends Controller
             'current_page' => $_POST['current_page'] ?? ''
         ];
 
-        $result = $this->openai->chatConversation($conversationHistory, $userMessage, $context);
+        if ($this->useSelfHosted) {
+            $result = $this->ollama->aiCustomerService($userMessage, $context);
+        } else {
+            $result = $this->openai->chatConversation($conversationHistory, $userMessage, $context);
+        }
 
         return $this->json($result);
+    }
+
+    /**
+     * Get destinations for AI search
+     */
+    private function getDestinations()
+    {
+        // This would normally come from the Destination model
+        // For now, return empty array - to be implemented
+        return [];
     }
 
     /**
