@@ -52,6 +52,14 @@
 - **Messaging System** — Sistem pesan antara user dan tour guide
 - **Promo Code System** — Kode promo untuk diskon booking
 
+### Modern Features (Self-Hosted) ✅ NEW
+- **AI Self-Hosted (Ollama)** — Local LLM untuk AI search, customer service, match engine, content automation
+- **Sustainability & Carbon Tracking** — Carbon footprint tracking, eco-scoring, low-carbon route recommendations
+- **WhatsApp Integration (Self-Hosted)** — WhatsApp messaging, templates, campaigns dengan OpenWA/WaSphere
+- **Business Operations Automation** — AI guide matching, smart scheduling, payroll management, GPS clock-in
+- **Document & Trip Management** — Digital wallet, itinerary import (PDF), trip timeline, PDF generation, WebSocket real-time updates
+- **Social Features** — Group trip planning, shared wishlists, split payments, trip albums dengan comments
+
 ---
 
 ## Tech Stack
