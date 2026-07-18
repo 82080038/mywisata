@@ -17,10 +17,16 @@
 
 # Security Headers
 <IfModule mod_headers.c>
+    Header always unset Content-Security-Policy
     Header set X-XSS-Protection "1; mode=block"
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Prevent HTML pages from being cached (stale CSP issue)
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
 </IfModule>
 
 # Disable Directory Browsing

@@ -19,7 +19,7 @@
                 <?php if (!empty($destination['main_image'])): ?>
                     <img src="<?= View::asset('uploads/destinations/' . $destination['main_image']) ?>" class="card-img-top" alt="<?= View::e($destination['name']) ?>" style="height: 400px; object-fit: cover;">
                 <?php else: ?>
-                    <img src="https://via.placeholder.com/800x400" class="card-img-top" alt="<?= View::e($destination['name']) ?>" style="height: 400px; object-fit: cover;">
+                    <img src="http://localhost/mywisata/public/assets/img/placeholder_large.png" class="card-img-top" alt="<?= View::e($destination['name']) ?>" style="height: 400px; object-fit: cover;">
                 <?php endif; ?>
                 <div class="card-body">
                     <h1 class="card-title"><?= View::e($destination['name']) ?></h1>
@@ -280,7 +280,7 @@
                             <?php if (!empty($near['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/destinations/' . $near['main_image']) ?>" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/60" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="http://localhost/mywisata/public/assets/img/placeholder_small.png" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                             <?php endif; ?>
                             <div class="flex-grow-1">
                                 <h6 class="mb-0"><?= View::e($near['name']) ?></h6>

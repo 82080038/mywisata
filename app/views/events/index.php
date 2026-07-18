@@ -55,7 +55,7 @@
                         <?php if (!empty($event['main_image'])): ?>
                             <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
                         <?php endif; ?>
                         <div class="card-body">
                             <h5 class="card-title"><?= View::e($event['title']) ?></h5>
@@ -110,7 +110,7 @@
                             <?php if (!empty($event['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/events/' . $event['main_image']) ?>" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" alt="<?= View::e($event['title']) ?>" style="height: 200px; object-fit: cover;">
                             <?php endif; ?>
                             <div class="card-body">
                                 <h5 class="card-title"><?= View::e($event['title']) ?></h5>

@@ -26,7 +26,7 @@
                                     <?php if ($ticket['main_image']): ?>
                                         <img src="<?= View::asset('uploads/destinations/' . $ticket['main_image']) ?>" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
                                     <?php else: ?>
-                                        <img src="https://via.placeholder.com/80" class="rounded me-3" style="width: 80px; height: 80px;">
+                                        <img src="http://localhost/mywisata/public/assets/img/placeholder_small.png" class="rounded me-3" style="width: 80px; height: 80px;">
                                     <?php endif; ?>
                                     <div>
                                         <h5 class="card-title mb-1"><?= View::e($ticket['destination_name']) ?></h5>

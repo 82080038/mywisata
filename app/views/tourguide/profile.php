@@ -13,7 +13,7 @@
                         <?php if ($guide && $guide['avatar']): ?>
                             <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder_small.png" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
                         <?php endif; ?>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Upload Avatar</label>

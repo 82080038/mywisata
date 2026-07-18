@@ -11,7 +11,7 @@
                         <?php if ($guide['avatar']): ?>
                             <img src="<?= View::asset('uploads/avatars/' . $guide['avatar']) ?>" class="rounded-circle me-3" style="width: 80px; height: 80px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/80" class="rounded-circle me-3" style="width: 80px; height: 80px;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder_small.png" class="rounded-circle me-3" style="width: 80px; height: 80px;">
                         <?php endif; ?>
                         <div>
                             <h3 class="mb-1"><?= View::e($guide['name']) ?></h3>

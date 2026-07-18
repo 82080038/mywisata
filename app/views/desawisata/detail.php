@@ -8,7 +8,7 @@
                 <?php if (!empty($destination['main_image'])): ?>
                 <img src="<?= View::asset('uploads/destinations/' . $destination['main_image']) ?>" class="card-img-top" style="height:350px;object-fit:cover;">
                 <?php else: ?>
-                <img src="https://via.placeholder.com/800x350" class="card-img-top" style="height:350px;object-fit:cover;">
+                <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" style="height:350px;object-fit:cover;">
                 <?php endif; ?>
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">

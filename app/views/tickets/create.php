@@ -11,7 +11,7 @@
                         <?php if ($destination['main_image']): ?>
                             <img src="<?= View::asset('uploads/destinations/' . $destination['main_image']) ?>" class="rounded me-3" style="width: 100px; height: 100px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/100" class="rounded me-3" style="width: 100px; height: 100px;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder_small.png" class="rounded me-3" style="width: 100px; height: 100px;">
                         <?php endif; ?>
                         <div>
                             <h3 class="mb-1"><?= View::e($destination['name']) ?></h3>

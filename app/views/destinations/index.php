@@ -51,7 +51,7 @@
                         <?php if (!empty($dest['main_image'])): ?>
                             <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php endif; ?>
                         <?php if (!empty($dest['eco_badge'])): ?>
                         <div class="position-absolute top-0 end-0 m-2">
@@ -95,7 +95,7 @@
                         <?php if (!empty($dest['main_image'])): ?>
                             <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
-                            <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                            <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                         <?php endif; ?>
                         <?php if (!empty($dest['eco_badge'])): ?>
                         <div class="position-absolute top-0 end-0 m-2">
@@ -141,7 +141,7 @@
                             <?php if (!empty($dest['main_image'])): ?>
                                 <img src="<?= View::asset('uploads/destinations/' . $dest['main_image']) ?>" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="http://localhost/mywisata/public/assets/img/placeholder.png" class="card-img-top" alt="<?= View::e($dest['name']) ?>" style="height: 200px; object-fit: cover;">
                             <?php endif; ?>
                             <?php if (!empty($dest['eco_badge'])): ?>
                             <div class="position-absolute top-0 end-0 m-2">

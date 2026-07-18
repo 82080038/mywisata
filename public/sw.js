@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mywisata-v2';
+const CACHE_NAME = 'mywisata-v3';
 const STATIC_ASSETS = [
     '/mywisata/',
     '/mywisata/destinations',
@@ -48,10 +48,13 @@ self.addEventListener('fetch', function (event) {
     // Skip API and AJAX requests
     if (event.request.headers.get('X-Requested-With') === 'XMLHttpRequest') return;
 
-    // Network-first for navigation requests, fallback to cache
+    // Network-first for navigation requests, never cache HTML pages
     if (event.request.mode === 'navigate') {
         event.respondWith(
-            fetch(event.request).catch(function () {
+            fetch(event.request).then(function (response) {
+                // Don't cache navigation responses - always fetch fresh
+                return response;
+            }).catch(function () {
                 return caches.match(event.request).then(function (response) {
                     return response || caches.match('/mywisata/public/offline.html');
                 });

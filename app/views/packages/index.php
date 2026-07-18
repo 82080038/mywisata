@@ -27,7 +27,7 @@
                 <?php if ($pkg['main_image']): ?>
                 <img src="<?= View::asset('uploads/packages/' . $pkg['main_image']) ?>" class="card-img-top" style="height:200px;object-fit:cover;">
                 <?php else: ?>
-                <img src="https://via.placeholder.com/400x200?text=<?= urlencode($pkg['title']) ?>" class="card-img-top" style="height:200px;object-fit:cover;">
+                <img src="http://localhost/mywisata/public/assets/img/placeholder.png'title']) ?>" class="card-img-top" style="height:200px;object-fit:cover;">
                 <?php endif; ?>
                 
                 <?php if ($pkg['is_featured']): ?>
